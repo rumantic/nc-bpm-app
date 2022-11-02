@@ -63,3 +63,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - fix unit tests
 - fix nextcloud ocp
 - update github actions
+
+## 0.4.0 (2022-11-02)
+# Updated
+- phpunit to 8.5
+- php-cs-fixer to 3.2
+- nextcloud/coding-standard to 1.0
+- christophwurtz/nextcloud replaced with nextcloud/ocp (no longer maintained)

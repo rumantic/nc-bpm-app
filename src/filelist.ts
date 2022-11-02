@@ -57,6 +57,7 @@ function registerFileIcon() {
 function startBPMNEditor(file, fileList) {
 	import(/* webpackChunkName: "bpmn-editor" */ './imports/BPMNEditor').then(({ default: Editor }) => {
 		const editor = new Editor(file, fileList);
+		console.log('Starting BPMN editor');
 		editor.start();
 	});
 }
