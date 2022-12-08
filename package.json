@@ -37,13 +37,6 @@
 		"jspdf": "^2.3.1",
 		"svg2pdf.js": "^2.1.0"
 	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "yarn lint",
-			"pre-push": "yarn test:php:unit && ./vendor/bin/psalm --threads=4",
-			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-		}
-	},
 	"browserslist": [
 		"extends @nextcloud/browserslist-config"
 	],
