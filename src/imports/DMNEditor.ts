@@ -7,11 +7,10 @@ import 'dmn-js/dist/assets/dmn-js-drd.css';
 import 'dmn-js/dist/assets/dmn-js-literal-expression.css';
 import 'dmn-js/dist/assets/dmn-js-shared.css';
 import 'dmn-js/dist/assets/dmn-font/css/dmn.css';
-import 'dmn-js-properties-panel/dist/assets/dmn-js-properties-panel.css';
+import 'dmn-js-properties-panel/dist/assets/properties-panel.css';
 import { DMSModeler, DMSViewer } from './vendor/dms-js';
-import propertiesPanelModule from 'dmn-js-properties-panel';
-import drdAdapterModule from 'dmn-js-properties-panel/lib/adapter/drd';
-import propertiesProviderModule from 'dmn-js-properties-panel/lib/provider/camunda';
+import {DmnPropertiesPanelModule, DmnPropertiesProviderModule }from 'dmn-js-properties-panel';
+//import drdAdapterModule from 'dmn-js-properties-panel/lib/adapter/drd';
 import camundaModdleDescriptor from 'camunda-dmn-moddle/resources/camunda.json';
 
 const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
@@ -100,9 +99,8 @@ export default class DMNEditor extends Editor {
 						parent: propertiesElement,
 					},
 					additionalModules: [
-						propertiesPanelModule,
-						propertiesProviderModule,
-						drdAdapterModule,
+						DmnPropertiesPanelModule, DmnPropertiesProviderModule,
+						//drdAdapterModule,
 					],
 				},
 				moddleExtensions: {

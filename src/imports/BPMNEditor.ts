@@ -1,13 +1,14 @@
 import Modeler from 'bpmn-js/lib/Modeler';
 import Viewer from 'bpmn-js/lib/Viewer';
-import propertiesPanelModule from 'bpmn-js-properties-panel';
-import propertiesProviderModule from 'bpmn-js-properties-panel/lib/provider/camunda';
+import {BpmnPropertiesPanelModule, BpmnPropertiesProviderModule} from 'bpmn-js-properties-panel'; //bpmn-js-properties-panel/lib/provider/camunda';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda.json';
 import api from './api';
 import Editor from './Editor';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
-import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css';
+import 'bpmn-js/dist/assets/bpmn-js.css';
+import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
+import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 
 declare type Modeler = {
 	destroy(): void,
@@ -88,8 +89,8 @@ export default class BPMNEditor extends Editor {
 			this.modeler = this.isFileUpdatable() ? new Modeler({
 				container: canvasElement,
 				additionalModules: [
-					propertiesPanelModule,
-					propertiesProviderModule,
+					BpmnPropertiesPanelModule, 
+					BpmnPropertiesProviderModule,
 				],
 				propertiesPanel: {
 					parent: propertiesElement,
@@ -110,7 +111,8 @@ export default class BPMNEditor extends Editor {
 				}
 			});
 		}
-
+		console.log('generated modeler');
+		console.log(this.modeler);
 		return this.modeler;
 	}
 

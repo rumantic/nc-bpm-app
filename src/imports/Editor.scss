@@ -28,6 +28,7 @@
   }
 }
 
+
 .bpmn-canvas {
   flex-grow: 1;
 }
@@ -144,7 +145,7 @@
 }
 
 .bpmn-properties {
-  background: #f8f8f8;
+  background: #00f8f8;
   padding-right: 10px;
   overflow: scroll;
 
@@ -153,21 +154,6 @@
   }
 }
 
-/*None of these three selectors is currently working; Nextcloud overrides these options.*/
-.bpmn-properties-input{
-  background-color: #f8f8f8;
-  color: black;
-}
-
-div[contenteditable="true"]{
-  background-color: #f8f8f8;
-  color: black;
-}
-
-.bpmn-properties-resizer {
-  border-left: solid 5px #ccc;
-  cursor: col-resize;
-}
 
 .djs-container svg {
   height: 100vh;
@@ -176,4 +162,12 @@ div[contenteditable="true"]{
 
 .tjs-container {
   margin: auto;
+}
+
+.bjs-drilldown{
+  background-color: #00f8f8;
+  fill: #f800f8;
+  color: black;
+  border-radius: 0px;
+  padding-left: 20px;
 }
