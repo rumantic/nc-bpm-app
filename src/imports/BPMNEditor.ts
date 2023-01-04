@@ -65,12 +65,11 @@ export default class BPMNEditor extends Editor {
 	protected async runEditor(): Promise<void> {
 		const bpmnXML = await this.getContent();
 		const modeler = this.getModeler();
-
 		try {
 			await modeler.importXML(bpmnXML);
-
 			this.addResizeListener(this.onResize);
 		} catch (err) {
+			console.log(err);
 			this.showLoadingError(err.toString());
 		}
 	}

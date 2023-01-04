@@ -26,7 +26,7 @@ If you like to build from source, please continue reading.
 
 To install it change into your Nextcloud's apps directory:
 
-    cd nextcloud/apps
+    cd nextcloud/apps-extra
 
 Then run:
 
