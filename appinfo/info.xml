@@ -4,12 +4,14 @@
     <name>BPM Files</name>
     <summary>A BPMN 2.0/DMN 1.3 Viewer and Editor</summary>
     <summary lang="de">Ein BPMN 2.0/DMN 1.3 Viewer und Editor</summary>
+    <summary lang="fr">Un éditeur et visionneur de diagrammes BPMN 2.0 et DMN 1.3</summary>
     <description><![CDATA[A BPMN 2.0/DMN 1.3 Viewer and Editor]]></description>
     <description lang="fr"><![CDATA[Un éditeur et visionneur de diagrammes BPMN 2.0 et DMN 1.3]]></description>
     <description lang="de"><![CDATA[Ein BPMN 2.0/DMN 1.3 Viewer und Editor]]></description>
     <version>0.4.0</version>
     <licence>agpl</licence>
-    <author mail="harald.loydl@loydl.ch" homepage="https://loydl.ch">Harald Loydl</author>
+    <author mail="kirsten.hauck@processcentric.ch" homepage="https://www.processcentric.ch">Kirsten Hauck</author>
+    <author>Harald Loydl</author>
     <namespace>FilesBpm</namespace>
     <types>
         <filesystem/>
@@ -18,9 +20,9 @@
     <category>files</category>
     <category>integration</category>
     <category>office</category>
-    <website>https://github.com/Loydl/nc-bpm-app/</website>
-    <bugs>https://github.com/Loydl/nc-bpm-app/issues</bugs>
-    <repository>https://github.com/Loydl/nc-bpm-app/</repository>
+    <website>https://github.com/kirstenhh/nc-bpm-app/</website>
+    <bugs>https://github.com/kirstenhh/nc-bpm-app/issues</bugs>
+    <repository>https://github.com/kirstenhh/nc-bpm-app/</repository>
     <screenshot>https://raw.githubusercontent.com/Loydl/nc-bpm-app/main/docs/screenshot-BPMN-editor.png</screenshot>
     <dependencies>
         <nextcloud min-version="20" max-version="26"/>
