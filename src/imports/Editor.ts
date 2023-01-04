@@ -57,9 +57,7 @@ export default abstract class Editor {
 	public async start(): Promise<void> {
 		this.addEditStateToHistory();
 		this.cleanFileList();
-
 		await this.runEditor();
-
 		this.setAppContainerReady();
 		this.addPropertiesResizeListener();
 		this.addClassToInputs();
@@ -317,7 +315,7 @@ export default abstract class Editor {
 
 		const linkElement = $('<a>').attr('href', svgUrl).attr('download', this.file.name.replace(/\.[^.]+$/, '.svg')).css('visibility', 'hidden');
 		linkElement.appendTo('body');
-		linkElement.get(0).click();
+		linkElement.get(0)?.click();
 		linkElement.remove();
 	}
 
@@ -331,20 +329,21 @@ export default abstract class Editor {
 		svgContainer.appendTo(this.containerElement);
 
 		const svgElement = svgContainer.find('svg').get(0);
-
-		const bounding = svgElement.getBoundingClientRect();
-		const pdf = new jsPDF(bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
-
-		try {
-			await pdf.svg(svgElement);
-
-			await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), {returnPromise: true});
-		} catch(err) {
-			svgContainer.remove();
-
-			throw err;
+		if(svgElement){
+			const bounding = svgElement.getBoundingClientRect();
+			const pdf = new jsPDF(bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
+	
+			try {
+				await pdf.svg(svgElement);
+	
+				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), {returnPromise: true});
+			} catch(err) {
+				svgContainer.remove();
+	
+				throw err;
+			}
 		}
-
+		
 		svgContainer.remove();
 	}
 
