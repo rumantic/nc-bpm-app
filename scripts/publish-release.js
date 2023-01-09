@@ -21,9 +21,9 @@ const commitMessage = `release: ${package.version} :tada:`;
 const tagName = `v${package.version}`;
 const files = [
 	path.join(__dirname, '..', 'archives', `files_bpm-v${package.version}.tar.gz`),
-	path.join(__dirname, '..', 'archives', `files_bpm-v${package.version}.tar.gz.asc`),
+	//path.join(__dirname, '..', 'archives', `files_bpm-v${package.version}.tar.gz.asc`),
 	path.join(__dirname, '..', 'archives', `files_bpm-v${package.version}.tar.gz.ncsig`),
-	path.join(__dirname, '..', 'archives', `files_bpm-v${package.version}.tar.gz.sig`),
+	//path.join(__dirname, '..', 'archives', `files_bpm-v${package.version}.tar.gz.sig`),
 ];
 
 function pull() {

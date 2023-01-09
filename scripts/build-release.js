@@ -65,15 +65,16 @@ async function createRelease(appId) {
 	await execa('yarn', ['composer:install']);
 	console.log('✔ composer dependencies installed'.green);
 
-	fs.rmdirSync(path.join(__dirname, 'js'), { recursive: true });
+	fs.rmdirSync(path.join(__dirname, '../js'), { recursive: true });
 
 	await execa('yarn', ['build']);
 	console.log('✔ scripts built'.green);
 
 	const filePath = await createArchive(appId, appId + '-v' + version);
+	console.log('file at '+filePath);
 	await createNextcloudSignature(appId, filePath);
-	await createGPGSignature(filePath);
-	await createGPGArmorSignature(filePath);
+	// await createGPGSignature(filePath);
+	// await createGPGArmorSignature(filePath);
 
 	await execa('yarn', ['composer:install:dev']);
 	console.log('✔ composer dev dependencies installed'.green);
