@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - update github actions
 
 ## 0.4.0 (2022-11-02)
-# Updated
+### Updated
 - phpunit updated to 8.5
 - php-cs-fixer updated to 3.2
 - nextcloud/coding-standard to 1.0
