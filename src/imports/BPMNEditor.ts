@@ -9,6 +9,7 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
+import './Editor.scss';
 
 declare type Modeler = {
 	destroy(): void,
@@ -93,6 +94,13 @@ export default class BPMNEditor extends Editor {
 				],
 				propertiesPanel: {
 					parent: propertiesElement,
+					layout: {
+						open: true,
+						groups: {
+						  general: { open: true },
+						  documentation: { open: true },
+						},
+					},
 				},
 				moddleExtensions: {
 					camunda: camundaModdleDescriptor,
@@ -110,8 +118,7 @@ export default class BPMNEditor extends Editor {
 				}
 			});
 		}
-		console.log('generated modeler');
-		console.log(this.modeler);
+
 		return this.modeler;
 	}
 

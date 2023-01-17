@@ -147,10 +147,6 @@
 .bpmn-properties {
   padding-right: 10px;
   overflow: scroll;
-
-  button, span, select {
-    all: unset;
-  }
 }
 
 
@@ -163,8 +159,19 @@
   margin: auto;
 }
 
-.bjs-drilldown{
-  color: black;
-  border-radius: 0px;
-  padding-left: 20px;
+/* Collapsed subprocess link button */
+button.bjs-drilldown{
+  background-color: var(--drilldown-background-color) !important;
+  border-radius: 2px !important;
+  margin-left: -20px !important;
+  padding: 0px !important;
+  min-height: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Expand properties section caret*/
+button.bio-properties-panel-group-header-button.bio-properties-panel-arrow{
+  min-height: 20px !important;
+  border:none !important;
 }

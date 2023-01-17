@@ -60,7 +60,6 @@ export default abstract class Editor {
 		await this.runEditor();
 		this.setAppContainerReady();
 		this.addPropertiesResizeListener();
-		this.addClassToInputs();
 	}
 
 	private addEditStateToHistory() {
@@ -129,12 +128,6 @@ export default abstract class Editor {
 		}
 	}
 
-	//minor "hack" to add a css class to the inputs, for formatting purposes.
-	//TODO: work out why NextCloud won't allow this. (Nextcloud settings for <input> override any changes.)
-	private addClassToInputs (){
-		const propertiesElement = this.containerElement.find('>.bpmn-properties');
-		propertiesElement.find('input').addClass('bpmn-properties-input');
-	}
 	
 	protected getAppContainerElement(): JQuery {
 		if (!this.containerElement || this.containerElement.length === 0) {
