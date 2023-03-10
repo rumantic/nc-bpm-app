@@ -31,7 +31,7 @@ To install it change into your Nextcloud's apps directory:
 Then run:
 
     git clone https://github.com/Loydl/nc-bpm-app.git files_bpm
-
+  Note: double-check that the folder is now named files_bpm, otherwise the app won't install in your Nextcloud properly.
 Then install the dependencies using:
 
     yarn install && composer install
