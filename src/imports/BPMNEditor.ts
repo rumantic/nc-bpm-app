@@ -40,6 +40,7 @@ export default class BPMNEditor extends Editor {
 
 	protected getContent(): Promise<string> {
 		if (this.modeler) {
+			console.log('***************************************************\nWe are loading a modeler');
 			return this.modeler.saveXML().then(data => data.xml);
 		}
 
@@ -61,7 +62,7 @@ export default class BPMNEditor extends Editor {
 	protected async destroy(): Promise<void> {
 		this.modeler && this.modeler.destroy();
 
-		this.removeResizeListener(this.onResize);
+		//this.removeResizeListener(this.onResize);
 	}
 
 	protected async runEditor(): Promise<void> {
@@ -69,7 +70,7 @@ export default class BPMNEditor extends Editor {
 		const modeler = this.getModeler();
 		try {
 			await modeler.importXML(bpmnXML);
-			this.addResizeListener(this.onResize);
+			//this.addResizeListener(this.onResize);
 		} catch (err) {
 			console.log(err);
 			this.showLoadingError(err.toString());

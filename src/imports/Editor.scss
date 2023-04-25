@@ -146,7 +146,10 @@
 
 .bpmn-properties {
   padding-right: 10px;
-  overflow: scroll;
+  overflow-y: scroll;
+  border-left: solid 2px #0cc;
+  max-width: 25%;
+  width: 25%;
 }
 
 

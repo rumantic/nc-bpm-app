@@ -59,7 +59,7 @@ export default abstract class Editor {
 		this.cleanFileList();
 		await this.runEditor();
 		this.setAppContainerReady();
-		this.addPropertiesResizeListener();
+		//this.addPropertiesResizeListener();
 	}
 
 	private addEditStateToHistory() {
@@ -100,33 +100,33 @@ export default abstract class Editor {
 		this.fileList.hideMask();
 	}
 
-	private addPropertiesResizeListener () {
-		const resizeElement = this.containerElement.find('>.bpmn-properties-resizer');
-		const propertiesElement = this.containerElement.find('>.bpmn-properties');
-		if(this.isFileUpdatable() && resizeElement && propertiesElement) {
-			resizeElement.on('mousedown', () => {
-				document.addEventListener('mousemove', resize, false);
-				document.addEventListener('mouseup', () => {
-					document.removeEventListener('mousemove', resize, false);
-				}, false);
-			});
-		}
+	// private addPropertiesResizeListener () {
+	// 	const resizeElement = this.containerElement.find('>.bpmn-properties-resizer');
+	// 	const propertiesElement = this.containerElement.find('>.bpmn-properties');
+	// 	if(this.isFileUpdatable() && resizeElement && propertiesElement) {
+	// 		resizeElement.on('mousedown', () => {
+	// 			document.addEventListener('mousemove', resize, false);
+	// 			document.addEventListener('mouseup', () => {
+	// 				document.removeEventListener('mousemove', resize, false);
+	// 			}, false);
+	// 		});
+	// 	}
 
-		const resize = (event: MouseEvent) => {
-			event.preventDefault();
-			event.stopPropagation();
-			const size = `${document.body.clientWidth - event.x}px`;
-			propertiesElement.css('flex-basis', size);
-		};
-	}
+	// 	const resize = (event: MouseEvent) => {
+	// 		event.preventDefault();
+	// 		event.stopPropagation();
+	// 		const size = `${document.body.clientWidth - event.x}px`;
+	// 		propertiesElement.css('flex-basis', size);
+	// 	};
+	// }
 
-	private removePropertiesResizeListener () {
-		const resizeElement = this.containerElement.find('>.bpmn-properties-resizer');
+	// private removePropertiesResizeListener () {
+	// 	const resizeElement = this.containerElement.find('>.bpmn-properties-resizer');
 
-		if(resizeElement) {
-			resizeElement.off('mousedown');
-		}
-	}
+	// 	if(resizeElement) {
+	// 		resizeElement.off('mousedown');
+	// 	}
+	// }
 
 	
 	protected getAppContainerElement(): JQuery {
@@ -180,9 +180,9 @@ export default abstract class Editor {
 			$('#content').append(this.containerElement);
 
 			if (this.isFileUpdatable() && this.containerElement.find('>.bpmn-properties').length === 0) {
-				const propertiesResizeElement = $('<div>');
-				propertiesResizeElement.addClass('bpmn-properties-resizer');
-				propertiesResizeElement.appendTo(this.containerElement);
+				// const propertiesResizeElement = $('<div>');
+				// propertiesResizeElement.addClass('bpmn-properties-resizer');
+				// propertiesResizeElement.appendTo(this.containerElement);
 
 				const propertiesElement = $('<div>');
 				propertiesElement.addClass('bpmn-properties');
@@ -222,25 +222,25 @@ export default abstract class Editor {
 		$('body').css('overflow', 'hidden');
 	}
 
-	protected addResizeListener(cb: () => void): void {
-		let resizeTimeout: number;
+	// protected addResizeListener(cb: () => void): void {
+	// 	let resizeTimeout: number;
 
-		const handler = () => {
-			if (resizeTimeout) {
-				window.clearTimeout(resizeTimeout);
-			}
+	// 	const handler = () => {
+	// 		if (resizeTimeout) {
+	// 			window.clearTimeout(resizeTimeout);
+	// 		}
 
-			resizeTimeout = window.setTimeout(cb, 500);
-		};
+	// 		resizeTimeout = window.setTimeout(cb, 500);
+	// 	};
 
-		this.resizeHandler.push(handler);
+	// 	this.resizeHandler.push(handler);
 
-		$(window).on('resize', handler);
-	}
+	// 	$(window).on('resize', handler);
+	// }
 
-	protected removeResizeListener(cb: () => void): void {
-		this.resizeHandler = this.resizeHandler.filter(handler => handler !== cb);
-	}
+	// protected removeResizeListener(cb: () => void): void {
+	// 	this.resizeHandler = this.resizeHandler.filter(handler => handler !== cb);
+	// }
 
 	protected showLoadingError(errorMessage: string): void {
 		const text = t('files_bpm', 'Error while loading diagram: ') + errorMessage;
@@ -267,7 +267,7 @@ export default abstract class Editor {
 		this.restoreFileList();
 		this.resetHistoryState();
 
-		this.removePropertiesResizeListener();
+		//this.removePropertiesResizeListener();
 
 		window.removeEventListener('beforeunload', this.onBeforeUnload);
 

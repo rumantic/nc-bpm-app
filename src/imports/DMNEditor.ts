@@ -60,7 +60,7 @@ export default class DMNEditor extends Editor {
 	protected async destroy(): Promise<void> {
 		this.modeler && this.modeler.destroy();
 
-		this.removeResizeListener(this.onResize);
+		//this.removeResizeListener(this.onResize);
 	}
 
 	protected async runEditor(): Promise<void> {
@@ -70,7 +70,7 @@ export default class DMNEditor extends Editor {
 		try {
 			await modeler.importXML(bpmnXML);
 
-			this.addResizeListener(this.onResize);
+			//this.addResizeListener(this.onResize);
 			this.attachChangeListener();
 		} catch (err) {
 			this.showLoadingError(err.toString());
