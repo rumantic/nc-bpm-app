@@ -54,6 +54,8 @@ export default abstract class Editor {
 
 	protected abstract destroy(): Promise<void>;
 
+	protected abstract onPrintAsPDF(): void;
+
 	public async start(): Promise<void> {
 		this.addEditStateToHistory();
 		this.cleanFileList();
@@ -313,31 +315,33 @@ export default abstract class Editor {
 	}
 
 	private async onDownloadAsPDF() {
-		const svgContainer = $('<div>');
-		svgContainer.css({
-			position: 'fixed',
-			bottom: '100%',
-		});
-		svgContainer.append(await this.getSVG());
-		svgContainer.appendTo(this.containerElement);
 
-		const svgElement = svgContainer.find('svg').get(0);
-		if(svgElement){
-			const bounding = svgElement.getBoundingClientRect();
-			const pdf = new jsPDF(bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
+
+		// const svgContainer = $('<div>');
+		// svgContainer.css({
+		// 	position: 'fixed',
+		// 	bottom: '100%',
+		// });
+		// svgContainer.append(await this.getSVG());
+		// svgContainer.appendTo(this.containerElement);
+
+		// const svgElement = svgContainer.find('svg').get(0);
+		// if(svgElement){
+		// 	const bounding = svgElement.getBoundingClientRect();
+		// 	const pdf = new jsPDF(bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
 	
-			try {
-				await pdf.svg(svgElement);
+		// 	try {
+		// 		await pdf.svg(svgElement);
 	
-				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), {returnPromise: true});
-			} catch(err) {
-				svgContainer.remove();
+		// 		await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), {returnPromise: true});
+		// 	} catch(err) {
+		// 		svgContainer.remove();
 	
-				throw err;
-			}
-		}
+		// 		throw err;
+		// 	}
+		// }
 		
-		svgContainer.remove();
+		// svgContainer.remove();
 	}
 
 	private async onFileHasChanged(serverEtag: string) {

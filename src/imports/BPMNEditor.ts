@@ -11,6 +11,10 @@ import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 import './Editor.scss';
 
+import PDFDocument from 'pdfkit';
+import blobStream from 'blob-stream';
+import SVGtoPDF from 'svg-to-pdfkit';
+
 declare type Modeler = {
 	destroy(): void,
 	on(event: string, callback: (...any) => void): void
@@ -65,6 +69,61 @@ export default class BPMNEditor extends Editor {
 		//this.removeResizeListener(this.onResize);
 	}
 
+	protected onPrintAsPDF(): void{
+		
+		var svg = this.getSVG();
+
+		var doc = new PDFDocument({
+		  layout: 'landscape',
+		  size: [612, 792]
+		});
+	  
+		var stream = doc.pipe(blobStream());
+	  
+		var title = document.getElementById("camunda-name")?.innerHTML ?? "Diagram";
+		doc.fontSize(25).text(title, 10, 10);
+	  
+		// add diagram as SVG
+		SVGtoPDF(doc, svg, 10, 40, {
+		  width: doc.page.width - 20,
+		  height: doc.page.height - 50,
+		  preserveAspectRatio: "xMinYMin meet"
+		});
+	  
+		const canvas = this.modeler.get('canvas');
+		var rootelem = canvas.getRootElement();
+		var elemReg:Array<object> = this.modeler.get('elementRegistry');
+		var subprocesses = elemReg.filter(el => (el as any).type === 'bpmn:SubProcess' && el.hasOwnProperty('layer'));
+	  
+		for(let i = 0; i<subprocesses.length; i++){
+		  canvas.setRootElement(subprocesses[i]);
+		  var subsvg= this.getSVG();
+	  
+		  // Optional: scale sizes (currently unpredictable)
+		  var parser = new DOMParser();
+	  
+		  doc
+		  .addPage()
+		  .fontSize(25)
+		  .text((subprocesses[i]as any).name?? "Subprocess", 10, 10);
+		  SVGtoPDF(doc, subsvg, 10, 40, {
+			width: doc.page.width - 20,
+			height: doc.page.height - 50,
+			preserveAspectRatio: "xMinYMin meet"
+		  });
+		}
+	  
+		canvas.setRootElement(rootelem);
+	  
+	  
+		// canvas.setContainer(container)
+	  
+		doc.end();
+		stream.on('finish', function () {
+		  var pdfurl = stream.toBlobURL('application/pdf');
+		  window.open(pdfurl);
+		});
+	}
 	protected async runEditor(): Promise<void> {
 		const bpmnXML = await this.getContent();
 		const modeler = this.getModeler();
