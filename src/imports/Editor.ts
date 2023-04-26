@@ -54,6 +54,8 @@ export default abstract class Editor {
 
 	protected abstract destroy(): Promise<void>;
 
+	protected abstract pdfAdditions(pdf): Promise<void>;
+
 	public async start(): Promise<void> {
 		this.addEditStateToHistory();
 		this.cleanFileList();
@@ -323,12 +325,23 @@ export default abstract class Editor {
 
 		const svgElement = svgContainer.find('svg').get(0);
 		if(svgElement){
-			const bounding = svgElement.getBoundingClientRect();
-			const pdf = new jsPDF(bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
-	
+			//const bounding = svgElement.getBoundingClientRect();
+			const pdf = new jsPDF({
+				orientation:'landscape',
+				format: 'a4',
+			});//bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
 			try {
-				await pdf.svg(svgElement);
-	
+				await pdf.svg(svgElement, {
+					x:15,
+					y:15,
+					width: 267,
+					height: 180,
+				}); //nb: width and height are a4 dimensions - 30 mm
+
+				console.log(svgElement);
+
+				//modeler-specific additional features (BPMN subprocesses, DMN to be seen)
+				await this.pdfAdditions(pdf);
 				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), {returnPromise: true});
 			} catch(err) {
 				svgContainer.remove();

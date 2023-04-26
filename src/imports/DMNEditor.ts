@@ -63,6 +63,9 @@ export default class DMNEditor extends Editor {
 		//this.removeResizeListener(this.onResize);
 	}
 
+	protected async pdfAdditions(pdf): Promise<void>{
+		console.log('No additions yet');
+	}
 	protected async runEditor(): Promise<void> {
 		const bpmnXML = await this.getContent();
 		const modeler = this.getModeler();

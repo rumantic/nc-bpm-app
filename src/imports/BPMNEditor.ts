@@ -1,6 +1,6 @@
 import Modeler from 'bpmn-js/lib/Modeler';
 import Viewer from 'bpmn-js/lib/Viewer';
-import {BpmnPropertiesPanelModule, BpmnPropertiesProviderModule} from 'bpmn-js-properties-panel'; //bpmn-js-properties-panel/lib/provider/camunda';
+import { BpmnPropertiesPanelModule, BpmnPropertiesProviderModule } from 'bpmn-js-properties-panel'; //bpmn-js-properties-panel/lib/provider/camunda';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda.json';
 import api from './api';
 import Editor from './Editor';
@@ -10,6 +10,7 @@ import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 import './Editor.scss';
+import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 declare type Modeler = {
 	destroy(): void,
@@ -64,7 +65,38 @@ export default class BPMNEditor extends Editor {
 
 		//this.removeResizeListener(this.onResize);
 	}
+	protected async pdfAdditions(pdf: any): Promise<void> {
+		let title = 'BPMN Diagram';
+		pdf.text(title, 10, 10);
 
+		const canvas = this.modeler.get('canvas');
+		const rootelem = canvas.getRootElement();
+		const subprocesses = this.modeler.get('elementRegistry').filter(el => el.type === 'bpmn:SubProcess' && el.hasOwnProperty('layer'));
+
+
+		for (let i = 0; i < subprocesses.length; i++) {
+			const svgContainer = $('<div>');
+			svgContainer.css({
+				position: 'fixed',
+				bottom: '100%',
+			});
+			canvas.setRootElement(subprocesses[i]);
+			svgContainer.append(await this.getSVG());
+			svgContainer.appendTo(this.containerElement);
+
+			const subsvg = svgContainer.find('svg').get(0);
+			pdf.addPage('a4', 'landscape');
+			await pdf.svg(subsvg, {
+				x: 15,
+				y: 15,
+				width: 267,
+				height: 180,
+			});
+			svgContainer.remove();
+
+		}
+		canvas.setRootElement(rootelem);
+	}
 	protected async runEditor(): Promise<void> {
 		const bpmnXML = await this.getContent();
 		const modeler = this.getModeler();
@@ -90,7 +122,7 @@ export default class BPMNEditor extends Editor {
 			this.modeler = this.isFileUpdatable() ? new Modeler({
 				container: canvasElement,
 				additionalModules: [
-					BpmnPropertiesPanelModule, 
+					BpmnPropertiesPanelModule,
 					BpmnPropertiesProviderModule,
 				],
 				propertiesPanel: {
@@ -98,8 +130,8 @@ export default class BPMNEditor extends Editor {
 					layout: {
 						open: true,
 						groups: {
-						  general: { open: true },
-						  documentation: { open: true },
+							general: { open: true },
+							documentation: { open: true },
 						},
 					},
 				},
