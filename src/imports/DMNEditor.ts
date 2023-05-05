@@ -12,6 +12,8 @@ import { DMSModeler, DMSViewer } from './vendor/dms-js';
 import {DmnPropertiesPanelModule, DmnPropertiesProviderModule }from 'dmn-js-properties-panel';
 //import drdAdapterModule from 'dmn-js-properties-panel/lib/adapter/drd';
 import camundaModdleDescriptor from 'camunda-dmn-moddle/resources/camunda.json';
+import {jsPDF} from 'jspdf';
+
 
 const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="definitions_0xcty6c" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" exporter="dmn-js (https://demo.bpmn.io/dmn)" exporterVersion="10.1.0">
@@ -63,7 +65,7 @@ export default class DMNEditor extends Editor {
 		//this.removeResizeListener(this.onResize);
 	}
 
-	protected async pdfAdditions(pdf): Promise<void>{
+	protected async pdfAdditions(pdf: jsPDF): Promise<void>{
 		console.log('No additions yet');
 	}
 	protected async runEditor(): Promise<void> {

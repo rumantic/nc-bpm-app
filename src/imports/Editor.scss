@@ -178,3 +178,24 @@ button.bio-properties-panel-group-header-button.bio-properties-panel-arrow{
   min-height: 20px !important;
   border:none !important;
 }
+
+
+/*Color fixes for dark mode*/
+
+.icon-download{
+  background-image: var(--original-icon-download-dark) !important;
+
+}
+
+.icon-close{
+  background-image: var(--original-icon-close-dark) !important;
+}
+
+.bio-properties-panel-group-header-button, .bio-properties-panel-input{
+  color: var(--color-grey-225-10-15) !important;
+  background-color: var(--input-background-color) !important;
+  border: 2px solid var(--color-grey-225-10-85) !important;
+}
+.bjs-breadcrumbs{
+  color: var(--color-grey-225-10-15) !important;
+}

@@ -10,7 +10,7 @@ import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 import './Editor.scss';
-import { isAny } from 'bpmn-js/lib/util/ModelUtil';
+import {jsPDF} from 'jspdf';
 
 declare type Modeler = {
 	destroy(): void,
@@ -65,8 +65,8 @@ export default class BPMNEditor extends Editor {
 
 		//this.removeResizeListener(this.onResize);
 	}
-	protected async pdfAdditions(pdf: any): Promise<void> {
-		let title = 'BPMN Diagram';
+	protected async pdfAdditions(pdf: jsPDF): Promise<void> {
+		const title = 'BPMN Diagram';
 		pdf.text(title, 10, 10);
 
 		const canvas = this.modeler.get('canvas');
@@ -85,13 +85,15 @@ export default class BPMNEditor extends Editor {
 			svgContainer.appendTo(this.containerElement);
 
 			const subsvg = svgContainer.find('svg').get(0);
-			pdf.addPage('a4', 'landscape');
-			await pdf.svg(subsvg, {
-				x: 15,
-				y: 15,
-				width: 267,
-				height: 180,
-			});
+			if(subsvg){
+				pdf.addPage('a4', 'landscape');
+				await pdf.svg(subsvg, {
+					x: 15,
+					y: 15,
+					width: 267,
+					height: 180,
+				});
+			}
 			svgContainer.remove();
 
 		}

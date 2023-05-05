@@ -24,5 +24,6 @@ module.exports = {
 		'quote-props': ['error', 'as-needed'],
 		'indent': ['warn', 'tab'],
 		semi: ["error", "always"],
+		'prefer-const': 'warn',
 	},
 }
