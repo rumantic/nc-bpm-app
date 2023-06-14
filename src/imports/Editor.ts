@@ -329,7 +329,14 @@ export default abstract class Editor {
 			const pdf = new jsPDF({
 				orientation:'landscape',
 				format: 'a4',
+				unit: 'pt',
 			});//bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
+			console.log(typeof (pdf));
+
+			const title = document.getElementById('camunda-name	')?.innerHTML ?? 'BPMN Diagram';
+			
+
+			pdf.setFontSize(25).text(title, 30, 30);
 			try {
 				await pdf.svg(svgElement, {
 					x:15,

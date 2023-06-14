@@ -11,6 +11,7 @@ import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 import './Editor.scss';
 import {jsPDF} from 'jspdf';
+import {is, isAny} from 'bpmn-js/lib/util/ModelUtil';
 
 declare type Modeler = {
 	destroy(): void,
@@ -71,6 +72,13 @@ export default class BPMNEditor extends Editor {
 
 		const canvas = this.modeler.get('canvas');
 		const rootelem = canvas.getRootElement();
+
+		if (rootelem.type == 'bpmn:SubProcess'){
+			const mainProc = this.modeler.get('elementRegistry')
+			.filter(el => isAny(el, ['bpmn:Process', 'bpmn:Collaboration']) && !is(el, 'bpmn:SubProcess'))[0];
+			canvas.setRootElement(mainProc);
+		  }
+
 		const subprocesses = this.modeler.get('elementRegistry').filter(el => el.type === 'bpmn:SubProcess' && el.hasOwnProperty('layer'));
 
 
