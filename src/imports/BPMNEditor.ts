@@ -1,6 +1,9 @@
 import Modeler from 'bpmn-js/lib/Modeler';
 import Viewer from 'bpmn-js/lib/Viewer';
-import { BpmnPropertiesPanelModule, BpmnPropertiesProviderModule } from 'bpmn-js-properties-panel'; //bpmn-js-properties-panel/lib/provider/camunda';
+import {
+	BpmnPropertiesPanelModule,
+	BpmnPropertiesProviderModule,
+} from 'bpmn-js-properties-panel';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda.json';
 import api from './api';
 import Editor from './Editor';
@@ -10,8 +13,11 @@ import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 import './Editor.scss';
-import {jsPDF} from 'jspdf';
-import {is, isAny} from 'bpmn-js/lib/util/ModelUtil';
+import { jsPDF } from 'jspdf';
+import { is, isAny, getBusinessObject} from 'bpmn-js/lib/util/ModelUtil';
+
+import propertiesProvider from './provider';
+import propDescriptor from './descriptors/ncModeler.json';
 
 declare type Modeler = {
 	destroy(): void,
@@ -73,11 +79,11 @@ export default class BPMNEditor extends Editor {
 		const canvas = this.modeler.get('canvas');
 		const rootelem = canvas.getRootElement();
 
-		if (rootelem.type == 'bpmn:SubProcess'){
+		if (rootelem.type == 'bpmn:SubProcess') {
 			const mainProc = this.modeler.get('elementRegistry')
-			.filter(el => isAny(el, ['bpmn:Process', 'bpmn:Collaboration']) && !is(el, 'bpmn:SubProcess'))[0];
+				.filter(el => isAny(el, ['bpmn:Process', 'bpmn:Collaboration']) && !is(el, 'bpmn:SubProcess'))[0];
 			canvas.setRootElement(mainProc);
-		  }
+		}
 
 		const subprocesses = this.modeler.get('elementRegistry').filter(el => el.type === 'bpmn:SubProcess' && el.hasOwnProperty('layer'));
 
@@ -93,7 +99,7 @@ export default class BPMNEditor extends Editor {
 			svgContainer.appendTo(this.containerElement);
 
 			const subsvg = svgContainer.find('svg').get(0);
-			if(subsvg){
+			if (subsvg) {
 				pdf.addPage('a4', 'landscape');
 				await pdf.svg(subsvg, {
 					x: 15,
@@ -107,11 +113,55 @@ export default class BPMNEditor extends Editor {
 		}
 		canvas.setRootElement(rootelem);
 	}
+
+	//helper method for getting the extension element values?
+	private extElemHelper = (xml) => {
+
+		let extensionDict = new Map<string, Array<[string,string]>>();
+
+		const parser = new DOMParser();
+		const xmlData = parser.parseFromString(xml, 'text/xml');
+
+		let elements = xmlData.getElementsByTagName('bpmn:extensionElements');
+
+		for (let i = 0; i < elements.length; i++) {
+			let parent = elements[i].parentElement?.id ?? 'na'; //na is a placeholder; this should not be a possible value
+			let children = new Array<[string,string]>();
+			let childArray = elements[i].getElementsByTagName('nc:property');
+			console.log(childArray);
+			for (let j = 0; j < childArray.length; j++) {
+				children.push([childArray[j].getAttribute('name')?? 'na', childArray[j].getAttribute('value') ?? 'na']);
+			}
+			extensionDict.set(parent, children);
+		}
+		return extensionDict;
+	};
 	protected async runEditor(): Promise<void> {
 		const bpmnXML = await this.getContent();
 		const modeler = this.getModeler();
+		const moddle = this.modeler.get('moddle');
 		try {
 			await modeler.importXML(bpmnXML);
+			//Hack to manually extract and set the extension elements
+			let extensionElementsDict = this.extElemHelper(bpmnXML);
+			console.log(extensionElementsDict);
+			let elements = modeler.get('elementRegistry');
+
+			elements.forEach(function (element) {
+				let bo = getBusinessObject(element);
+				let extensionParent = bo.extensionElements || moddle.create('bpmn:ExtensionElements');
+				if (!extensionParent.values) {
+					extensionParent.values = [];
+				}
+				let extProperties = extensionElementsDict.get(element.id) || [];
+				console.log(extProperties);
+				for (let i = 0; i < extProperties.length; i++) {
+					const prop = extProperties[i];
+					const property = moddle.create('nc:property', { name: prop[0], value: prop[1] });
+					extensionParent.get('values').push(property);
+				}
+			});
+
 			//this.addResizeListener(this.onResize);
 		} catch (err) {
 			console.log(err);
@@ -128,12 +178,12 @@ export default class BPMNEditor extends Editor {
 			const containerElement = this.getAppContainerElement();
 			const canvasElement = containerElement.find('.bpmn-canvas');
 			const propertiesElement = containerElement.find('.bpmn-properties');
-
 			this.modeler = this.isFileUpdatable() ? new Modeler({
 				container: canvasElement,
 				additionalModules: [
 					BpmnPropertiesPanelModule,
 					BpmnPropertiesProviderModule,
+					propertiesProvider,
 				],
 				propertiesPanel: {
 					parent: propertiesElement,
@@ -147,12 +197,12 @@ export default class BPMNEditor extends Editor {
 				},
 				moddleExtensions: {
 					camunda: camundaModdleDescriptor,
+					nc: propDescriptor,
 				},
 				keyboard: { bindTo: window },
 			}) : new Viewer({
 				container: canvasElement,
 			});
-
 			this.modeler.on('element.changed', () => {
 				if (!this.hasUnsavedChanges) {
 					this.hasUnsavedChanges = true;
@@ -160,9 +210,40 @@ export default class BPMNEditor extends Editor {
 					containerElement.attr('data-state', 'unsaved');
 				}
 			});
+
+			this.addOverlays();
 		}
 
 		return this.modeler;
+	}
+
+
+	private addOverlays() {
+		const elements = this.modeler.get('elementRegistry');
+		const overlays = this.modeler.get('overlays');
+		elements.forEach(function (element) {
+
+			if (is(element, 'bpmn:CallActivity')) {
+				try {
+					const extValues = element.businessObject.extensionElements?.values;
+					const modelUrl = extValues.find(a => a.name == 'bpmnModel').value;
+					const htmlOverlay = `<a href="https://www.${modelUrl}" class="link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
+					console.log(htmlOverlay);
+
+					overlays.add(element.id, 'drilldown', {
+						position: {
+							bottom: 0,
+							right: 0,
+						},
+						html: htmlOverlay,
+					});
+				} catch (e) {
+					console.log('non-breaking error: ');
+					console.log(e);
+					//Non-breaking errors: continue running
+				}
+			}
+		});
 	}
 
 	protected getAppContainerElement(): JQuery {

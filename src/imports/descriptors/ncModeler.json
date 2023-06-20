@@ -1,0 +1,29 @@
+{
+    "name": "NCModeler",
+    "prefix": "nc",
+    "uri": "http://",
+    "xml": {
+      "tagAlias": "lowerCase"
+    },
+    "associations": [],
+    "types": [
+      {
+        "name": "property",
+        "superClass": [
+          "Element"
+        ],
+        "properties": [
+          {
+            "name": "name",
+            "type": "String",
+            "isAttr": true
+          },
+          {
+            "name": "value",
+            "type": "String",
+            "isAttr": true
+          }
+        ]
+      }
+    ]
+  }
