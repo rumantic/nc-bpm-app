@@ -1,3 +1,4 @@
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
 #bpmn-app {
   background-color: #ffffff;
   bottom: 0;
@@ -163,7 +164,7 @@
 }
 
 /* Collapsed subprocess link button */
-button.bjs-drilldown{
+.bjs-drilldown{
   background-color: var(--drilldown-background-color) !important;
   border-radius: 2px !important;
   margin-left: -20px !important;
@@ -198,4 +199,22 @@ button.bio-properties-panel-group-header-button.bio-properties-panel-arrow{
 }
 .bjs-breadcrumbs{
   color: var(--color-grey-225-10-15) !important;
+}
+
+.link-overlay{
+  color:white;
+  display:inline-block;
+  height: 22px !important;
+  width: 22px !important;
+  align-content: center;
+  background-color: var(--drilldown-background-color) !important;
+  border-radius: 2px !important;
+}
+
+.link-overlay > svg{
+  max-width:95%;
+  width:95%;
+  border: 1px solid var(--color-border-dark);
+  outline:none;
+  border-radius: 2px !important;
 }

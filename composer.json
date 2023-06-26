@@ -1,9 +1,13 @@
 {
-    "name": "loydl/nc-bpmn-app",
+    "name": "kirstenhh/nc-bpmn-app",
     "description": "BPMN editor for Nextcloud",
     "type": "project",
     "license": "AGPL",
     "authors": [
+        {
+            "name": "Kirsten Hauck",
+            "email": "kirsten.hauck@processcentric.ch"
+        },
         {
             "name": "Klaus Herberth",
             "email": "klaus@jsxc.org"

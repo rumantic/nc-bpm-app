@@ -26,7 +26,6 @@ export function TextComponent(props):TextFieldEntry {
 	const setValue = value => {
 		const extensionElements = element.businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
 		let prop = getProperty(element.businessObject, id);
-		
 		if (!prop) {
 			prop = moddle.create('nc:property', { name: id, value: value });
 			extensionElements.get('values').push(prop);
@@ -59,8 +58,6 @@ export function TextComponent(props):TextFieldEntry {
 }
 
 export function getProperty(businessObject, type) {
-	console.log(JSON.parse(JSON.stringify(businessObject)));
-
 	if (!businessObject.extensionElements) {
 		return;
 	}

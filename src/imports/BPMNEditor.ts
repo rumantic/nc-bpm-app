@@ -12,9 +12,13 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
+
+import '@fortawesome/fontawesome-free/js/all.js';
+import '@fortawesome/fontawesome-free/js/solid.js';
+
 import './Editor.scss';
 import { jsPDF } from 'jspdf';
-import { is, isAny, getBusinessObject} from 'bpmn-js/lib/util/ModelUtil';
+import { is, isAny, getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import propertiesProvider from './provider';
 import propDescriptor from './descriptors/ncModeler.json';
@@ -117,7 +121,7 @@ export default class BPMNEditor extends Editor {
 	//helper method for getting the extension element values?
 	private extElemHelper = (xml) => {
 
-		let extensionDict = new Map<string, Array<[string,string]>>();
+		let extensionDict = new Map<string, Array<[string, string]>>();
 
 		const parser = new DOMParser();
 		const xmlData = parser.parseFromString(xml, 'text/xml');
@@ -126,11 +130,10 @@ export default class BPMNEditor extends Editor {
 
 		for (let i = 0; i < elements.length; i++) {
 			let parent = elements[i].parentElement?.id ?? 'na'; //na is a placeholder; this should not be a possible value
-			let children = new Array<[string,string]>();
+			let children = new Array<[string, string]>();
 			let childArray = elements[i].getElementsByTagName('nc:property');
-			console.log(childArray);
 			for (let j = 0; j < childArray.length; j++) {
-				children.push([childArray[j].getAttribute('name')?? 'na', childArray[j].getAttribute('value') ?? 'na']);
+				children.push([childArray[j].getAttribute('name') ?? 'na', childArray[j].getAttribute('value') ?? 'na']);
 			}
 			extensionDict.set(parent, children);
 		}
@@ -142,9 +145,9 @@ export default class BPMNEditor extends Editor {
 		const moddle = this.modeler.get('moddle');
 		try {
 			await modeler.importXML(bpmnXML);
+
 			//Hack to manually extract and set the extension elements
 			let extensionElementsDict = this.extElemHelper(bpmnXML);
-			console.log(extensionElementsDict);
 			let elements = modeler.get('elementRegistry');
 
 			elements.forEach(function (element) {
@@ -154,7 +157,6 @@ export default class BPMNEditor extends Editor {
 					extensionParent.values = [];
 				}
 				let extProperties = extensionElementsDict.get(element.id) || [];
-				console.log(extProperties);
 				for (let i = 0; i < extProperties.length; i++) {
 					const prop = extProperties[i];
 					const property = moddle.create('nc:property', { name: prop[0], value: prop[1] });
@@ -162,6 +164,7 @@ export default class BPMNEditor extends Editor {
 				}
 			});
 
+			this.addOverlays();
 			//this.addResizeListener(this.onResize);
 		} catch (err) {
 			console.log(err);
@@ -192,6 +195,7 @@ export default class BPMNEditor extends Editor {
 						groups: {
 							general: { open: true },
 							documentation: { open: true },
+							nc: { open: true },
 						},
 					},
 				},
@@ -211,7 +215,6 @@ export default class BPMNEditor extends Editor {
 				}
 			});
 
-			this.addOverlays();
 		}
 
 		return this.modeler;
@@ -221,14 +224,13 @@ export default class BPMNEditor extends Editor {
 	private addOverlays() {
 		const elements = this.modeler.get('elementRegistry');
 		const overlays = this.modeler.get('overlays');
-		elements.forEach(function (element) {
 
+		elements.forEach(function (element) {
 			if (is(element, 'bpmn:CallActivity')) {
 				try {
 					const extValues = element.businessObject.extensionElements?.values;
 					const modelUrl = extValues.find(a => a.name == 'bpmnModel').value;
-					const htmlOverlay = `<a href="https://www.${modelUrl}" class="link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
-					console.log(htmlOverlay);
+					const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
 
 					overlays.add(element.id, 'drilldown', {
 						position: {
@@ -243,6 +245,30 @@ export default class BPMNEditor extends Editor {
 					//Non-breaking errors: continue running
 				}
 			}
+			else if (element.type == 'bpmn:DataStoreReference' || element.type == 'bpmn:DataObjectReference') {
+				const extValues = element.businessObject?.extensionElements;
+				if(!extValues){
+					return;
+				}
+				const modelUrl = extValues.values.find(a => a.name == 'dataSource').value;
+				if (!modelUrl) {
+					return;
+				}
+				const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-regular fa-file-lines"></i></a>`;
+
+				let left = element.width;
+				let top = element.height + 5;
+				if (element.label) {
+					left = (element.width + element.label.width) / 2 + 5;
+					top = element.height + element.label.height + 5;
+				}
+
+				overlays.add(element.id, 'drilldown', {
+					position: { left, top },
+					html: htmlOverlay,
+				});
+			}
+
 		});
 	}
 

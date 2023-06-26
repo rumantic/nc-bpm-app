@@ -1,15 +1,15 @@
-import { html } from 'htm/preact';
 import { isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 import { TextComponent } from './ProviderUtil';
 import {is, isAny} from 'bpmn-js/lib/util/ModelUtil';
+import {} from 'bpmn-js/lib/core';
 
-
-export default function (element) {
+export default function (element):Array<unknown> {
 	const ncProperties = new Array<unknown>();
 	if(is(element, 'bpmn:CallActivity')){
 		ncProperties.push({
 			id: 'bpmnModel',
 			element,
+			label: 'Referenced model',
 			component: TextComponent,
 			isEdited: isTextFieldEntryEdited,
 		  });
