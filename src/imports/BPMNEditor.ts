@@ -126,7 +126,7 @@ export default class BPMNEditor extends Editor {
 		const parser = new DOMParser();
 		const xmlData = parser.parseFromString(xml, 'text/xml');
 
-		let elements = xmlData.getElementsByTagName('bpmn:extensionElements');
+		let elements = xmlData.getElementsByTagNameNS('*', 'extensionElements');
 
 		for (let i = 0; i < elements.length; i++) {
 			let parent = elements[i].parentElement?.id ?? 'na'; //na is a placeholder; this should not be a possible value
@@ -228,8 +228,14 @@ export default class BPMNEditor extends Editor {
 		elements.forEach(function (element) {
 			if (is(element, 'bpmn:CallActivity')) {
 				try {
-					const extValues = element.businessObject.extensionElements?.values;
-					const modelUrl = extValues.find(a => a.name == 'bpmnModel').value;
+					const extValues = element.businessObject?.extensionElements;
+					if (!extValues) {
+						return;
+					}
+					const modelUrl = extValues.values?.find(a => a.name == 'dataSource')?.value;
+					if (!modelUrl) {
+						return;
+					}
 					const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
 
 					overlays.add(element.id, 'drilldown', {
@@ -247,7 +253,7 @@ export default class BPMNEditor extends Editor {
 			}
 			else if (element.type == 'bpmn:DataStoreReference' || element.type == 'bpmn:DataObjectReference') {
 				const extValues = element.businessObject?.extensionElements;
-				if(!extValues){
+				if (!extValues) {
 					return;
 				}
 				const modelUrl = extValues.values.find(a => a.name == 'dataSource').value;
