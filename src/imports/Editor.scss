@@ -185,12 +185,20 @@ button.bio-properties-panel-group-header-button.bio-properties-panel-arrow{
 
 .icon-download{
   background-image: var(--original-icon-download-dark) !important;
-
 }
 
 .icon-close{
   background-image: var(--original-icon-close-dark) !important;
 }
+
+.icon-download-old{
+  background-image: var(--icon-download-000) !important;
+}
+
+.icon-close-old{
+  background-image: var(--icon-close-000) !important;
+}
+
 
 .bio-properties-panel-group-header-button, .bio-properties-panel-input{
   color: var(--color-grey-225-10-15) !important;

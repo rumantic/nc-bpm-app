@@ -3,6 +3,7 @@ import api from './api';
 import './Editor.scss';
 import { jsPDF } from 'jspdf';
 import 'svg2pdf.js';
+import { down } from 'inquirer/lib/utils/readline';
 
 export type NextcloudFile = {
 	id?: number
@@ -130,7 +131,7 @@ export default abstract class Editor {
 	// 	}
 	// }
 
-	
+
 	protected getAppContainerElement(): JQuery {
 		if (!this.containerElement || this.containerElement.length === 0) {
 			this.containerElement = $('<div>');
@@ -147,6 +148,8 @@ export default abstract class Editor {
 			groupElement.addClass('bpmn-group');
 			groupElement.appendTo(paletteElement);
 
+			let oldflag = getComputedStyle(document.body).getPropertyValue('--original-icon-download-dark') == '';
+
 			if (this.isFileUpdatable()) {
 				$('<div>')
 					.addClass('entry icon-save bpmn-save')
@@ -155,11 +158,16 @@ export default abstract class Editor {
 					.appendTo(groupElement);
 			}
 
-			const downloadElement = $('<div>');
-			downloadElement.addClass('entry icon-download')
+			const downloadElement = $('<div>')
 				.attr('role', 'button')
 				.on('click', this.toggleMenu)
 				.appendTo(groupElement);
+
+			if (oldflag) { 
+				downloadElement.addClass('entry icon-download-old');
+			} else { 
+				downloadElement.addClass('entry icon-download');
+			}
 
 			$('<ul>')
 				.addClass('menu')
@@ -168,11 +176,16 @@ export default abstract class Editor {
 				.appendTo(downloadElement);
 
 			if (this.isRealFileList()) {
-				$('<div>')
-					.addClass('entry icon-close bpmn-close')
+				const closeBtn = $('<div>')
 					.attr('role', 'button')
 					.on('click', this.clickCallbackFactory(this.onClose))
 					.appendTo(groupElement);
+				if (oldflag) {
+					closeBtn.addClass('entry icon-close-old bpmn-close')
+				} else {
+					closeBtn.addClass('entry icon-close bpmn-close')
+				}
+
 			}
 
 			const canvasElement = $('<div>');
@@ -324,23 +337,23 @@ export default abstract class Editor {
 		svgContainer.appendTo(this.containerElement);
 
 		const svgElement = svgContainer.find('svg').get(0);
-		if(svgElement){
+		if (svgElement) {
 			//const bounding = svgElement.getBoundingClientRect();
 			const pdf = new jsPDF({
-				orientation:'landscape',
+				orientation: 'landscape',
 				format: 'a4',
 				unit: 'pt',
 			});//bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
 			console.log(typeof (pdf));
 
 			const title = document.getElementById('camunda-name	')?.innerHTML ?? 'BPMN Diagram';
-			
+
 
 			pdf.setFontSize(25).text(title, 30, 30);
 			try {
 				await pdf.svg(svgElement, {
-					x:15,
-					y:15,
+					x: 15,
+					y: 15,
 					width: 267,
 					height: 180,
 				}); //nb: width and height are a4 dimensions - 30 mm
@@ -349,14 +362,14 @@ export default abstract class Editor {
 
 				//modeler-specific additional features (BPMN subprocesses, DMN to be seen)
 				await this.pdfAdditions(pdf);
-				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), {returnPromise: true});
-			} catch(err) {
+				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), { returnPromise: true });
+			} catch (err) {
 				svgContainer.remove();
-	
+
 				throw err;
 			}
 		}
-		
+
 		svgContainer.remove();
 	}
 
