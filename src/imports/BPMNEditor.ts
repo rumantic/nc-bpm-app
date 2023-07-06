@@ -133,7 +133,7 @@ export default class BPMNEditor extends Editor {
 			let children = new Array<[string, string]>();
 			let childArray = elements[i].getElementsByTagName('nc:property');
 			for (let j = 0; j < childArray.length; j++) {
-				children.push([childArray[j].getAttribute('name') ?? 'na', childArray[j].getAttribute('value') ?? 'na']);
+				children.push([childArray[j].getAttribute('name') ?? 'na', childArray[j].getAttribute('value') ?? '']);
 			}
 			extensionDict.set(parent, children);
 		}
@@ -256,7 +256,7 @@ export default class BPMNEditor extends Editor {
 				if (!extValues) {
 					return;
 				}
-				const modelUrl = extValues.values.find(a => a.name == 'dataSource').value;
+				const modelUrl = extValues.values?.find(a => a.name == 'dataSource')?.value;
 				if (!modelUrl) {
 					return;
 				}
