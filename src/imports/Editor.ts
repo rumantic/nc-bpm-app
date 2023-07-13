@@ -3,7 +3,6 @@ import api from './api';
 import './Editor.scss';
 import { jsPDF } from 'jspdf';
 import 'svg2pdf.js';
-import { down } from 'inquirer/lib/utils/readline';
 
 export type NextcloudFile = {
 	id?: number
@@ -55,7 +54,7 @@ export default abstract class Editor {
 
 	protected abstract destroy(): Promise<void>;
 
-	protected abstract pdfAdditions(pdf): Promise<void>;
+	protected abstract pdfAdditions(pdf: jsPDF): Promise<void>;
 
 	public async start(): Promise<void> {
 		this.addEditStateToHistory();
@@ -65,7 +64,7 @@ export default abstract class Editor {
 		//this.addPropertiesResizeListener();
 	}
 
-	private addEditStateToHistory() {
+	private addEditStateToHistory(): void {
 		const url = new URL(this.originalUrl.toString());
 		url.searchParams.set('openfile', this.file.id?.toString() || 'new');
 		url.searchParams.delete('fileid');
@@ -73,7 +72,7 @@ export default abstract class Editor {
 		OC.Util.History.pushState(url.searchParams.toString());
 	}
 
-	private resetHistoryState() {
+	private resetHistoryState(): void {
 		const url = new URL(this.originalUrl.toString());
 
 		if (url.searchParams.get('openfile') && this.file.id) {
@@ -84,7 +83,7 @@ export default abstract class Editor {
 		OC.Util.History.pushState(url.searchParams.toString());
 	}
 
-	private updateHistoryState() {
+	private updateHistoryState(): void {
 		const url = new URL(this.originalUrl.toString());
 		url.searchParams.set('openfile', this.file.id?.toString() || 'new');
 		url.searchParams.delete('fileid');
@@ -92,13 +91,13 @@ export default abstract class Editor {
 		OC.Util.History.replaceState(url.searchParams.toString());
 	}
 
-	private cleanFileList() {
+	private cleanFileList(): void {
 		OCA.Files.Sidebar?.close();
 		this.fileList.setViewerMode(true);
 		this.fileList.showMask();
 	}
 
-	private restoreFileList() {
+	private restoreFileList(): void {
 		this.fileList.setViewerMode(false);
 		this.fileList.hideMask();
 	}
@@ -148,7 +147,7 @@ export default abstract class Editor {
 			groupElement.addClass('bpmn-group');
 			groupElement.appendTo(paletteElement);
 
-			let oldflag = getComputedStyle(document.body).getPropertyValue('--original-icon-download-dark') == '';
+			const oldflag = getComputedStyle(document.body).getPropertyValue('--original-icon-download-dark') == '';
 
 			if (this.isFileUpdatable()) {
 				$('<div>')
@@ -163,9 +162,9 @@ export default abstract class Editor {
 				.on('click', this.toggleMenu)
 				.appendTo(groupElement);
 
-			if (oldflag) { 
+			if (oldflag) {
 				downloadElement.addClass('entry icon-download-old');
-			} else { 
+			} else {
 				downloadElement.addClass('entry icon-download');
 			}
 
@@ -181,9 +180,9 @@ export default abstract class Editor {
 					.on('click', this.clickCallbackFactory(this.onClose))
 					.appendTo(groupElement);
 				if (oldflag) {
-					closeBtn.addClass('entry icon-close-old bpmn-close')
+					closeBtn.addClass('entry icon-close-old bpmn-close');
 				} else {
-					closeBtn.addClass('entry icon-close bpmn-close')
+					closeBtn.addClass('entry icon-close bpmn-close');
 				}
 
 			}
@@ -193,6 +192,7 @@ export default abstract class Editor {
 			canvasElement.appendTo(this.containerElement);
 
 			$('#content').append(this.containerElement);
+			$('.app-navigation').addClass('hidden');
 
 			if (this.isFileUpdatable() && this.containerElement.find('>.bpmn-properties').length === 0) {
 				// const propertiesResizeElement = $('<div>');
@@ -281,6 +281,7 @@ export default abstract class Editor {
 
 		this.restoreFileList();
 		this.resetHistoryState();
+		$('.app-navigation').removeClass('hidden');
 
 		//this.removePropertiesResizeListener();
 
@@ -328,6 +329,7 @@ export default abstract class Editor {
 	}
 
 	private async onDownloadAsPDF() {
+		//for printing
 		const svgContainer = $('<div>');
 		svgContainer.css({
 			position: 'fixed',
@@ -344,16 +346,15 @@ export default abstract class Editor {
 				format: 'a4',
 				unit: 'pt',
 			});//bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
-			console.log(typeof (pdf));
-
-			const title = document.getElementById('camunda-name	')?.innerHTML ?? 'BPMN Diagram';
-
+			const title = this.file.name.replace(/\.[^.]+$/, '') ?? 'Diagram';
 
 			pdf.setFontSize(25).text(title, 30, 30);
+			await this.pdfAdditions(pdf);
+
 			try {
 				await pdf.svg(svgElement, {
 					x: 15,
-					y: 15,
+					y: 30,
 					width: 267,
 					height: 180,
 				}); //nb: width and height are a4 dimensions - 30 mm
@@ -361,7 +362,6 @@ export default abstract class Editor {
 				console.log(svgElement);
 
 				//modeler-specific additional features (BPMN subprocesses, DMN to be seen)
-				await this.pdfAdditions(pdf);
 				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), { returnPromise: true });
 			} catch (err) {
 				svgContainer.remove();

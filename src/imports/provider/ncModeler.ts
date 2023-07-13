@@ -30,7 +30,7 @@ export default function NCPropertiesProvider(propertiesPanel:PropertiesPanel, tr
 				groups.push(ncGroup);
 			}
 			return groups;
-		}
+		};
 	};
 
 	// registration ////////

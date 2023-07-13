@@ -60,6 +60,15 @@ abstract class BaseModeler {
 	public getActiveViewer() {
 		return this.modeler.getActiveViewer();
 	}
+	public getActiveView() {
+		return this.modeler.getActiveView();
+	}
+	public getViews(){
+		return this.modeler.getViews();
+	}
+	public open(diagram: any){
+		this.modeler.open(diagram);
+	}
 }
 
 export class DMSModeler extends BaseModeler {

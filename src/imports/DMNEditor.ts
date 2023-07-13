@@ -38,8 +38,8 @@ const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
 
 export default class DMNEditor extends Editor {
 	private modeler: DMSModeler;
-
 	protected getContent(): Promise<string> {
+		
 		if (this.modeler) {
 			return this.modeler.saveXML();
 		}
@@ -53,7 +53,20 @@ export default class DMNEditor extends Editor {
 
 	protected async getSVG(): Promise<string> {
 		if (this.modeler) {
-			return (await this.modeler.saveSVG()).svg;
+			const active = await this.modeler.getActiveViewer();
+			const temp = await this.modeler.getActiveView();
+			console.log(active);
+			if(active.type == 'drd'){
+				console.log('print this');
+			}
+			else{
+				const drd = this.modeler.getViews().filter(a => a.type == 'drd')[0];
+				this.modeler.open(drd);
+			}
+			const svg = (await this.modeler.getActiveViewer().saveSVG()).svg;
+
+			this.modeler.open(temp);
+			return svg;
 		}
 
 		throw new Error('Modeler not loaded');
@@ -74,7 +87,6 @@ export default class DMNEditor extends Editor {
 
 		try {
 			await modeler.importXML(bpmnXML);
-
 			//this.addResizeListener(this.onResize);
 			this.attachChangeListener();
 		} catch (err) {
@@ -91,7 +103,7 @@ export default class DMNEditor extends Editor {
 			const containerElement = this.getAppContainerElement();
 			const canvasElement = containerElement.find('.bpmn-canvas');
 			const propertiesElement = containerElement.find('.bpmn-properties');
-
+			
 			this.modeler = this.isFileUpdatable() ? new DMSModeler({
 				container: canvasElement,
 				common: {
@@ -117,6 +129,7 @@ export default class DMNEditor extends Editor {
 
 			this.modeler.on('views.changed', function(...args) {
 				console.log('views.changed', args);
+
 			});
 
 			this.modeler.on('viewer.created', function(...args) {

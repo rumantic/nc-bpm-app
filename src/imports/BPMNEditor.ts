@@ -35,14 +35,14 @@ declare type Modeler = {
 const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn">
   <bpmn2:process id="Process_1" isExecutable="false">
-    <bpmn2:startEvent id="StartEvent_1"/>
+	<bpmn2:startEvent id="StartEvent_1"/>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds height="36.0" width="36.0" x="412.0" y="240.0"/>
-      </bpmndi:BPMNShape>
-    </bpmndi:BPMNPlane>
+	<bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+	  <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+		<dc:Bounds height="36.0" width="36.0" x="412.0" y="240.0"/>
+	  </bpmndi:BPMNShape>
+	</bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn2:definitions>`;
 
@@ -77,19 +77,21 @@ export default class BPMNEditor extends Editor {
 		//this.removeResizeListener(this.onResize);
 	}
 	protected async pdfAdditions(pdf: jsPDF): Promise<void> {
-		const title = 'BPMN Diagram';
-		pdf.text(title, 10, 10);
 
+		const elemReg = this.modeler.get('elementRegistry');
+		const mainProc = elemReg
+			.filter(el => isAny(el, ['bpmn:Process', 'bpmn:Collaboration']) && !is(el, 'bpmn:SubProcess'))[0];
+		
+		
 		const canvas = this.modeler.get('canvas');
 		const rootelem = canvas.getRootElement();
 
 		if (rootelem.type == 'bpmn:SubProcess') {
-			const mainProc = this.modeler.get('elementRegistry')
-				.filter(el => isAny(el, ['bpmn:Process', 'bpmn:Collaboration']) && !is(el, 'bpmn:SubProcess'))[0];
+			
 			canvas.setRootElement(mainProc);
 		}
 
-		const subprocesses = this.modeler.get('elementRegistry').filter(el => el.type === 'bpmn:SubProcess' && el.hasOwnProperty('layer'));
+		const subprocesses = elemReg.filter(el => el.type === 'bpmn:SubProcess' && el.hasOwnProperty('layer'));
 
 
 		for (let i = 0; i < subprocesses.length; i++) {
@@ -119,19 +121,19 @@ export default class BPMNEditor extends Editor {
 	}
 
 	//helper method for getting the extension element values?
-	private extElemHelper = (xml) => {
+	private extElemHelper = (xml: string) => {
 
-		let extensionDict = new Map<string, Array<[string, string]>>();
+		const extensionDict = new Map<string, Array<[string, string]>>();
 
 		const parser = new DOMParser();
 		const xmlData = parser.parseFromString(xml, 'text/xml');
 
-		let elements = xmlData.getElementsByTagNameNS('*', 'extensionElements');
+		const elements = xmlData.getElementsByTagNameNS('*', 'extensionElements');
 
 		for (let i = 0; i < elements.length; i++) {
-			let parent = elements[i].parentElement?.id ?? 'na'; //na is a placeholder; this should not be a possible value
-			let children = new Array<[string, string]>();
-			let childArray = elements[i].getElementsByTagName('nc:property');
+			const parent = elements[i].parentElement?.id ?? 'na'; //na is a placeholder; this should not be a possible value
+			const children = new Array<[string, string]>();
+			const childArray = elements[i].getElementsByTagName('nc:property');
 			for (let j = 0; j < childArray.length; j++) {
 				children.push([childArray[j].getAttribute('name') ?? 'na', childArray[j].getAttribute('value') ?? '']);
 			}
@@ -139,6 +141,7 @@ export default class BPMNEditor extends Editor {
 		}
 		return extensionDict;
 	};
+
 	protected async runEditor(): Promise<void> {
 		const bpmnXML = await this.getContent();
 		const modeler = this.getModeler();
@@ -147,16 +150,16 @@ export default class BPMNEditor extends Editor {
 			await modeler.importXML(bpmnXML);
 
 			//Hack to manually extract and set the extension elements
-			let extensionElementsDict = this.extElemHelper(bpmnXML);
-			let elements = modeler.get('elementRegistry');
+			const extensionElementsDict = this.extElemHelper(bpmnXML);
+			const elements = modeler.get('elementRegistry');
 
 			elements.forEach(function (element) {
-				let bo = getBusinessObject(element);
-				let extensionParent = bo.extensionElements || moddle.create('bpmn:ExtensionElements');
+
+				const extensionParent = getBusinessObject(element).extensionElements || moddle.create('bpmn:ExtensionElements');
 				if (!extensionParent.values) {
 					extensionParent.values = [];
 				}
-				let extProperties = extensionElementsDict.get(element.id) || [];
+				const extProperties = extensionElementsDict.get(element.id) || [];
 				for (let i = 0; i < extProperties.length; i++) {
 					const prop = extProperties[i];
 					const property = moddle.create('nc:property', { name: prop[0], value: prop[1] });
