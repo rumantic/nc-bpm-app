@@ -349,7 +349,6 @@ export default abstract class Editor {
 			const title = this.file.name.replace(/\.[^.]+$/, '') ?? 'Diagram';
 
 			pdf.setFontSize(25).text(title, 30, 30);
-			await this.pdfAdditions(pdf);
 
 			try {
 				await pdf.svg(svgElement, {
@@ -360,6 +359,7 @@ export default abstract class Editor {
 				}); //nb: width and height are a4 dimensions - 30 mm
 
 				console.log(svgElement);
+				await this.pdfAdditions(pdf);
 
 				//modeler-specific additional features (BPMN subprocesses, DMN to be seen)
 				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), { returnPromise: true });
