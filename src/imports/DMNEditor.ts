@@ -1,72 +1,34 @@
 import api from './api';
 import Editor from './Editor';
-import 'dmn-js/dist/assets/diagram-js.css';
-import 'dmn-js/dist/assets/dmn-js-decision-table-controls.css';
-import 'dmn-js/dist/assets/dmn-js-decision-table.css';
-import 'dmn-js/dist/assets/dmn-js-drd.css';
-import 'dmn-js/dist/assets/dmn-js-literal-expression.css';
-import 'dmn-js/dist/assets/dmn-js-shared.css';
-import 'dmn-js/dist/assets/dmn-font/css/dmn.css';
-import 'dmn-js-properties-panel/dist/assets/properties-panel.css';
-import { DMSModeler, DMSViewer } from './vendor/dms-js';
-import {DmnPropertiesPanelModule, DmnPropertiesProviderModule }from 'dmn-js-properties-panel';
-//import drdAdapterModule from 'dmn-js-properties-panel/lib/adapter/drd';
-import camundaModdleDescriptor from 'camunda-dmn-moddle/resources/camunda.json';
-import {jsPDF} from 'jspdf';
+import { jsPDF } from 'jspdf';
+import * as DmnEditor from "@kogito-tooling/kie-editors-standalone/dist/dmn"
 
 
-const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="definitions_0xcty6c" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" exporter="dmn-js (https://demo.bpmn.io/dmn)" exporterVersion="10.1.0">
-  <decision id="decision_0k1xeln" name="">
-    <decisionTable id="decisionTable_0h35w5w">
-      <input id="input1" label="">
-        <inputExpression id="inputExpression1" typeRef="string">
-          <text></text>
-        </inputExpression>
-      </input>
-      <output id="output1" label="" name="" typeRef="string" />
-    </decisionTable>
-  </decision>
-  <dmndi:DMNDI>
-    <dmndi:DMNDiagram id="DMNDiagram_0wcate9">
-      <dmndi:DMNShape id="DMNShape_0pi5rd3" dmnElementRef="decision_0k1xeln">
-        <dc:Bounds height="80" width="180" x="150" y="80" />
-      </dmndi:DMNShape>
-    </dmndi:DMNDiagram>
-  </dmndi:DMNDI>
-</definitions>`;
+declare type DMNModeler = {
+	destroy(): void,
+	subscribeToContentChanges(callback: (isDirty: boolean) => void): (isDirty: boolean) => void
+	getContent(): Promise<string>
+	setContent(path: string, content: string): Promise<{ warnings: string[] }>
+	getPreview(): Promise<string>
+}
 
 export default class DMNEditor extends Editor {
-	private modeler: DMSModeler;
+	private modeler: DMNModeler;
 	protected getContent(): Promise<string> {
-		
 		if (this.modeler) {
-			return this.modeler.saveXML();
+			return this.modeler.getContent();
 		}
 
 		if (this.file.etag || OCA.Sharing?.PublicApp) {
 			return api.getFileContent(this.file.path, this.file.name);
 		}
 
-		return Promise.resolve(PLAIN_TEMPLATE);
+		return Promise.resolve("");
 	}
 
 	protected async getSVG(): Promise<string> {
 		if (this.modeler) {
-			const active = await this.modeler.getActiveViewer();
-			const temp = await this.modeler.getActiveView();
-			console.log(active);
-			if(active.type == 'drd'){
-				console.log('print this');
-			}
-			else{
-				const drd = this.modeler.getViews().filter(a => a.type == 'drd')[0];
-				this.modeler.open(drd);
-			}
-			const svg = (await this.modeler.getActiveViewer().saveSVG()).svg;
-
-			this.modeler.open(temp);
-			return svg;
+			return this.modeler.getPreview();
 		}
 
 		throw new Error('Modeler not loaded');
@@ -78,15 +40,14 @@ export default class DMNEditor extends Editor {
 		//this.removeResizeListener(this.onResize);
 	}
 
-	protected async pdfAdditions(pdf: jsPDF): Promise<void>{
+	protected async pdfAdditions(pdf: jsPDF): Promise<void> {
 		console.log('No additions yet');
 	}
 	protected async runEditor(): Promise<void> {
-		const bpmnXML = await this.getContent();
+		const dmnXML = await this.getContent();
 		const modeler = this.getModeler();
-
 		try {
-			await modeler.importXML(bpmnXML);
+			await modeler.setContent('diagram', dmnXML);
 			//this.addResizeListener(this.onResize);
 			this.attachChangeListener();
 		} catch (err) {
@@ -94,68 +55,69 @@ export default class DMNEditor extends Editor {
 		}
 	}
 
-	private onResize = () => {
-		this.modeler && this.modeler.resized();
-	}
+	// private onResize = () => {
+	// 	this.modeler && this.modeler.resized();
+	// }
 
 	private getModeler() {
 		if (!this.modeler) {
 			const containerElement = this.getAppContainerElement();
-			const canvasElement = containerElement.find('.bpmn-canvas');
+			const canvasElement = containerElement.find('.bpmn-canvas').get(0);
+			if (!canvasElement) {
+				throw new Error('Modeler not loaded');
+			}
 			const propertiesElement = containerElement.find('.bpmn-properties');
+
+			this.modeler = this.isFileUpdatable() ? DmnEditor.open({
+				container: canvasElement!,
+				initialContent: Promise.resolve(""),
+				readOnly: false,
+			}) : DmnEditor.open({
+				container: canvasElement!,
+				initialContent: Promise.resolve(""), //TODO CHANGE
+				readOnly: true,
+			});
+			this.modeler.subscribeToContentChanges(
+				function (...args) {
+					console.log('view changed', args);
+				}
+			);
 			
-			this.modeler = this.isFileUpdatable() ? new DMSModeler({
-				container: canvasElement,
-				common: {
-					keyboard: {
-						bindTo: window,
-					},
-				},
-				drd: {
-					propertiesPanel: {
-						parent: propertiesElement,
-					},
-					additionalModules: [
-						DmnPropertiesPanelModule, DmnPropertiesProviderModule,
-						//drdAdapterModule,
-					],
-				},
-				moddleExtensions: {
-					camunda: camundaModdleDescriptor,
-				},
-			}) : new DMSViewer({
-				container: canvasElement,
-			});
+			console.log(this.modeler);
 
-			this.modeler.on('views.changed', function(...args) {
-				console.log('views.changed', args);
-
-			});
-
-			this.modeler.on('viewer.created', function(...args) {
-				console.log('viewer.created', args);
-			});
+			// this.modeler.on('viewer.created', function (...args) {
+			// 	console.log('viewer.created', args);
+			// });
 		}
 
 		return this.modeler;
 	}
 
-	private attachChangeListener() {
-		const viewer = this.modeler.getActiveViewer();
 
-		if (!viewer) {
+	private attachChangeListener() {
+
+		if (!this.modeler) {
 			return;
 		}
 
 		const containerElement = this.getAppContainerElement();
 
-		viewer.on('element.changed', () => {
+		this.modeler.subscribeToContentChanges(() => {
 			if (!this.hasUnsavedChanges) {
 				this.hasUnsavedChanges = true;
 
 				containerElement.attr('data-state', 'unsaved');
 			}
 		});
+		// this.modeler.on('element.changed', () => {
+		// 	if (!this.hasUnsavedChanges) {
+		// 		this.hasUnsavedChanges = true;
+
+		// 		containerElement.attr('data-state', 'unsaved');
+		// 	}
+		// });
+
+
 	}
 
 	protected getAppContainerElement(): JQuery {
