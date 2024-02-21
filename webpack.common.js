@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const webpack = require('webpack');
-
+const ESLintPlugin = require('eslint-webpack-plugin');
 const fileLoader = {
 	loader: 'file-loader',
 	options: {
@@ -9,14 +9,18 @@ const fileLoader = {
 		outputPath: '../assets/',
 	},
 };
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
 	entry: {
 		filelist: [
-			path.join(__dirname, 'src', 'filelist.ts'),
+			path.join(__dirname, 'src', 'index.ts'),
 		],
 		admin: [
 			path.join(__dirname, 'src', 'admin.ts'),
+		],
+		main: [
+			path.join(__dirname, 'src', 'modeler.ts'),
 		],
 	},
 	output: {
@@ -44,25 +48,11 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				use: ['style-loader', 'css-loader'],
+				use: ['style-loader', 'vue-style-loader', 'css-loader'],
 			},
 			{
 				test: /\.scss$/,
 				use: ['style-loader', 'css-loader', 'sass-loader'],
-			},
-			{
-				test: /\.tsx?$/,
-				enforce: 'pre',
-				use: [
-					{
-						options: {
-							eslintPath: require.resolve('eslint'),
-
-						},
-						loader: require.resolve('eslint-loader'),
-					},
-				],
-				exclude: /node_modules/,
 			},
 			{
 				test: /\.js$/,
@@ -71,16 +61,16 @@ module.exports = {
 			},
 			{
 				test: /\.(png|jpg|gif|svg)(\?.+)?$/,
-				loader: 'url-loader',
-				options: {
-					name: '[name].[ext]?[hash]',
-					limit: 8192,
-				},
+				type: 'asset/resource',
 			},
 			{
 				test: /.*\.(ttf|woff|woff2|eot)(\?.+)?$/,
-				use: [fileLoader],
+				type: 'asset/resource',
 			},
+			{
+				test: /\.vue$/,
+				loader: 'vue-loader'
+			  }
 		],
 	},
 	plugins: [
@@ -88,9 +78,14 @@ module.exports = {
 			$: 'jquery',
 			jQuery: 'jquery',
 		}),
+		new ESLintPlugin(),
+		new VueLoaderPlugin(),
 	],
 	resolve: {
 		extensions: ['*', '.tsx', '.ts', '.js', '.scss'],
+		fallback: {
+			path: require.resolve('path-browserify'),
+		},
 		symlinks: false,
 	},
 };

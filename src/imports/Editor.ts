@@ -11,6 +11,8 @@ export type NextcloudFile = {
 	size?: number
 	etag?: string
 	permissions: number
+	mime?: string
+	writeable: boolean
 }
 
 export type NextcloudFileList = {
@@ -38,13 +40,13 @@ export default abstract class Editor {
 
 	private resizeHandler: (() => void)[] = [];
 
-	constructor(protected file: NextcloudFile, private fileList: NextcloudFileList) {
+	constructor(protected file: NextcloudFile, private fileList?: NextcloudFileList) {
 		this.originalUrl = new URL(window.location.toString());
 		this.originalEtag = file.etag || '';
 		this.hasUnsavedChanges = !file.etag && !OCA.Sharing?.PublicApp;
 
 		window.addEventListener('beforeunload', this.onBeforeUnload);
-	}
+	};
 
 	protected abstract getContent(): Promise<string>;
 
@@ -58,7 +60,6 @@ export default abstract class Editor {
 
 	public async start(): Promise<void> {
 		this.addEditStateToHistory();
-		this.cleanFileList();
 		await this.runEditor();
 		this.setAppContainerReady();
 		//this.addPropertiesResizeListener();
@@ -91,16 +92,6 @@ export default abstract class Editor {
 		OC.Util.History.replaceState(url.searchParams.toString());
 	}
 
-	private cleanFileList(): void {
-		OCA.Files.Sidebar?.close();
-		this.fileList.setViewerMode(true);
-		this.fileList.showMask();
-	}
-
-	private restoreFileList(): void {
-		this.fileList.setViewerMode(false);
-		this.fileList.hideMask();
-	}
 
 	// private addPropertiesResizeListener () {
 	// 	const resizeElement = this.containerElement.find('>.bpmn-properties-resizer');
@@ -133,6 +124,7 @@ export default abstract class Editor {
 
 	protected getAppContainerElement(): JQuery {
 		if (!this.containerElement || this.containerElement.length === 0) {
+
 			this.containerElement = $('<div>');
 			this.containerElement.attr('id', CONTENT_ID);
 			this.containerElement.addClass('icon-loading');
@@ -191,8 +183,8 @@ export default abstract class Editor {
 			canvasElement.addClass('bpmn-canvas');
 			canvasElement.appendTo(this.containerElement);
 
-			$('#content').append(this.containerElement);
-			$('.app-navigation').addClass('hidden');
+			$('#app-content').append(this.containerElement);
+			//$('.app-navigation').addClass('hidden');
 
 			if (this.isFileUpdatable() && this.containerElement.find('>.bpmn-properties').length === 0) {
 				// const propertiesResizeElement = $('<div>');
@@ -233,7 +225,7 @@ export default abstract class Editor {
 
 	private setAppContainerReady(): void {
 		this.containerElement && this.containerElement.removeClass('icon-loading');
-
+		console.log('app container should be ready');
 		$('body').css('overflow', 'hidden');
 	}
 
@@ -270,7 +262,7 @@ export default abstract class Editor {
 		}
 
 		if (this.originalEtag !== this.file.etag) {
-			await this.fileList.reload();
+			await this.fileList?.reload();
 		}
 
 		this.destroy();
@@ -279,15 +271,12 @@ export default abstract class Editor {
 			this.containerElement.remove();
 		}
 
-		this.restoreFileList();
 		this.resetHistoryState();
-		$('.app-navigation').removeClass('hidden');
 
 		//this.removePropertiesResizeListener();
 
 		window.removeEventListener('beforeunload', this.onBeforeUnload);
-
-		$('body').css('overflow', '');
+		window.location.href = OC.generateUrl('/apps/files' + this.file.path); //files/dir=path without files_bpm
 	}
 
 	private async onSave() {
@@ -469,8 +458,8 @@ export default abstract class Editor {
 	}
 
 	private updateFile(): void {
-		this.fileList.reload().then(() => {
-			const newFile = this.fileList.findFile(this.file.name);
+		this.fileList?.reload().then(() => {
+			const newFile = this.fileList?.findFile(this.file.name);
 
 			if (newFile && newFile.id !== this.file.id) {
 				this.file = newFile;
@@ -478,6 +467,7 @@ export default abstract class Editor {
 
 				this.updateHistoryState();
 			}
+			
 		});
 	}
 
@@ -491,15 +481,24 @@ export default abstract class Editor {
 	}
 
 	protected isFileUpdatable(): boolean {
+		if (this.file.writeable != null) {
+			return this.file.writeable;
+		}
 		return (this.file.permissions & OC.PERMISSION_UPDATE) !== 0;
 	}
 
 	protected isDirectoryWritable(): boolean {
-		return (this.fileList.getDirectoryPermissions() & OC.PERMISSION_CREATE) !== 0;
+		if (this.fileList)
+			return (this.fileList.getDirectoryPermissions() & OC.PERMISSION_CREATE) !== 0;
+		else
+			return true;
 	}
 
 	protected isRealFileList(): boolean {
-		return typeof this.fileList.shown === 'boolean';
+		if (this.fileList)
+			return typeof this.fileList.shown === 'boolean';
+		else
+			return true;
 	}
 
 }

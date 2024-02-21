@@ -1,5 +1,9 @@
 import { generateRemoteUrl, getRootUrl } from '@nextcloud/router';
 import axios from '@nextcloud/axios';
+import {generateUrl} from '@nextcloud/router';
+
+import { File } from '@nextcloud/files'
+import { NextcloudFile } from './Editor';
 
 class Api {
 	public async checkPreviewServer(serverUrl: string): Promise<'success' | 'invalid-url'> {
@@ -16,10 +20,10 @@ class Api {
 		return response.data;
 	}
 
+	
 	public getDownloadPath(path: string, name: string): string {
 		path = encodeURI(path);
 		name = encodeURIComponent(name);
-
 		if (OCA.Sharing?.PublicApp) {
 			return $('#downloadURL').val() as string;
 		}
@@ -85,6 +89,18 @@ class Api {
 		}
 		return etag;
 	}
+
+	// public async createFile(path: string, ext:string){
+
+	// }
+
+	public async getFileInfo(fileId: string): Promise<NextcloudFile>{
+
+		var url = generateUrl('/apps/files_bpm/page/getFileInfo?fileId='+fileId);
+		const response = await axios.get(url);
+		return response.data;
+	}
+	
 }
 
 const api = new Api();

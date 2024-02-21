@@ -1,0 +1,246 @@
+import { translate as t } from '@nextcloud/l10n';
+import { loadState } from '@nextcloud/initial-state';
+import './imports/bootstrap';
+import './index.scss';
+import {
+	DefaultType, FileAction, addNewFileMenuEntry, registerFileAction,
+	File, Permission, getNavigation
+} from '@nextcloud/files'
+
+import './imports/Editor.scss';
+
+function bootstrapFileShare() {
+	//called once on page load
+	if (!OCA?.Sharing?.PublicApp) {
+		return;
+	}
+
+}
+
+function fixFileIconForFileShare() {
+	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-bpmn') {
+		$('#mimetypeIcon').val(OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'));
+	}
+
+	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-dmn') {
+		$('#mimetypeIcon').val(OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'));
+	}
+}
+
+function registerFileIcon() {
+	if (OC?.MimeType?._mimeTypeIcons) {
+		OC.MimeType._mimeTypeIcons['application/x-bpmn'] = OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg');
+		OC.MimeType._mimeTypeIcons['application/x-dmn'] = OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg');
+	}
+}
+
+
+
+if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
+	//Thanks to : https://github.com/githubkoma/multiboards/blob/main/js/filesintegration/src/index.js
+	const Mimes = {
+		bpmn: {
+			mime: 'application/x-bpmn',
+			type: 'text',
+			css: 'file-icon-bpmn',
+			icon: '',
+			newStr: 'New BPMN File',
+		},
+		dmn: {
+			mime: 'application/x-dmn',
+			type: 'text',
+			css: 'file-icon-bpmn',
+			icon: '',
+			newStr: 'New DMN File',
+		},
+	};
+	function registerAction(ext, attr) {
+		registerFileAction(new FileAction({
+			id: ext,
+			displayName() {
+				return 'Open in ' + ext.toUpperCase() + ' Editor'
+			},
+			enabled(nodes) {
+				return nodes.length === 1 && attr.mime === nodes[0].mime && (nodes[0].permissions & OC.PERMISSION_READ) !== 0
+			},
+			iconSvgInline: () => attr.icon,
+			async exec(file, view) {
+
+				if (!window.OC.getCurrentUser().uid) {
+					alert("Not yet implemented.");
+					return false;
+				} else {
+					console.log('opening existing file');
+
+					var dirName = file.dirname;
+
+					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + dirName + '&fileId='+file.fileid);
+					window.location.href = url;
+
+					return true;
+				}
+
+			},
+			default: DefaultType.HIDDEN
+		}));
+	}
+
+	function addMenuEntry(ext, attr) {
+		addNewFileMenuEntry({
+			id: ext,
+			displayName: attr.newStr,
+			enabled() {
+				// only attach to main file list, public view is not supported yet
+				return getNavigation()?.active?.id === 'files'
+			},
+			iconClass: attr.css,
+			async handler(folder, contents) {
+				//Generate new BPMN/DMN diagram
+				if (!window.OC.getCurrentUser().uid) {
+					alert("Not yet implemented.");
+				} else {
+					console.log('create new diagram', ext);
+
+					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + folder.dirname +'&ext='+ext);
+					window.location.href = url;
+
+					return true;
+
+				}
+			}
+		});
+	}
+
+	for (const ext in Mimes) {
+		registerAction(ext, Mimes[ext]);
+		addMenuEntry(ext, Mimes[ext]);
+	}
+}
+
+else {  // Nextcloud versions lower than 28
+	function startBPMNEditor(file, fileList) {
+		import(/* webpackChunkName: "bpmn-editor" */ './imports/BPMNEditor').then(({ default: Editor }) => {
+			const editor = new Editor(file, fileList);
+			console.log('Starting BPMN editor');
+			editor.start();
+		});
+	}
+	
+	function startDMNEditor(file, fileList) {
+		import(/* webpackChunkName: "dmn-editor" */ './imports/DMNEditor').then(({ default: Editor }) => {
+			const editor = new Editor(file, fileList);
+			console.log('Starting DMN editor');
+			editor.start();
+		});
+	}
+	
+	const BpmFileMenuPlugin = {
+		attach: function (menu) {
+			menu.addMenuEntry({
+				id: 'bpmn',
+				displayName: t('files_bpm', 'New BPMN diagram'),
+				templateName: 'diagram.bpmn',
+				iconClass: 'icon-filetype-bpmn',
+				fileType: 'file',
+				actionHandler(fileName: string) {
+					
+					const fileList = menu.fileList;
+					const file = {
+						name: fileName,
+						path: fileList.getCurrentDirectory(),
+						permissions: OC.PERMISSION_CREATE | OC.PERMISSION_UPDATE,
+					};
+
+					startBPMNEditor(file, fileList);
+				},
+			});
+
+			menu.addMenuEntry({
+				id: 'dmn',
+				displayName: t('files_bpm', 'New DMN diagram'),
+				templateName: 'diagram.dmn',
+				iconClass: 'icon-filetype-dmn',
+				fileType: 'file',
+				actionHandler(fileName: string) {
+					const fileList = menu.fileList;
+
+					const file = {
+						name: fileName,
+						path: fileList.getCurrentDirectory(),
+						permissions: OC.PERMISSION_CREATE | OC.PERMISSION_UPDATE,
+					};
+
+					startDMNEditor(file, fileList);
+				},
+			});
+		},
+	};
+
+	OC.Plugins.register('OCA.Files.NewFileMenu', BpmFileMenuPlugin);
+
+	const BpmFileListPlugin = {
+		ignoreLists: [
+			'trashbin',
+		],
+
+		attach(fileList) {
+			registerFileIcon();
+
+			console.log(fileList);
+			console.log(typeof(fileList));
+			if (this.ignoreLists.includes(fileList.id)) {
+				return;
+			}
+
+			fileList.fileActions.registerAction({
+				name: 'bpmn',
+				displayName: t('files_bpm', 'BPMN diagram'),
+				mime: 'application/x-bpmn',
+				icon: OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'),
+				permissions: OC.PERMISSION_READ,
+				actionHandler(fileName: string, context) {
+					const file = context.fileList.elementToFile(context.$file);
+
+					console.log(fileList);
+					console.log(typeof(fileList));
+					startBPMNEditor(file, context.fileList);
+				},
+			});
+
+			fileList.fileActions.setDefault('application/x-bpmn', 'bpmn');
+
+			fileList.fileActions.registerAction({
+				name: 'dmn',
+				displayName: t('files_bpm', 'DMN diagram'),
+				mime: 'application/x-dmn',
+				icon: OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'),
+				permissions: OC.PERMISSION_READ,
+				actionHandler(fileName: string, context) {
+					const file = context.fileList.elementToFile(context.$file);
+
+					console.log(fileList);
+					console.log(typeof(fileList));
+					startDMNEditor(file, context.fileList);
+				},
+			});
+
+			fileList.fileActions.setDefault('application/x-dmn', 'dmn');
+		},
+	};
+
+	OC.Plugins.register('OCA.Files.FileList', BpmFileListPlugin);
+	bootstrapFileShare();
+	fixFileIconForFileShare();
+
+}
+
+bootstrapFileShare();
+fixFileIconForFileShare();
+
+
+document.addEventListener('DOMContentLoaded', (event) => {
+
+	console.log('Fully loaded');
+	console.log(event);
+	//startEditor();
+})

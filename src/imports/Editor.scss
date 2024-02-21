@@ -1,4 +1,6 @@
 @import '~@fortawesome/fontawesome-free/scss/fontawesome';
+
+
 #bpmn-app {
   background-color: #ffffff;
   bottom: 0;
@@ -120,6 +122,16 @@
     &:hover {
       opacity: 1;
     }
+  }
+
+  .file-icon-bpmn{
+    background-image: url('../../img/icon-filetypes_bpmn.svg');
+  } 
+  .file-icon-dmn{
+    background-image: url('../../img/icon-filetypes_bpmn.svg');
+  }
+  .icon-bpmn{
+    background-image: url('../../img/app.svg');
   }
 
   .icon-image {

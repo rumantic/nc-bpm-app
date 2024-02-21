@@ -14,13 +14,13 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\IPreview;
 
 class Application extends App implements IBootstrap {
-	public const APPID = 'files_bpm';
+	public const APP_ID = 'files_bpm';
 
 	/**
 	 * @param array $params
 	 */
 	public function __construct(array $params = []) {
-		parent::__construct(self::APPID, $params);
+		parent::__construct(self::APP_ID, $params);
 	}
 
 	public function register(IRegistrationContext $context): void {

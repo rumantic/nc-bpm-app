@@ -1,4 +1,4 @@
-import Modeler from 'bpmn-js/lib/Modeler';
+import BPMNModeler from 'bpmn-js/lib/Modeler';
 import Viewer from 'bpmn-js/lib/Viewer';
 import {
 	BpmnPropertiesPanelModule,
@@ -10,8 +10,8 @@ import Editor from './Editor';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import 'bpmn-js/dist/assets/bpmn-js.css';
-import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
-import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
+// import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
+// import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 
 import '@fortawesome/fontawesome-free/js/all.js';
 import '@fortawesome/fontawesome-free/js/solid.js';
@@ -48,7 +48,7 @@ const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
 
 export default class BPMNEditor extends Editor {
 
-	private modeler: Modeler;
+	private modeler: Modeler | Viewer;
 
 	protected getContent(): Promise<string> {
 		if (this.modeler) {
@@ -57,7 +57,11 @@ export default class BPMNEditor extends Editor {
 		}
 
 		if (this.file.etag || OCA.Sharing?.PublicApp) {
-			return api.getFileContent(this.file.path, this.file.name);
+			if(this.file.path.endsWith('/')){
+				return api.getFileContent(this.file.path, this.file.name);
+			}
+			//new version: path includes name. Old version: path does not include name.
+			return api.getFileContent(this.file.path,this.file.name);
 		}
 
 		return Promise.resolve(PLAIN_TEMPLATE);
@@ -148,29 +152,29 @@ export default class BPMNEditor extends Editor {
 		const moddle = this.modeler.get('moddle');
 		try {
 			await modeler.importXML(bpmnXML);
+			console.log(modeler);
+			// //Hack to manually extract and set the extension elements
+			// const extensionElementsDict = this.extElemHelper(bpmnXML);
+			// const elements = modeler.get('elementRegistry');
 
-			//Hack to manually extract and set the extension elements
-			const extensionElementsDict = this.extElemHelper(bpmnXML);
-			const elements = modeler.get('elementRegistry');
+			// elements.forEach(function (element) {
 
-			elements.forEach(function (element) {
+			// 	const extensionParent = getBusinessObject(element).extensionElements || moddle.create('bpmn:ExtensionElements');
+			// 	if (!extensionParent.values) {
+			// 		extensionParent.values = [];
+			// 	}
+			// 	const extProperties = extensionElementsDict.get(element.id) || [];
+			// 	for (let i = 0; i < extProperties.length; i++) {
+			// 		const prop = extProperties[i];
+			// 		const property = moddle.create('nc:property', { name: prop[0], value: prop[1] });
+			// 		extensionParent.get('values').push(property);
+			// 	}
+			// });
 
-				const extensionParent = getBusinessObject(element).extensionElements || moddle.create('bpmn:ExtensionElements');
-				if (!extensionParent.values) {
-					extensionParent.values = [];
-				}
-				const extProperties = extensionElementsDict.get(element.id) || [];
-				for (let i = 0; i < extProperties.length; i++) {
-					const prop = extProperties[i];
-					const property = moddle.create('nc:property', { name: prop[0], value: prop[1] });
-					extensionParent.get('values').push(property);
-				}
-			});
-
-			this.addOverlays();
+			// this.addOverlays();
 			//this.addResizeListener(this.onResize);
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 			this.showLoadingError(err.toString());
 		}
 	}
@@ -182,9 +186,11 @@ export default class BPMNEditor extends Editor {
 	private getModeler() {
 		if (!this.modeler) {
 			const containerElement = this.getAppContainerElement();
-			const canvasElement = containerElement.find('.bpmn-canvas');
+			const canvasElement = containerElement.find('.bpmn-canvas')[0]; //[0] will return the HTMLElement; otherwise this function returns JQuery<HTMLElement>
 			const propertiesElement = containerElement.find('.bpmn-properties');
-			this.modeler = this.isFileUpdatable() ? new Modeler({
+			console.log('file updatable: ', this.isFileUpdatable());
+
+			this.modeler = this.isFileUpdatable() ? new BPMNModeler({
 				container: canvasElement,
 				additionalModules: [
 					BpmnPropertiesPanelModule,

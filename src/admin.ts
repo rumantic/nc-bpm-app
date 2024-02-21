@@ -1,5 +1,5 @@
 import { translate as t } from '@nextcloud/l10n';
-import confirmPassword from '@nextcloud/password-confirmation';
+import {confirmPassword} from '@nextcloud/password-confirmation';
 import './admin.scss';
 import api from './imports/api';
 

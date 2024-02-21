@@ -78,7 +78,7 @@ abstract class PreviewServer implements IProviderV2 {
 	}
 
 	protected function getPreviewServerUrl(): string {
-		$server = $this->config->getAppValue(Application::APPID, 'preview.server', '');
+		$server = $this->config->getAppValue(Application::APP_ID, 'preview.server', '');
 
 		return $server !== '' ? $server . 'preview' : '';
 	}
