@@ -44,7 +44,7 @@ class PageController extends Controller {
 	
 		if ($this->userId == "") {
 	
-			$template = new PublicTemplateResponse($this->appName, 'index', []);
+			$template = new PublicTemplateResponse($this->appName, 'modeler', []);
 			$template->setHeaderTitle('BPMN Files');
 			$template->setHeaderDetails("Public");
 			$template->setFooterVisible(false);
@@ -70,7 +70,7 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function indexLoggedIn() {
-		return new TemplateResponse($this->appName, 'index');  // templates/index.php
+		return new TemplateResponse($this->appName, 'modeler');  // templates/index.php
 	}
 
 

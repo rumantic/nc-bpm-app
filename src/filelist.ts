@@ -1,7 +1,7 @@
 import { translate as t } from '@nextcloud/l10n';
 import { loadState } from '@nextcloud/initial-state';
 import './imports/bootstrap';
-import './index.scss';
+import './filelist.scss';
 import {
 	DefaultType, FileAction, addNewFileMenuEntry, registerFileAction,
 	File, Permission, getNavigation
@@ -28,6 +28,7 @@ function fixFileIconForFileShare() {
 }
 
 function registerFileIcon() {
+	console.log(OC?.MimeType?._mimeTypeIcons);
 	if (OC?.MimeType?._mimeTypeIcons) {
 		OC.MimeType._mimeTypeIcons['application/x-bpmn'] = OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg');
 		OC.MimeType._mimeTypeIcons['application/x-dmn'] = OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg');
@@ -42,18 +43,20 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 		bpmn: {
 			mime: 'application/x-bpmn',
 			type: 'text',
-			css: 'file-icon-bpmn',
-			icon: '',
+			css: 'icon-filetype-bpmn',
+			icon: '../img/icon-filetypes_bpmn.svg',
 			newStr: 'New BPMN File',
 		},
 		dmn: {
 			mime: 'application/x-dmn',
 			type: 'text',
-			css: 'file-icon-bpmn',
-			icon: '',
+			css: 'icon-filetype-dmn',
+			icon: OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'),
 			newStr: 'New DMN File',
 		},
 	};
+	registerFileIcon();
+
 	function registerAction(ext, attr) {
 		registerFileAction(new FileAction({
 			id: ext,
@@ -99,7 +102,6 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 				if (!window.OC.getCurrentUser().uid) {
 					alert("Not yet implemented.");
 				} else {
-					console.log('create new diagram', ext);
 
 					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + folder.dirname +'&ext='+ext);
 					window.location.href = url;
@@ -113,6 +115,7 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 
 	for (const ext in Mimes) {
 		registerAction(ext, Mimes[ext]);
+		
 		addMenuEntry(ext, Mimes[ext]);
 	}
 }
@@ -186,8 +189,6 @@ else {  // Nextcloud versions lower than 28
 		attach(fileList) {
 			registerFileIcon();
 
-			console.log(fileList);
-			console.log(typeof(fileList));
 			if (this.ignoreLists.includes(fileList.id)) {
 				return;
 			}
@@ -237,10 +238,3 @@ else {  // Nextcloud versions lower than 28
 bootstrapFileShare();
 fixFileIconForFileShare();
 
-
-document.addEventListener('DOMContentLoaded', (event) => {
-
-	console.log('Fully loaded');
-	console.log(event);
-	//startEditor();
-})

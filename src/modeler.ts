@@ -4,7 +4,6 @@ import axios from '@nextcloud/axios';
 import { translate as t } from '@nextcloud/l10n';
 import { loadState } from '@nextcloud/initial-state';
 import './imports/bootstrap';
-import './index.scss';
 
 
 import 'bpmn-js/dist/assets/diagram-js.css';
@@ -50,7 +49,7 @@ async function runEditor(){
 		console.log('making new file');
 		const datetime = new Date().toISOString();
 		fileInfo = {
-				name: 'diagram_'+datetime+'.bpmn',
+				name: 'diagram_'+datetime+'.'+extension,
 				path: dirName,
 				permissions: OC.PERMISSION_CREATE | OC.PERMISSION_UPDATE,
 				mime: extension
@@ -71,7 +70,11 @@ async function runEditor(){
 	
 	
 	} else if (fileInfo.mime?.includes('dmn')) {
-	
+		import(/* webpackChunkName: "bpmn-editor" */ './imports/DMNEditor').then(({ default: Editor }) => {
+			const editor = new Editor(fileInfo);
+			console.log('Starting DMN editor');
+			editor.start();
+		});
 	}else{
 		console.error('MimeType missing');
 	}

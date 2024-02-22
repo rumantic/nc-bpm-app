@@ -14,7 +14,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 module.exports = {
 	entry: {
 		filelist: [
-			path.join(__dirname, 'src', 'index.ts'),
+			path.join(__dirname, 'src', 'filelist.ts'),
 		],
 		admin: [
 			path.join(__dirname, 'src', 'admin.ts'),
