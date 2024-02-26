@@ -2,6 +2,20 @@ import { translate as t } from '@nextcloud/l10n';
 import { loadState } from '@nextcloud/initial-state';
 import './imports/bootstrap';
 import './filelist.scss';
+
+
+import 'bpmn-js/dist/assets/diagram-js.css';
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
+import 'bpmn-js/dist/assets/bpmn-js.css';
+
+import '@fortawesome/fontawesome-free/js/all.js';
+import '@fortawesome/fontawesome-free/js/solid.js';
+
+import './imports/Editor.scss';
+import './imports/BPMNEditor';
+import './imports/DMNEditor';
+import './imports/Editor';
+
 import {
 	DefaultType, FileAction, addNewFileMenuEntry, registerFileAction,
 	File, Permission, getNavigation

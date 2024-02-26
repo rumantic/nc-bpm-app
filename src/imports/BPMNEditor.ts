@@ -4,6 +4,9 @@ import {
 	BpmnPropertiesPanelModule,
 	BpmnPropertiesProviderModule,
 } from 'bpmn-js-properties-panel';
+
+//@ts-ignore
+import colorPicker from 'bpmn-js-color-picker';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda.json';
 import api from './api';
 import Editor from './Editor';
@@ -57,11 +60,11 @@ export default class BPMNEditor extends Editor {
 		}
 
 		if (this.file.etag || OCA.Sharing?.PublicApp) {
-			if(this.file.path.endsWith('/')){
+			if (this.file.path.endsWith('/')) {
 				return api.getFileContent(this.file.path, this.file.name);
 			}
 			//new version: path includes name. Old version: path does not include name.
-			return api.getFileContent(this.file.path,this.file.name);
+			return api.getFileContent(this.file.path, this.file.name);
 		}
 
 		return Promise.resolve(PLAIN_TEMPLATE);
@@ -85,13 +88,13 @@ export default class BPMNEditor extends Editor {
 		const elemReg = this.modeler.get('elementRegistry');
 		const mainProc = elemReg
 			.filter(el => isAny(el, ['bpmn:Process', 'bpmn:Collaboration']) && !is(el, 'bpmn:SubProcess'))[0];
-		
-		
+
+
 		const canvas = this.modeler.get('canvas');
 		const rootelem = canvas.getRootElement();
 
 		if (rootelem.type == 'bpmn:SubProcess') {
-			
+
 			canvas.setRootElement(mainProc);
 		}
 
@@ -196,6 +199,7 @@ export default class BPMNEditor extends Editor {
 					BpmnPropertiesPanelModule,
 					BpmnPropertiesProviderModule,
 					propertiesProvider,
+					colorPicker,
 				],
 				propertiesPanel: {
 					parent: propertiesElement,

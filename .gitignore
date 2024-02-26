@@ -13,4 +13,5 @@ node_modules/
 yarn-error.log
 /assets/
 .php-cs-fixer.cache
-*.lock
+yarn.lock
+composer.lock

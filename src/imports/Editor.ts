@@ -276,7 +276,9 @@ export default abstract class Editor {
 		//this.removePropertiesResizeListener();
 
 		window.removeEventListener('beforeunload', this.onBeforeUnload);
-		window.location.href = OC.generateUrl('/apps/files' + this.file.path); //files/dir=path without files_bpm
+		if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
+			window.location.href = OC.generateUrl('/apps/files' + this.file.path); //files/dir=path without files_bpm
+		}
 	}
 
 	private async onSave() {
@@ -467,7 +469,7 @@ export default abstract class Editor {
 
 				this.updateHistoryState();
 			}
-			
+
 		});
 	}
 
