@@ -55,7 +55,6 @@ export default class BPMNEditor extends Editor {
 
 	protected getContent(): Promise<string> {
 		if (this.modeler) {
-			console.log('***************************************************\nWe are loading a modeler');
 			return this.modeler.saveXML().then(data => data.xml);
 		}
 
@@ -155,26 +154,25 @@ export default class BPMNEditor extends Editor {
 		const moddle = this.modeler.get('moddle');
 		try {
 			await modeler.importXML(bpmnXML);
-			console.log(modeler);
-			// //Hack to manually extract and set the extension elements
-			// const extensionElementsDict = this.extElemHelper(bpmnXML);
-			// const elements = modeler.get('elementRegistry');
+			//Hack to manually extract and set the extension elements
+			const extensionElementsDict = this.extElemHelper(bpmnXML);
+			const elements = modeler.get('elementRegistry');
 
-			// elements.forEach(function (element) {
+			elements.forEach(function (element) {
 
-			// 	const extensionParent = getBusinessObject(element).extensionElements || moddle.create('bpmn:ExtensionElements');
-			// 	if (!extensionParent.values) {
-			// 		extensionParent.values = [];
-			// 	}
-			// 	const extProperties = extensionElementsDict.get(element.id) || [];
-			// 	for (let i = 0; i < extProperties.length; i++) {
-			// 		const prop = extProperties[i];
-			// 		const property = moddle.create('nc:property', { name: prop[0], value: prop[1] });
-			// 		extensionParent.get('values').push(property);
-			// 	}
-			// });
+				const extensionParent = getBusinessObject(element).extensionElements || moddle.create('bpmn:ExtensionElements');
+				if (!extensionParent.values) {
+					extensionParent.values = [];
+				}
+				const extProperties = extensionElementsDict.get(element.id) || [];
+				for (let i = 0; i < extProperties.length; i++) {
+					const prop = extProperties[i];
+					const property = moddle.create('nc:property', { name: prop[0], value: prop[1] });
+					extensionParent.get('values').push(property);
+				}
+			});
 
-			// this.addOverlays();
+			this.addOverlays();
 			//this.addResizeListener(this.onResize);
 		} catch (err) {
 			console.error(err);

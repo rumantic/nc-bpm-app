@@ -277,7 +277,7 @@ export default abstract class Editor {
 
 		window.removeEventListener('beforeunload', this.onBeforeUnload);
 		if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
-			window.location.href = OC.generateUrl('/apps/files' + this.file.path); //files/dir=path without files_bpm
+			window.location.href = OC.generateUrl('/apps/files/?dir=' + this.file.path); //files/dir=path without files_bpm
 		}
 	}
 
@@ -349,7 +349,6 @@ export default abstract class Editor {
 					height: 180,
 				}); //nb: width and height are a4 dimensions - 30 mm
 
-				console.log(svgElement);
 				await this.pdfAdditions(pdf);
 
 				//modeler-specific additional features (BPMN subprocesses, DMN to be seen)

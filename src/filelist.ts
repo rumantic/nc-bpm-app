@@ -42,7 +42,6 @@ function fixFileIconForFileShare() {
 }
 
 function registerFileIcon() {
-	console.log(OC?.MimeType?._mimeTypeIcons);
 	if (OC?.MimeType?._mimeTypeIcons) {
 		OC.MimeType._mimeTypeIcons['application/x-bpmn'] = OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg');
 		OC.MimeType._mimeTypeIcons['application/x-dmn'] = OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg');
@@ -87,7 +86,6 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 					alert("Not yet implemented.");
 					return false;
 				} else {
-					console.log('opening existing file');
 
 					var dirName = file.dirname;
 
@@ -116,10 +114,10 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 				if (!window.OC.getCurrentUser().uid) {
 					alert("Not yet implemented.");
 				} else {
-
-					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + folder.dirname +'&ext='+ext);
+					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + folder.path +'&ext='+ext);
+				
 					window.location.href = url;
-
+					
 					return true;
 
 				}
@@ -216,8 +214,6 @@ else {  // Nextcloud versions lower than 28
 				actionHandler(fileName: string, context) {
 					const file = context.fileList.elementToFile(context.$file);
 
-					console.log(fileList);
-					console.log(typeof(fileList));
 					startBPMNEditor(file, context.fileList);
 				},
 			});
@@ -233,8 +229,6 @@ else {  // Nextcloud versions lower than 28
 				actionHandler(fileName: string, context) {
 					const file = context.fileList.elementToFile(context.$file);
 
-					console.log(fileList);
-					console.log(typeof(fileList));
 					startDMNEditor(file, context.fileList);
 				},
 			});

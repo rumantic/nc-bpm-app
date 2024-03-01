@@ -46,7 +46,6 @@ let extension = urlParams.get('ext') ?? 'bpmn';
 async function runEditor(){
 	let fileInfo;
 	if(!fileId){
-		console.log('making new file');
 		const datetime = new Date().toISOString();
 		fileInfo = {
 				name: 'diagram_'+datetime+'.'+extension,
@@ -58,7 +57,6 @@ async function runEditor(){
 		fileInfo = await api.getFileInfo(fileId);
 	}
 
-	console.log(fileInfo);
 	//TEMP: Get mimetype properly
 	if (fileInfo.mime?.includes('bpmn')) {
 		
