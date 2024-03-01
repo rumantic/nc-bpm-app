@@ -173,7 +173,6 @@ export default class BPMNEditor extends Editor {
 			});
 
 			this.addOverlays();
-			//this.addResizeListener(this.onResize);
 		} catch (err) {
 			console.error(err);
 			this.showLoadingError(err.toString());
@@ -237,13 +236,13 @@ export default class BPMNEditor extends Editor {
 		const overlays = this.modeler.get('overlays');
 
 		elements.forEach(function (element) {
-			if (is(element, 'bpmn:CallActivity')) {
+			if (element.type == 'bpmn:CallActivity' ||element.type == 'bpmn:callActivity') {
 				try {
 					const extValues = element.businessObject?.extensionElements;
 					if (!extValues) {
 						return;
 					}
-					const modelUrl = extValues.values?.find(a => a.name == 'dataSource')?.value;
+					const modelUrl = extValues.values?.find(a => a.name == 'bpmnModel')?.value;
 					if (!modelUrl) {
 						return;
 					}

@@ -76,3 +76,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - BPMN-js updated to v11
 
 
+## 1.3.0 (2024-02-26)
+- Nextcloud support updated to v28
+- BPMN-js updated to v17
+
+
+## 1.3.1 (2024-03-0?)
+- Fixed behaviour on modeler exit: now returns you to the correct folder
+- Fixed Call Activity links
