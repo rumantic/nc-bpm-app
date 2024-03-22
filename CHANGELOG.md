@@ -81,6 +81,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - BPMN-js updated to v17
 
 
-## 1.3.1 (2024-03-0?)
+## 1.3.1 (2024-03-08)
 - Fixed behaviour on modeler exit: now returns you to the correct folder
 - Fixed Call Activity links
+
+## 1.3.2 (2024-03-24)
+- Fixed bug that prevented regular users from using the modeler

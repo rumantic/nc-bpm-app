@@ -13,6 +13,7 @@ use OCP\Files\IRootFolder;
 
 use OCP\AppFramework\Http;
 
+use OCP\ILogger;
 
 //Thanks to : https://github.com/githubkoma/multiboards/blob/main/js/filesintegration/src/index.js
 
@@ -20,9 +21,15 @@ use OCP\AppFramework\Http;
 class PageController extends Controller {
 	private $userId;
 	private IRootFolder $storage;
+	private $logger;
 
-	
-	public function __construct($AppName, IRequest $request, IRootFolder $storage, $UserId){
+
+	public function __construct($AppName,
+					IRequest $request,
+					IRootFolder
+					$storage,
+					$UserId,
+					ILogger $logger){
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->storage = $storage;
@@ -39,26 +46,26 @@ class PageController extends Controller {
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 * @PublicPage
-	 */	 
-    public function index() {	
-	
+	 */
+    public function index() {
+
 		if ($this->userId == "") {
-	
+
 			$template = new PublicTemplateResponse($this->appName, 'modeler', []);
 			$template->setHeaderTitle('BPMN Files');
 			$template->setHeaderDetails("Public");
 			$template->setFooterVisible(false);
-			
+
 			$response = $template;
 			//$response->setHeaders(['X-Frame-Options' => 'allow-from *']);		// Should be needed when this site is allowed to be embedded by 3rd party sites
-			
+
 		} else {
 			$response = $this->indexLoggedIn();
 		}
-		
+
         return $response;
     }
-	
+
 	/**
 	 * CAUTION: the @Stuff turns off security checks; for this page no admin is
 	 *          required and no CSRF check. If you don't know what CSRF is, read
@@ -69,11 +76,16 @@ class PageController extends Controller {
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
+
 	public function indexLoggedIn() {
 		return new TemplateResponse($this->appName, 'modeler');  // templates/index.php
 	}
 
-
+  /**
+     * This is not a comment, it's a setting!
+     * @NoAdminRequired
+     */
+	#[NoAdminRequired]
 	private function getFile($fileId){
 		$files = $this->storage->getById($fileId);
 
@@ -91,10 +103,14 @@ class PageController extends Controller {
 
         return $file;
 	}
-	
 
+	  /**
+     * This is not a comment, it's a setting!
+     * @NoAdminRequired
+     */
+	#[NoAdminRequired]
 	public function getFileInfo($fileId) {
-		try 
+		try
         {
             $file = $this->getFile($fileId);
 			//, $writeable, $relativePath
@@ -127,11 +143,17 @@ class PageController extends Controller {
 			$message ='An internal server error occurred.';
 			return new DataResponse(['message' => $message], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
-    
+
     }
 
+
+	  /**
+     * This is not a comment, it's a setting!
+     * @NoAdminRequired
+     */
+	#[NoAdminRequired]
 	public function getFileContent($fileId){
-		try 
+		try
         {
             $file = $this->getFile($fileId);
 			//, $writeable, $relativePath
@@ -148,6 +170,14 @@ class PageController extends Controller {
 		}
 	}
 
-
+  /**
+     * This is not a comment, it's a setting!
+     * @NoAdminRequired
+     */
+	#[NoAdminRequired]
+	public function testDummy($fileId){
+		$message = 'This is only a test. File ID: ';
+		return new DataResponse(['message'=> $message], 418);
+	}
 
 }

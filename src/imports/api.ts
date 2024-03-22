@@ -15,6 +15,7 @@ class Api {
 
 	public async getFileContent(path: string, name: string): Promise<string> {
 		const fullPath = this.getDownloadPath(path, name);
+		console.log('file content: '+fullPath);
 		const response = await axios.get(fullPath);
 
 		return response.data;
@@ -97,6 +98,7 @@ class Api {
 	public async getFileInfo(fileId: string): Promise<NextcloudFile>{
 
 		var url = generateUrl('/apps/files_bpm/page/getFileInfo?fileId='+fileId);
+		//var url = generateUrl('/apps/files_bpm/page/testDummy');
 		const response = await axios.get(url);
 		return response.data;
 	}
