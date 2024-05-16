@@ -60,7 +60,7 @@ module.exports = {
 				exclude: /node_modules/,
 			},
 			{
-				test: /\.(png|jpg|gif|svg)(\?.+)?$/,
+				test: /\.(png|jpg|gif)(\?.+)?$/,
 				type: 'asset/resource',
 			},
 			{
@@ -70,7 +70,11 @@ module.exports = {
 			{
 				test: /\.vue$/,
 				loader: 'vue-loader'
-			  }
+			  },
+			{
+				test: /\.svg$/,
+				loader: 'svg-inline-loader'
+			}
 		],
 	},
 	plugins: [

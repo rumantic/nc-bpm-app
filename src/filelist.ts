@@ -1,7 +1,6 @@
 import { translate as t } from '@nextcloud/l10n';
 import { loadState } from '@nextcloud/initial-state';
 import './imports/bootstrap';
-import './filelist.scss';
 
 
 import 'bpmn-js/dist/assets/diagram-js.css';
@@ -22,6 +21,10 @@ import {
 } from '@nextcloud/files'
 
 import './imports/Editor.scss';
+import './filelist.scss';
+
+const bpmnicon = require('./../img/icon-filetypes_bpmn.svg')
+const dmnicon = require('./../img/icon-filetypes_dmn.svg')
 
 function bootstrapFileShare() {
 	//called once on page load
@@ -33,11 +36,14 @@ function bootstrapFileShare() {
 
 function fixFileIconForFileShare() {
 	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-bpmn') {
-		$('#mimetypeIcon').val(OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'));
+		$('#mimetypeIcon').val(bpmnicon); //OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'));
 	}
 
 	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-dmn') {
-		$('#mimetypeIcon').val(OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'));
+		console.log('found a dmn icon');
+		console.log($('#dir').val());
+		console.log($('#mimetype').val());
+		$('#mimetypeIcon').val(dmnicon);//OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'));
 	}
 }
 
@@ -57,14 +63,14 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 			mime: 'application/x-bpmn',
 			type: 'text',
 			css: 'icon-filetype-bpmn',
-			icon: '../img/icon-filetypes_bpmn.svg',
+			icon: bpmnicon,//'../img/icon-filetypes_bpmn.svg',
 			newStr: 'New BPMN File',
 		},
 		dmn: {
 			mime: 'application/x-dmn',
 			type: 'text',
 			css: 'icon-filetype-dmn',
-			icon: OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'),
+			icon: dmnicon, //OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'),
 			newStr: 'New DMN File',
 		},
 	};
@@ -109,6 +115,7 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 				return getNavigation()?.active?.id === 'files'
 			},
 			iconClass: attr.css,
+			iconSvgInline: attr.icon,
 			async handler(folder, contents) {
 				//Generate new BPMN/DMN diagram
 				if (!window.OC.getCurrentUser().uid) {

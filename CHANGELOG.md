@@ -87,3 +87,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## 1.3.2 (2024-03-24)
 - Fixed bug that prevented regular users from using the modeler
+
+## 1.4.0 
+- Nextcloud support updated to v29
+- DMN-js updated to v16

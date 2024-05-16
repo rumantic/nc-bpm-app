@@ -33,14 +33,14 @@ abstract class BaseModeler {
 		});
 	}
 
-	public saveSVG(): Promise<{svg: string}> {
+	public saveSVG(): Promise<{ svg: string }> {
 		return new Promise(resolve => {
 			this.modeler.saveSVG((err, svg) => {
 				if (err) {
 					throw new Error(err);
 				}
 
-				resolve({svg});
+				resolve({ svg });
 			});
 		});
 	}
@@ -63,10 +63,10 @@ abstract class BaseModeler {
 	public getActiveView() {
 		return this.modeler.getActiveView();
 	}
-	public getViews(){
+	public getViews() {
 		return this.modeler.getViews();
 	}
-	public open(diagram: any){
+	public open(diagram: any) {
 		this.modeler.open(diagram);
 	}
 }
@@ -74,10 +74,17 @@ abstract class BaseModeler {
 export class DMSModeler extends BaseModeler {
 	constructor(options: {
 		container: string | JQuery<HTMLElement>,
-		common?: { keyboard?: { bindTo: Window }},
+		common?: { keyboard?: { bindTo: Window } },
 		drd?: {
 			propertiesPanel: {
 				parent: string | JQuery<HTMLElement>,
+				layout?: {
+					open: boolean,
+					groups?: {
+						documentation?: { open: boolean },
+						general?: { open: boolean }
+					}
+				}
 			},
 			additionalModules: Array<any>
 		},

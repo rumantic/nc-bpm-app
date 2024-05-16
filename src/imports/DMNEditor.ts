@@ -9,10 +9,10 @@ import 'dmn-js/dist/assets/dmn-js-shared.css';
 import 'dmn-js/dist/assets/dmn-font/css/dmn.css';
 import 'dmn-js-properties-panel/dist/assets/properties-panel.css';
 import { DMSModeler, DMSViewer } from './vendor/dms-js';
-import {DmnPropertiesPanelModule, DmnPropertiesProviderModule }from 'dmn-js-properties-panel';
+import { DmnPropertiesPanelModule, DmnPropertiesProviderModule } from 'dmn-js-properties-panel';
 //import drdAdapterModule from 'dmn-js-properties-panel/lib/adapter/drd';
 import camundaModdleDescriptor from 'camunda-dmn-moddle/resources/camunda.json';
-import {jsPDF} from 'jspdf';
+import { jsPDF } from 'jspdf';
 
 
 const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
@@ -39,7 +39,7 @@ const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
 export default class DMNEditor extends Editor {
 	private modeler: DMSModeler;
 	protected getContent(): Promise<string> {
-		
+
 		if (this.modeler) {
 			return this.modeler.saveXML();
 		}
@@ -56,16 +56,16 @@ export default class DMNEditor extends Editor {
 			const active = await this.modeler.getActiveViewer();
 			const temp = await this.modeler.getActiveView();
 			console.log(active);
-			if(active.type == 'drd'){
+			if (active.type == 'drd') {
 				console.log('print this');
 			}
-			else{
+			else {
 				const drd = this.modeler.getViews().filter(a => a.type == 'drd')[0];
-				this.modeler.open(drd);
+				await this.modeler.open(drd);
 			}
 			const svg = (await this.modeler.getActiveViewer().saveSVG()).svg;
 
-			this.modeler.open(temp);
+			await this.modeler.open(temp);
 			return svg;
 		}
 
@@ -78,17 +78,17 @@ export default class DMNEditor extends Editor {
 		//this.removeResizeListener(this.onResize);
 	}
 
-	protected async pdfAdditions(pdf: jsPDF): Promise<void>{
+	protected async pdfAdditions(pdf: jsPDF): Promise<void> {
 		console.log('No additions yet');
 	}
 	protected async runEditor(): Promise<void> {
-		const bpmnXML = await this.getContent();
+		const xmldata = await this.getContent();
 		const modeler = this.getModeler();
 
 		try {
-			await modeler.importXML(bpmnXML);
-			//this.addResizeListener(this.onResize);
+			const result = await modeler.importXML(xmldata);
 			this.attachChangeListener();
+			return result;
 		} catch (err) {
 			this.showLoadingError(err.toString());
 		}
@@ -103,7 +103,7 @@ export default class DMNEditor extends Editor {
 			const containerElement = this.getAppContainerElement();
 			const canvasElement = containerElement.find('.bpmn-canvas');
 			const propertiesElement = containerElement.find('.bpmn-properties');
-			
+
 			this.modeler = this.isFileUpdatable() ? new DMSModeler({
 				container: canvasElement,
 				common: {
@@ -114,6 +114,13 @@ export default class DMNEditor extends Editor {
 				drd: {
 					propertiesPanel: {
 						parent: propertiesElement,
+						layout: {
+							open: true,
+							groups: {
+								general: { open: true },
+								documentation: { open: true },
+							},
+						},
 					},
 					additionalModules: [
 						DmnPropertiesPanelModule, DmnPropertiesProviderModule,
@@ -126,22 +133,13 @@ export default class DMNEditor extends Editor {
 			}) : new DMSViewer({
 				container: canvasElement,
 			});
-
-			this.modeler.on('views.changed', function(...args) {
-				console.log('views.changed', args);
-
-			});
-
-			this.modeler.on('viewer.created', function(...args) {
-				console.log('viewer.created', args);
-			});
 		}
 
 		return this.modeler;
 	}
 
 	private attachChangeListener() {
-		const viewer = this.modeler.getActiveViewer();
+		let viewer = this.modeler.getActiveViewer();
 
 		if (!viewer) {
 			return;
@@ -152,10 +150,10 @@ export default class DMNEditor extends Editor {
 		viewer.on('element.changed', () => {
 			if (!this.hasUnsavedChanges) {
 				this.hasUnsavedChanges = true;
-
 				containerElement.attr('data-state', 'unsaved');
 			}
 		});
+
 	}
 
 	protected getAppContainerElement(): JQuery {
