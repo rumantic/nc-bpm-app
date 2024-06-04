@@ -17,14 +17,14 @@ import './imports/Editor';
 
 import {
 	DefaultType, FileAction, addNewFileMenuEntry, registerFileAction,
-	File, Permission, getNavigation
+	getNavigation
 } from '@nextcloud/files'
 
 import './imports/Editor.scss';
 import './filelist.scss';
 
-const bpmnicon = require('./../img/icon-filetypes_bpmn.svg')
-const dmnicon = require('./../img/icon-filetypes_dmn.svg')
+const bpmnicon = require('!!svg-inline-loader!./../img/icon-filetypes_bpmn.svg')
+const dmnicon = require('!!svg-inline-loader!./../img/icon-filetypes_dmn.svg')
 
 function bootstrapFileShare() {
 	//called once on page load
@@ -40,14 +40,13 @@ function fixFileIconForFileShare() {
 	}
 
 	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-dmn') {
-		console.log('found a dmn icon');
-		console.log($('#dir').val());
-		console.log($('#mimetype').val());
 		$('#mimetypeIcon').val(dmnicon);//OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'));
 	}
 }
 
 function registerFileIcon() {
+	console.log(OC.MimeType);
+	console.log(OC.MimeType._mimeTypeIcons)
 	if (OC?.MimeType?._mimeTypeIcons) {
 		OC.MimeType._mimeTypeIcons['application/x-bpmn'] = OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg');
 		OC.MimeType._mimeTypeIcons['application/x-dmn'] = OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg');
@@ -114,7 +113,6 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 				// only attach to main file list, public view is not supported yet
 				return getNavigation()?.active?.id === 'files'
 			},
-			iconClass: attr.css,
 			iconSvgInline: attr.icon,
 			async handler(folder, contents) {
 				//Generate new BPMN/DMN diagram
@@ -122,11 +120,8 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 					alert("Not yet implemented.");
 				} else {
 					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + folder.path +'&ext='+ext);
-				
 					window.location.href = url;
-					
 					return true;
-
 				}
 			}
 		});

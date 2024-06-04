@@ -2,7 +2,7 @@ import { TextFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
-export function TextComponent(props: any):TextFieldEntry {
+export function TextComponent(props: any): TextFieldEntry {
 	const { element, id } = props;
 
 	const modeling = useService('modeling');
@@ -31,7 +31,7 @@ export function TextComponent(props: any):TextFieldEntry {
 			extensionElements.get('values').push(prop);
 		}
 		prop.value = value;
-		
+
 		return modeling.updateProperties(element, {
 			extensionElements,
 		});
@@ -58,7 +58,7 @@ export function TextComponent(props: any):TextFieldEntry {
 }
 
 //TODO: import types from bpmn.io?
-export function getProperty(businessObject, type: string):any {
+export function getProperty(businessObject, type: string): any {
 	if (!businessObject.extensionElements) {
 		return;
 	}

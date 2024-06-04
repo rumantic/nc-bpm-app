@@ -295,7 +295,7 @@ export default abstract class Editor {
 
 			this.hasUnsavedChanges = false;
 			this.getAppContainerElement().attr('data-state', 'saved');
-
+			console.log(content)
 			return;
 		}
 

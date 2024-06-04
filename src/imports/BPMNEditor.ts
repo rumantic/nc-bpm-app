@@ -25,7 +25,7 @@ import { is, isAny, getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import propertiesProvider from './provider';
 import propDescriptor from './descriptors/ncModeler.json';
-
+import ncrenderer from './customElements';
 declare type Modeler = {
 	destroy(): void,
 	on(event: string, callback: (...any) => void): void
@@ -48,6 +48,7 @@ const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
 	</bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn2:definitions>`;
+
 
 export default class BPMNEditor extends Editor {
 
@@ -154,6 +155,20 @@ export default class BPMNEditor extends Editor {
 		const moddle = this.modeler.get('moddle');
 		try {
 			await modeler.importXML(bpmnXML);
+
+
+			const canvasElement = document.getElementsByClassName('bpmn-canvas')[0];
+			canvasElement.addEventListener('customElementAdded', (e: CustomEvent) => {
+				let elem = e.detail.elmt;
+
+				const elemReg = modeler.get('elementRegistry');
+				let foundelem = elemReg.get(elem.id);
+				const extensionParent = elem.extensionElements || moddle.create('bpmn:ExtensionElements');
+				extensionParent.values = [];
+				const property = moddle.create('nc:property', { name: 'chevron', value: true });
+				extensionParent.get('values').push(property);
+			})
+
 			//Hack to manually extract and set the extension elements
 			const extensionElementsDict = this.extElemHelper(bpmnXML);
 			const elements = modeler.get('elementRegistry');
@@ -188,7 +203,6 @@ export default class BPMNEditor extends Editor {
 			const containerElement = this.getAppContainerElement();
 			const canvasElement = containerElement.find('.bpmn-canvas')[0]; //[0] will return the HTMLElement; otherwise this function returns JQuery<HTMLElement>
 			const propertiesElement = containerElement.find('.bpmn-properties');
-			console.log('file updatable: ', this.isFileUpdatable());
 
 			this.modeler = this.isFileUpdatable() ? new BPMNModeler({
 				container: canvasElement,
@@ -197,6 +211,7 @@ export default class BPMNEditor extends Editor {
 					BpmnPropertiesProviderModule,
 					propertiesProvider,
 					colorPicker,
+					ncrenderer
 				],
 				propertiesPanel: {
 					parent: propertiesElement,
@@ -225,6 +240,7 @@ export default class BPMNEditor extends Editor {
 				}
 			});
 
+
 		}
 
 		return this.modeler;
@@ -236,7 +252,7 @@ export default class BPMNEditor extends Editor {
 		const overlays = this.modeler.get('overlays');
 
 		elements.forEach(function (element) {
-			if (element.type == 'bpmn:CallActivity' ||element.type == 'bpmn:callActivity') {
+			if (element.type == 'bpmn:CallActivity' || element.type == 'bpmn:callActivity') {
 				try {
 					const extValues = element.businessObject?.extensionElements;
 					if (!extValues) {
