@@ -10,11 +10,16 @@ import colorPicker from 'bpmn-js-color-picker';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda.json';
 import api from './api';
 import Editor from './Editor';
+
+
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import 'bpmn-js/dist/assets/bpmn-js.css';
 // import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 // import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
+// import 'bpmn-js-bpmnlint/dist/assets/css/bpmn-js-bpmnlint.css';
+
+import './Editor.scss';
 
 import '@fortawesome/fontawesome-free/js/all.js';
 import '@fortawesome/fontawesome-free/js/solid.js';
@@ -25,7 +30,6 @@ import { is, isAny, getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import propertiesProvider from './provider';
 import propDescriptor from './descriptors/ncModeler.json';
-
 declare type Modeler = {
 	destroy(): void,
 	on(event: string, callback: (...any) => void): void
@@ -59,17 +63,21 @@ export default class BPMNEditor extends Editor {
 		}
 
 		if (this.file.etag || OCA.Sharing?.PublicApp) {
-			if (this.file.path.endsWith('/')) {
-				return api.getFileContent(this.file.path, this.file.name);
-			}
-			//new version: path includes name. Old version: path does not include name.
+
 			return api.getFileContent(this.file.path, this.file.name);
+			// if (this.file.path.endsWith('/')) {
+			// 	return api.getFileContent(this.file.path, this.file.name);
+			// }
+
+			// //new version: path includes name. Old version: path does not include name.
+			// return api.getFileContent(this.file.path, this.file.name);
 		}
 
 		return Promise.resolve(PLAIN_TEMPLATE);
 	}
 
 	protected async getSVG(): Promise<string> {
+
 		if (this.modeler) {
 			return (await this.modeler.saveSVG()).svg;
 		}
@@ -82,20 +90,42 @@ export default class BPMNEditor extends Editor {
 
 		//this.removeResizeListener(this.onResize);
 	}
-	protected async pdfAdditions(pdf: jsPDF): Promise<void> {
+	protected async downloadAsPDF(pdf: jsPDF): Promise<void> {
 
+		const canvas = this.modeler.get('canvas');
+		const rootelem = canvas.getRootElement();
 		const elemReg = this.modeler.get('elementRegistry');
 		const mainProc = elemReg
 			.filter(el => isAny(el, ['bpmn:Process', 'bpmn:Collaboration']) && !is(el, 'bpmn:SubProcess'))[0];
 
-
-		const canvas = this.modeler.get('canvas');
-		const rootelem = canvas.getRootElement();
-
 		if (rootelem.type == 'bpmn:SubProcess') {
-
-			canvas.setRootElement(mainProc);
+			await canvas.setRootElement(mainProc);
+			console.log(canvas.getRootElement());
 		}
+		//for printing
+		const svgContainer = $('<div>');
+		svgContainer.css({
+			position: 'fixed',
+			bottom: '100%',
+		});
+		svgContainer.append(await this.getSVG());
+		svgContainer.appendTo(this.containerElement);
+
+		const svgElement = svgContainer.find('svg').get(0);
+		//const bounding = svgElement.getBoundingClientRect();
+
+		if (svgElement) {
+			const width = svgElement.width.baseVal.value < 620 ? svgElement.width.baseVal.value - 30 : 600;
+			const height = svgElement.height.baseVal.value < 375 ? svgElement.height.baseVal.value - 30 : 375;
+			await pdf.svg(svgElement, {
+				x: 15,
+				y: 45,
+				width: width,
+				height: height,
+			}); //nb: width and height are a4 dimensions - 30 mm
+		}
+
+		//get subprocesses
 
 		const subprocesses = elemReg.filter(el => el.type === 'bpmn:SubProcess' && el.hasOwnProperty('layer'));
 
@@ -107,21 +137,26 @@ export default class BPMNEditor extends Editor {
 				bottom: '100%',
 			});
 			canvas.setRootElement(subprocesses[i]);
+
 			svgContainer.append(await this.getSVG());
 			svgContainer.appendTo(this.containerElement);
 
 			const subsvg = svgContainer.find('svg').get(0);
 			if (subsvg) {
 				pdf.addPage('a4', 'landscape');
+				pdf.text(subprocesses[i].di.bpmnElement.name, 15, 30);
+
+				const width = subsvg.width.baseVal.value < 620 ? subsvg.width.baseVal.value - 30 : 600;
+				const height = subsvg.height.baseVal.value < 375 ? subsvg.height.baseVal.value - 30 : 375;
+
 				await pdf.svg(subsvg, {
 					x: 15,
-					y: 15,
-					width: 267,
-					height: 180,
+					y: 45,
+					width: width,
+					height: height,
 				});
 			}
 			svgContainer.remove();
-
 		}
 		canvas.setRootElement(rootelem);
 	}
@@ -188,8 +223,6 @@ export default class BPMNEditor extends Editor {
 			const containerElement = this.getAppContainerElement();
 			const canvasElement = containerElement.find('.bpmn-canvas')[0]; //[0] will return the HTMLElement; otherwise this function returns JQuery<HTMLElement>
 			const propertiesElement = containerElement.find('.bpmn-properties');
-			console.log('file updatable: ', this.isFileUpdatable());
-
 			this.modeler = this.isFileUpdatable() ? new BPMNModeler({
 				container: canvasElement,
 				additionalModules: [
@@ -215,39 +248,41 @@ export default class BPMNEditor extends Editor {
 				},
 				keyboard: { bindTo: window },
 			}) : new Viewer({
-				container: canvasElement,
+				container: canvasElement
 			});
-			this.modeler.on('element.changed', () => {
+			this.modeler.on('element.changed', (e) => {
+				console.log(typeof e);
 				if (!this.hasUnsavedChanges) {
 					this.hasUnsavedChanges = true;
 
 					containerElement.attr('data-state', 'unsaved');
 				}
+				this.updateOverlay(e);
 			});
 
 		}
-
 		return this.modeler;
 	}
+	private updateOverlay(ev) {
+		const element = ev.element;
+		if (isAny(element, ['bpmn:CallActivity', 'bpmn:DataStoreReference', 'bpmn:DataObjectReference'])) {
+			try {
+				const overlays = this.modeler.get('overlays');
+				overlays.remove({ element: element.id });
 
+				const extValues = element.businessObject?.extensionElements;
+				if (!extValues) {
+					return;
+				}
+				let modelUrl = extValues.values?.find(a => ['bpmnModel', 'dataSource'].indexOf(a.name) > 0)?.value;
+				if (!modelUrl) {
+					return;
+				}
+				modelUrl = modelUrl.replace('https://', '');
+				modelUrl = modelUrl.replace('https//', '');
 
-	private addOverlays() {
-		const elements = this.modeler.get('elementRegistry');
-		const overlays = this.modeler.get('overlays');
-
-		elements.forEach(function (element) {
-			if (element.type == 'bpmn:CallActivity' ||element.type == 'bpmn:callActivity') {
-				try {
-					const extValues = element.businessObject?.extensionElements;
-					if (!extValues) {
-						return;
-					}
-					const modelUrl = extValues.values?.find(a => a.name == 'bpmnModel')?.value;
-					if (!modelUrl) {
-						return;
-					}
-					const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
-
+				if (element.type == 'bpmn:CallActivity' || element.type == 'bpmn:callActivity') {
+				const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
 					overlays.add(element.id, 'drilldown', {
 						position: {
 							bottom: 0,
@@ -255,40 +290,85 @@ export default class BPMNEditor extends Editor {
 						},
 						html: htmlOverlay,
 					});
-				} catch (e) {
-					console.log('non-breaking error: ');
-					console.log(e);
-					//Non-breaking errors: continue running
+				} else {
+					const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-regular fa-file-lines"></i></a>`;
+
+					let left = element.width;
+					let top = element.height + 5;
+					if (element.label) {
+						left = (element.width + element.label.width) / 2 + 5;
+						top = element.height + element.label.height + 5;
+					}
+
+					overlays.add(element.id, 'drilldown', {
+						position: { left, top },
+						html: htmlOverlay,
+					});
 				}
+
+			} catch (e) {
+				//These overlays are just helpful, so it's better to skip any that break without warning the user
+				console.error('non-breaking error: ');
+				console.log(e);
 			}
-			else if (element.type == 'bpmn:DataStoreReference' || element.type == 'bpmn:DataObjectReference') {
-				const extValues = element.businessObject?.extensionElements;
-				if (!extValues) {
-					return;
-				}
-				const modelUrl = extValues.values?.find(a => a.name == 'dataSource')?.value;
-				if (!modelUrl) {
-					return;
-				}
-				const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-regular fa-file-lines"></i></a>`;
-
-				let left = element.width;
-				let top = element.height + 5;
-				if (element.label) {
-					left = (element.width + element.label.width) / 2 + 5;
-					top = element.height + element.label.height + 5;
-				}
-
-				overlays.add(element.id, 'drilldown', {
-					position: { left, top },
-					html: htmlOverlay,
-				});
-			}
-
-		});
+		}
 	}
 
+	private addOverlays() {
+		const elements = this.modeler.get('elementRegistry');
+		const overlays = this.modeler.get('overlays');
+		elements.forEach(function (element) {
+			if (isAny(element, ['bpmn:CallActivity', 'bpmn:DataStoreReference', 'bpmn:DataObjectReference'])) {
+				try {
+					const extValues = element.businessObject?.extensionElements;
+					if (!extValues) {
+						return;
+					}
+					let modelUrl = extValues.values?.find(a => ['bpmnModel', 'dataSource'].indexOf(a.name) > 0)?.value;
+					if (!modelUrl) {
+						return;
+					}
+					modelUrl = modelUrl.replace('https://', '');
+					modelUrl = modelUrl.replace('https//', '');
+					if (element.type == 'bpmn:CallActivity' || element.type == 'bpmn:callActivity') {
+						const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
+
+						overlays.add(element.id, 'drilldown', {
+							position: {
+								bottom: 0,
+								right: 0,
+							},
+							html: htmlOverlay,
+						});
+					} else {
+						const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-regular fa-file-lines"></i></a>`;
+
+						let left = element.width;
+						let top = element.height + 5;
+						if (element.label) {
+							left = (element.width + element.label.width) / 2 + 5;
+							top = element.height + element.label.height + 5;
+						}
+
+						overlays.add(element.id, 'drilldown', {
+							position: { left, top },
+							html: htmlOverlay,
+						});
+					}
+
+				} catch (e) {
+					//These overlays are just helpful, so it's better to skip any that break without warning the user
+					console.error('non-breaking error: ');
+					console.log(e);
+				}
+			}
+		});
+	}
 	protected getAppContainerElement(): JQuery {
+		let newcontainer = false;
+		if (!this.containerElement || this.containerElement.length === 0) {
+			newcontainer = true;
+		}
 		const containerElement = super.getAppContainerElement();
 		return containerElement;
 	}

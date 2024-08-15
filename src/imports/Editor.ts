@@ -3,6 +3,8 @@ import api from './api';
 import './Editor.scss';
 import { jsPDF } from 'jspdf';
 import 'svg2pdf.js';
+import { DialogBuilder, showError } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css';
 
 export type NextcloudFile = {
 	id?: number
@@ -56,7 +58,8 @@ export default abstract class Editor {
 
 	protected abstract destroy(): Promise<void>;
 
-	protected abstract pdfAdditions(pdf: jsPDF): Promise<void>;
+	//protected abstract pdfAdditions(pdf: jsPDF): Promise<void>;
+	protected abstract downloadAsPDF(pdf: jsPDF): Promise<void>;
 
 	public async start(): Promise<void> {
 		this.addEditStateToHistory();
@@ -135,9 +138,10 @@ export default abstract class Editor {
 			paletteElement.attr('data-filename', this.file.name);
 			paletteElement.appendTo(this.containerElement);
 
-			const groupElement = $('<div>');
-			groupElement.addClass('bpmn-group');
-			groupElement.appendTo(paletteElement);
+			const groupElement = $('<div>', {
+				id: 'modeler-actions-group',
+				class: 'bpmn-group',
+			}).appendTo(paletteElement);
 
 			const oldflag = getComputedStyle(document.body).getPropertyValue('--original-icon-download-dark') == '';
 
@@ -178,7 +182,6 @@ export default abstract class Editor {
 				}
 
 			}
-
 			const canvasElement = $('<div>');
 			canvasElement.addClass('bpmn-canvas');
 			canvasElement.appendTo(this.containerElement);
@@ -197,11 +200,11 @@ export default abstract class Editor {
 			}
 		}
 
-
 		return this.containerElement;
 	}
 
 	private toggleMenu = (ev: JQuery.ClickEvent) => {
+
 		ev.preventDefault();
 		ev.stopPropagation();
 
@@ -214,6 +217,7 @@ export default abstract class Editor {
 			$('body').one('click', closeMenu);
 		}
 
+
 		if ($(ev.currentTarget).hasClass('icon-loading') || ev.currentTarget !== ev.target) {
 			closeMenu();
 
@@ -225,7 +229,6 @@ export default abstract class Editor {
 
 	private setAppContainerReady(): void {
 		this.containerElement && this.containerElement.removeClass('icon-loading');
-		console.log('app container should be ready');
 		$('body').css('overflow', 'hidden');
 	}
 
@@ -253,7 +256,7 @@ export default abstract class Editor {
 		const text = t('files_bpm', 'Error while loading diagram: ') + errorMessage;
 		const title = t('files_bpm', 'Could not load diagram');
 
-		OC.dialogs.alert(text, title, () => undefined);
+		showError(text);
 	}
 
 	private async onClose() {
@@ -281,6 +284,7 @@ export default abstract class Editor {
 		}
 	}
 
+
 	private async onSave() {
 		const content = await this.getContent();
 
@@ -301,7 +305,10 @@ export default abstract class Editor {
 
 		if (result.statuscode === STATUS_PRECONDITION_FAILED) {
 			await this.onFileHasChanged(result.header.etag);
-
+			const retry = await api.uploadFile(this.file.path, this.file.name, content, this.file.etag);
+			if(!(retry.statuscode >= 200 && retry.statuscode <= 299) ){
+				throw new Error(`Unexpected status code (${retry.statuscode}) while uploading file on second try`);
+			}
 			return;
 		}
 
@@ -319,90 +326,95 @@ export default abstract class Editor {
 		linkElement.remove();
 	}
 
+	//pdf printing
 	private async onDownloadAsPDF() {
-		//for printing
-		const svgContainer = $('<div>');
-		svgContainer.css({
-			position: 'fixed',
-			bottom: '100%',
-		});
-		svgContainer.append(await this.getSVG());
-		svgContainer.appendTo(this.containerElement);
 
-		const svgElement = svgContainer.find('svg').get(0);
-		if (svgElement) {
-			//const bounding = svgElement.getBoundingClientRect();
-			const pdf = new jsPDF({
-				orientation: 'landscape',
-				format: 'a4',
-				unit: 'pt',
-			});//bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
-			const title = this.file.name.replace(/\.[^.]+$/, '') ?? 'Diagram';
+		//using mm as units breaks the arrows in the SVGs
+		const pdf = new jsPDF({
+			orientation: 'landscape',
+			format: 'a4',
+			unit: 'px',
+		});//bounding.width > bounding.height ? 'l' : 'p', 'pt', [bounding.width, bounding.height]);
+		const title = this.file.name.replace(/\.[^.]+$/, '') ?? 'Diagram';
 
-			pdf.setFontSize(25).text(title, 30, 30);
+		pdf.setFontSize(25).text(title, 15, 30);
+		await this.downloadAsPDF(pdf);
 
-			try {
-				await pdf.svg(svgElement, {
-					x: 15,
-					y: 30,
-					width: 267,
-					height: 180,
-				}); //nb: width and height are a4 dimensions - 30 mm
 
-				await this.pdfAdditions(pdf);
-
-				//modeler-specific additional features (BPMN subprocesses, DMN to be seen)
-				await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), { returnPromise: true });
-			} catch (err) {
-				svgContainer.remove();
-
-				throw err;
-			}
+		try {
+			await pdf.save(this.file.name.replace(/\.[^.]+$/, '.pdf'), { returnPromise: true });
+		} catch (err) {
+			throw err;
 		}
-
-		svgContainer.remove();
 	}
 
 	private async onFileHasChanged(serverEtag: string) {
-		const title = t('files_bpm', 'File has changed');
-		const description = t('files_bpm', 'The file was modified while editing. Do you want to overwrite it, or should your changes be saved with a new filename?');
-		const buttons = {
-			type: OC.dialogs.YES_NO_BUTTONS,
-			confirm: t('files_bpm', 'Overwrite'),
-			cancel: t('files_bpm', 'As new file'),
-		};
+		// const title = t('files_bpm', 'File has changed');
+		// const description = t('files_bpm', 'The file was modified while editing. Do you want to overwrite it, or should your changes be saved with a new filename?');
+		// const buttons = {
+		// 	type: OC.dialogs.YES_NO_BUTTONS,
+		// 	confirm: t('files_bpm', 'Overwrite'),
+		// 	cancel: t('files_bpm', 'As new file'),
+		// };
 
 		return new Promise(resolve => {
-			OC.dialogs.confirmDestructive(description, title, buttons, (overwrite) => {
-				if (overwrite) {
+
+
+			// OC.dialogs.confirmDestructive(description, title, buttons, (overwrite) => {
+			// 	if (overwrite) {
+			// 		this.file.etag = serverEtag;
+			// 	} else {
+			// 		this.file.name = this.generateNewFileName();
+			// 		this.file.etag = '';
+			// 		this.getAppContainerElement().find('.bpmn-filename').attr('data-filename', this.file.name);
+			// 	}
+
+			// 	resolve(this.onSave());
+			// }, true);
+
+			let newButtons = [{
+				label: 'Overwrite', 
+				type: 'primary' as const, 
+				callback: () => {
 					this.file.etag = serverEtag;
-				} else {
+					resolve(true);
+				}
+			},
+			{
+				label: 'As new file', 
+				callback: () => {
 					this.file.name = this.generateNewFileName();
 					this.file.etag = '';
-
 					this.getAppContainerElement().find('.bpmn-filename').attr('data-filename', this.file.name);
+					resolve(false);
 				}
-
-				resolve(this.onSave());
-			}, true);
+			}
+			];
+			const builder = new DialogBuilder();
+			builder.setName('File has changed')
+			builder.setText('The file was modified while editing. Do you want to overwrite it, or should your changes be saved with a new filename?')
+			builder.setButtons(newButtons);
+			let dialog = builder.build();
+			dialog.show();
 		});
 	}
 
 	private async showConfirmClose(): Promise<boolean> {
 		return new Promise(resolve => {
-			const title = t('files_bpm', 'Discard changes?');
-			const description = t('files_bpm', 'You have unsaved changes. Do you really want to close the editor? All your changes will be lost.');
-			const buttons = {
-				type: OC.dialogs.YES_NO_BUTTONS,
-				confirm: t('files_bpm', 'Close editor'),
-				cancel: t('files_bpm', 'Abort'),
-			};
 
-			OC.dialogs.confirmDestructive(description, title, buttons, resolve, true);
+			let newButtons = [{ label: 'Close editor', type: 'primary' as const, callback: () => { resolve(true); } },
+			{ label: 'Abort', callback: () => { resolve(false); } }
+			];
+			const builder = new DialogBuilder();
+			builder.setName('Discard changes?')
+			builder.setText('You have unsaved changes. Do you really want to close the editor?')
+			builder.setButtons(newButtons);
+			let dialog = builder.build();
+			dialog.show();
 		});
 	}
 
-	private clickCallbackFactory = (handler: () => Promise<void>, className?: string) => {
+	protected clickCallbackFactory = (handler: () => Promise<void>, className?: string) => {
 		return (ev: JQuery.ClickEvent<HTMLElement>) => {
 			ev.preventDefault();
 
@@ -422,15 +434,15 @@ export default abstract class Editor {
 					targetElement.removeClass('icon-checkmark');
 
 					className && targetElement.addClass(className);
-				}, 3000);
+				}, 1000);
 			}).catch((error) => {
 				console.log('clickCBFactory Error', error);
-
-				OC.dialogs.alert(
-					error.toString(),
-					t('files_bpm', 'Error'),
-					() => undefined
-				);
+				showError(error.toString())
+				// OC.dialogs.alert(
+				// 	error.toString(),
+				// 	t('files_bpm', 'Error'),
+				// 	() => undefined
+				// );
 
 				targetElement.addClass('icon-error');
 

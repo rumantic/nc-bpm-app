@@ -38,15 +38,6 @@ export function TextComponent(props: any):TextFieldEntry {
 	};
 
 	const label = props.label ?? id;
-	// return TextFieldEntry(
-	// 	{ id:id,
-	// 		element,
-	// 		label: translate(label),
-	// 		getValue,
-	// 		setValue,
-	// 		debounce,
-	// 	}
-	// );
 	return html`<${TextFieldEntry}
 	    id=${id}
 	    element=${element}

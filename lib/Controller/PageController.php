@@ -6,6 +6,7 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\Template\PublicTemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\Util;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IConfig;
@@ -47,6 +48,7 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
 	 * @PublicPage
 	 */
+	#[NoAdminRequired]
     public function index() {
 
 		if ($this->userId == "") {
@@ -76,6 +78,8 @@ class PageController extends Controller {
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 
 	public function indexLoggedIn() {
 		return new TemplateResponse($this->appName, 'modeler');  // templates/index.php

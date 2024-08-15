@@ -91,3 +91,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## 1.4.0 
 - Nextcloud support updated to v29
 - DMN-js updated to v16
+
+## 1.5.0
+- Nextcloud support updated to v30
+- Fixed icons for pdf, svg downloads, save button
+- Update to pdf download: subprocesses now have titles
+- Links for call activities and data references now update immediately

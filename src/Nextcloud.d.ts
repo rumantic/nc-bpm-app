@@ -98,7 +98,7 @@ declare namespace OC {
 	const requestToken: string;
 
 	const config: {
-		blacklist_files_regex: string;
+		forbidden_filenames: string;
 		enable_avatars: boolean;
 		last_password_link: string | null;
 		modRewriteWorking: boolean;

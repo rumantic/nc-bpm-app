@@ -78,13 +78,47 @@ export default class DMNEditor extends Editor {
 		//this.removeResizeListener(this.onResize);
 	}
 
-	protected async pdfAdditions(pdf: jsPDF): Promise<void> {
-		console.log('No additions yet');
+	protected async downloadAsPDF(pdf: jsPDF): Promise<void> {
+		//for printing
+		const svgContainer = $('<div>');
+		svgContainer.css({
+			position: 'fixed',
+			bottom: '100%',
+		});
+		svgContainer.append(await this.getSVG());
+		svgContainer.appendTo(this.containerElement);
+
+		const svgElement = svgContainer.find('svg').get(0);
+		if (svgElement) {
+			//modeler-specific additional features (BPMN subprocesses, DMN to be seen)
+
+			const width = svgElement.width.baseVal.value < 620? svgElement.width.baseVal.value - 30 : 600;
+			const height = svgElement.height.baseVal.value < 375? svgElement.height.baseVal.value - 30 : 375;
+
+			try {
+				await pdf.svg(svgElement, {
+					x: 15,
+					y: 30,
+					width: width,
+					height: height,
+				}); //nb: width and height are a4 dimensions - 30 mm
+
+			} catch (err) {
+				svgContainer.remove();
+
+				throw err;
+			}
+		}
+
+		svgContainer.remove();
 	}
 	protected async runEditor(): Promise<void> {
-		const xmldata = await this.getContent();
-		const modeler = this.getModeler();
+		let xmldata = await this.getContent();
+		if (!xmldata || xmldata == '') {
+			xmldata = PLAIN_TEMPLATE;
+		}
 
+		const modeler = this.getModeler();
 		try {
 			const result = await modeler.importXML(xmldata);
 			this.attachChangeListener();
