@@ -8,6 +8,8 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\Util;
+use OCP\IURLGenerator;
+use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IConfig;
 use OCP\Files\IRootFolder;
@@ -23,6 +25,7 @@ class PageController extends Controller {
 	private $userId;
 	private IRootFolder $storage;
 	private $logger;
+	private $urlGenerator;
 
 
 	public function __construct($AppName,
@@ -30,10 +33,12 @@ class PageController extends Controller {
 					IRootFolder
 					$storage,
 					$UserId,
-					ILogger $logger){
+					ILogger $logger,
+					IURLGenerator $urlGenerator,){
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->storage = $storage;
+		$this->urlGenerator = $urlGenerator;
 	}
 
 
@@ -59,6 +64,10 @@ class PageController extends Controller {
 			$template->setFooterVisible(false);
 
 			$response = $template;
+			$redirectUrl = $this->urlGenerator->linkToRoute("core.login.showLoginForm", [
+                "redirect_url" => $this->request->getRequestUri()
+            ]);
+            return new RedirectResponse($redirectUrl);
 			//$response->setHeaders(['X-Frame-Options' => 'allow-from *']);		// Should be needed when this site is allowed to be embedded by 3rd party sites
 
 		} else {
@@ -91,22 +100,24 @@ class PageController extends Controller {
      */
 	#[NoAdminRequired]
 	private function getFile($fileId){
-		$files = $this->storage->getById($fileId);
+		$userFolder = $this->storage->getUserFolder($this->userId);
+		try{
+			$file = $userFolder->getById($fileId)[0];
 
-        if (empty($files))
-        {
-            throw new NotFoundException();
+		} catch(\OCP\Files\NotFoundException $e) {
+            throw new StorageException('File does not exist');
         }
-
-        $file = $files[0];
-
         if (!$file->isReadable())
         {
             throw new ForbiddenException();
         }
-
-        return $file;
+		if ($file instanceof \OCP\Files\File) {
+			return $file;
+		} else {
+			throw new StorageException('Can not read from folder');
+		}
 	}
+
 
 	  /**
      * This is not a comment, it's a setting!

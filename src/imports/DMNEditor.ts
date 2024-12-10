@@ -45,7 +45,7 @@ export default class DMNEditor extends Editor {
 		}
 
 		if (this.file.etag || OCA.Sharing?.PublicApp) {
-			return api.getFileContent(this.file.path, this.file.name);
+			return api.getFileContent(this.file.path, this.file.id ?? 0);
 		}
 
 		return Promise.resolve(PLAIN_TEMPLATE);
@@ -122,7 +122,20 @@ export default class DMNEditor extends Editor {
 		try {
 			const result = await modeler.importXML(xmldata);
 			this.attachChangeListener();
-			return result;
+			const containerElement = this.getAppContainerElement();
+			const propertiesElement = containerElement.find('.bpmn-properties');
+
+			$('<div>')
+				.addClass('entry close icon-close propertiespanel-close')
+				.attr('role', 'button')
+				.on('click', this.clickCallbackFactory(this.closeProp))
+				.appendTo(propertiesElement);
+
+			this.modeler.getActiveViewer().on('propertiesPanel.updated', () => {
+				propertiesElement.removeClass('hidden');
+			})
+
+
 		} catch (err) {
 			this.showLoadingError(err.toString());
 		}
@@ -171,7 +184,14 @@ export default class DMNEditor extends Editor {
 
 		return this.modeler;
 	}
+	protected async closeProp(): Promise<void> {
+		const containerElement = this.getAppContainerElement();
+		const propertiesElement = containerElement.find('.bpmn-properties');
+		console.log(containerElement);
+		console.log(propertiesElement);
+		propertiesElement.addClass('hidden');
 
+	}
 	private attachChangeListener() {
 		let viewer = this.modeler.getActiveViewer();
 
@@ -187,6 +207,7 @@ export default class DMNEditor extends Editor {
 				containerElement.attr('data-state', 'unsaved');
 			}
 		});
+		//todo: figure out event for changes in a DRD, and set that -> unsaved changes
 
 	}
 

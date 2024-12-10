@@ -63,6 +63,7 @@ export default abstract class Editor {
 
 	public async start(): Promise<void> {
 		this.addEditStateToHistory();
+		document.title = this.file.name +' - Nextcloud';
 		await this.runEditor();
 		this.setAppContainerReady();
 		//this.addPropertiesResizeListener();
@@ -165,7 +166,7 @@ export default abstract class Editor {
 			}
 
 			$('<ul>')
-				.addClass('menu')
+				.addClass('menu hide')
 				.append($('<li>').addClass('entry icon-image').attr('title', t('files_bpm', 'Export SVG')).on('click', this.clickCallbackFactory(this.onDownloadAsSVG, 'icon-download')))
 				.append($('<li>').addClass('entry icon-pdf').attr('title', t('files_bpm', 'Export PDF')).on('click', this.clickCallbackFactory(this.onDownloadAsPDF, 'icon-download')))
 				.appendTo(downloadElement);
@@ -203,28 +204,25 @@ export default abstract class Editor {
 		return this.containerElement;
 	}
 
-	private toggleMenu = (ev: JQuery.ClickEvent) => {
+	protected toggleMenu = (ev: JQuery.ClickEvent) => {
 
 		ev.preventDefault();
 		ev.stopPropagation();
-
-		const element = $(ev.currentTarget).find('ul');
-		const closeMenu = () => element.removeClass('show');
-
-		if (element.hasClass('show')) {
-			$('body').off('click', closeMenu);
+		const list = $(ev.currentTarget).find('ul');
+		const closeMenu = () => list.addClass('hide');
+		if (list.hasClass('hide')) {
+			$('body').on('click', closeMenu);
 		} else {
-			$('body').one('click', closeMenu);
+			$('body').off('click', closeMenu);
 		}
 
-
-		if ($(ev.currentTarget).hasClass('icon-loading') || ev.currentTarget !== ev.target) {
+// || ev.currentTarget !== ev.target
+		if ($(ev.currentTarget).hasClass('icon-loading')) {
 			closeMenu();
-
 			return;
 		}
 
-		element.toggleClass('show');
+		list.toggleClass('hide');
 	}
 
 	private setAppContainerReady(): void {
@@ -299,7 +297,6 @@ export default abstract class Editor {
 
 			this.hasUnsavedChanges = false;
 			this.getAppContainerElement().attr('data-state', 'saved');
-
 			return;
 		}
 
@@ -373,15 +370,15 @@ export default abstract class Editor {
 			// }, true);
 
 			let newButtons = [{
-				label: 'Overwrite', 
-				type: 'primary' as const, 
+				label: 'Overwrite',
+				type: 'primary' as const,
 				callback: () => {
 					this.file.etag = serverEtag;
 					resolve(true);
 				}
 			},
 			{
-				label: 'As new file', 
+				label: 'As new file',
 				callback: () => {
 					this.file.name = this.generateNewFileName();
 					this.file.etag = '';

@@ -4,9 +4,12 @@ import {
 	BpmnPropertiesPanelModule,
 	BpmnPropertiesProviderModule,
 } from 'bpmn-js-properties-panel';
+import { translate as t } from '@nextcloud/l10n';
 
 //@ts-ignore
 import colorPicker from 'bpmn-js-color-picker';
+import copyPasteModule from './copypaste';
+
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda.json';
 import api from './api';
 import Editor from './Editor';
@@ -19,6 +22,8 @@ import 'bpmn-js/dist/assets/bpmn-js.css';
 // import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 // import 'bpmn-js-bpmnlint/dist/assets/css/bpmn-js-bpmnlint.css';
 
+let openPropertiesPanel = false;
+
 import './Editor.scss';
 
 import '@fortawesome/fontawesome-free/js/all.js';
@@ -30,6 +35,7 @@ import { is, isAny, getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 import propertiesProvider from './provider';
 import propDescriptor from './descriptors/ncModeler.json';
+
 declare type Modeler = {
 	destroy(): void,
 	on(event: string, callback: (...any) => void): void
@@ -64,7 +70,8 @@ export default class BPMNEditor extends Editor {
 
 		if (this.file.etag || OCA.Sharing?.PublicApp) {
 
-			return api.getFileContent(this.file.path, this.file.name);
+			//return api.fileContentFmController(this.file.path, this.file.id ?? 0);
+			return api.getFileContent(this.file.path, this.file.id ?? 0);
 			// if (this.file.path.endsWith('/')) {
 			// 	return api.getFileContent(this.file.path, this.file.name);
 			// }
@@ -100,7 +107,6 @@ export default class BPMNEditor extends Editor {
 
 		if (rootelem.type == 'bpmn:SubProcess') {
 			await canvas.setRootElement(mainProc);
-			console.log(canvas.getRootElement());
 		}
 		//for printing
 		const svgContainer = $('<div>');
@@ -137,7 +143,6 @@ export default class BPMNEditor extends Editor {
 				bottom: '100%',
 			});
 			canvas.setRootElement(subprocesses[i]);
-
 			svgContainer.append(await this.getSVG());
 			svgContainer.appendTo(this.containerElement);
 
@@ -184,7 +189,11 @@ export default class BPMNEditor extends Editor {
 	};
 
 	protected async runEditor(): Promise<void> {
-		const bpmnXML = await this.getContent();
+
+		let bpmnXML = await this.getContent();
+		if (!bpmnXML || bpmnXML == '') {
+			bpmnXML = PLAIN_TEMPLATE;
+		}
 		const modeler = this.getModeler();
 		const moddle = this.modeler.get('moddle');
 		try {
@@ -206,7 +215,6 @@ export default class BPMNEditor extends Editor {
 					extensionParent.get('values').push(property);
 				}
 			});
-
 			this.addOverlays();
 		} catch (err) {
 			console.error(err);
@@ -230,6 +238,7 @@ export default class BPMNEditor extends Editor {
 					BpmnPropertiesProviderModule,
 					propertiesProvider,
 					colorPicker,
+					copyPasteModule
 				],
 				propertiesPanel: {
 					parent: propertiesElement,
@@ -246,12 +255,10 @@ export default class BPMNEditor extends Editor {
 					camunda: camundaModdleDescriptor,
 					nc: propDescriptor,
 				},
-				keyboard: { bindTo: window },
 			}) : new Viewer({
 				container: canvasElement
 			});
 			this.modeler.on('element.changed', (e) => {
-				console.log(typeof e);
 				if (!this.hasUnsavedChanges) {
 					this.hasUnsavedChanges = true;
 
@@ -259,22 +266,40 @@ export default class BPMNEditor extends Editor {
 				}
 				this.updateOverlay(e);
 			});
+			if (openPropertiesPanel) {
+
+				$('<div>')
+					.addClass('entry close icon-close propertiespanel-close')
+					.attr('role', 'button')
+					.on('click', this.clickCallbackFactory(this.closeProp))
+					.appendTo(propertiesElement);
+				console.log('appended a close button');
+			}
 
 		}
 		return this.modeler;
 	}
+	protected async closeProp(): Promise<void> {
+		const containerElement = this.getAppContainerElement();
+		const propertiesElement = containerElement.find('.bpmn-properties');
+		propertiesElement.addClass('hidden');
+	}
+
 	private updateOverlay(ev) {
+		console.log('updating overlays');
 		const element = ev.element;
-		if (isAny(element, ['bpmn:CallActivity', 'bpmn:DataStoreReference', 'bpmn:DataObjectReference'])) {
+		if (isAny(element, ['bpmn:CallActivity', 'bpmn:DataStoreReference', 'bpmn:DataObjectReference']) &&! (element.type == 'label' )) {
+			console.log(element);
 			try {
 				const overlays = this.modeler.get('overlays');
+
 				overlays.remove({ element: element.id });
 
 				const extValues = element.businessObject?.extensionElements;
 				if (!extValues) {
 					return;
 				}
-				let modelUrl = extValues.values?.find(a => ['bpmnModel', 'dataSource'].indexOf(a.name) > 0)?.value;
+				let modelUrl = extValues.values?.find(a => ['bpmnModel', 'dataSource'].indexOf(a.name) >= 0)?.value;
 				if (!modelUrl) {
 					return;
 				}
@@ -282,7 +307,7 @@ export default class BPMNEditor extends Editor {
 				modelUrl = modelUrl.replace('https//', '');
 
 				if (element.type == 'bpmn:CallActivity' || element.type == 'bpmn:callActivity') {
-				const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
+					const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
 					overlays.add(element.id, 'drilldown', {
 						position: {
 							bottom: 0,
@@ -318,18 +343,24 @@ export default class BPMNEditor extends Editor {
 		const elements = this.modeler.get('elementRegistry');
 		const overlays = this.modeler.get('overlays');
 		elements.forEach(function (element) {
-			if (isAny(element, ['bpmn:CallActivity', 'bpmn:DataStoreReference', 'bpmn:DataObjectReference'])) {
+
+			if (isAny(element, ['bpmn:CallActivity', 'bpmn:DataStoreReference', 'bpmn:DataObjectReference']) && ! (element.type == 'label')) {
 				try {
+					console.log(element);
 					const extValues = element.businessObject?.extensionElements;
 					if (!extValues) {
 						return;
 					}
-					let modelUrl = extValues.values?.find(a => ['bpmnModel', 'dataSource'].indexOf(a.name) > 0)?.value;
+					overlays.remove({ element: element.id });
+
+					let modelUrl = extValues.values?.find(a => ['bpmnModel', 'dataSource'].indexOf(a.name) >= 0)?.value;
 					if (!modelUrl) {
 						return;
 					}
+
 					modelUrl = modelUrl.replace('https://', '');
 					modelUrl = modelUrl.replace('https//', '');
+
 					if (element.type == 'bpmn:CallActivity' || element.type == 'bpmn:callActivity') {
 						const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-solid fa-link"></i></a>`;
 
@@ -341,7 +372,7 @@ export default class BPMNEditor extends Editor {
 							html: htmlOverlay,
 						});
 					} else {
-						const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank"><i class="fa-regular fa-file-lines"></i></a>`;
+						const htmlOverlay = `<a href="https://${modelUrl}" class="djs-overlay djs-overlay-drilldown link-overlay" target="_blank""><i class="fa-regular fa-file-lines"></i></a>`;
 
 						let left = element.width;
 						let top = element.height + 5;
@@ -355,7 +386,6 @@ export default class BPMNEditor extends Editor {
 							html: htmlOverlay,
 						});
 					}
-
 				} catch (e) {
 					//These overlays are just helpful, so it's better to skip any that break without warning the user
 					console.error('non-breaking error: ');
@@ -370,6 +400,44 @@ export default class BPMNEditor extends Editor {
 			newcontainer = true;
 		}
 		const containerElement = super.getAppContainerElement();
+		// if (newcontainer) {
+		//const groupElement = $('#modeler-actions-group');
+		if (newcontainer) {
+			const actionsgroup = document.getElementById('modeler-actions-group') ?? $('#modeler-actions-group');
+			$('<div>', { id: 'propertiesToggle' })
+				.attr('role', 'button')
+				.addClass('entry')
+				.on('click', this.toggleProperties)
+				.append('<span>Properties</span>')
+				.appendTo(actionsgroup);
+		}
+
+
+		// 	//Properties Panel on/off button
+		// 	const propertiesToggle = $('<div>', { id: 'propertiesToggle' })
+		// 		.attr('role', 'button')
+		// 		.addClass('entry')
+		// 		.on('click', this.toggleProperties)
+		// 		.append('<span>Properties</span>')
+		// 		.appendTo(groupElement);
+		// }
 		return containerElement;
 	}
+
+
+
+	private toggleProperties = (ev: JQuery.ClickEvent) => {
+
+		openPropertiesPanel = !openPropertiesPanel;
+
+		const propertiesElement = this.getAppContainerElement().find('.bpmn-properties');
+		propertiesElement.toggleClass('hidden');
+		// if (openPropertiesPanel) {
+		// 	propertiesElement.removeClass('hidden');
+		// }else{
+		// 	propertiesElement.addClass('hidden');
+		// 	//
+		// }
+	}
+
 }

@@ -1,9 +1,10 @@
 import { generateRemoteUrl, getRootUrl } from '@nextcloud/router';
 import axios from '@nextcloud/axios';
-import {generateUrl} from '@nextcloud/router';
+import { generateUrl } from '@nextcloud/router';
 
-import { File } from '@nextcloud/files'
 import { NextcloudFile } from './Editor';
+import { showError } from '@nextcloud/dialogs'
+import {emit} from '@nextcloud/event-bus'
 
 class Api {
 	public async checkPreviewServer(serverUrl: string): Promise<'success' | 'invalid-url'> {
@@ -13,15 +14,24 @@ class Api {
 		return response.data.result;
 	}
 
-	public async getFileContent(path: string, name: string): Promise<string> {
-		const fullPath = this.getDownloadPath(path, name);
-		console.log('file content: '+fullPath);
-		const response = await axios.get(fullPath);
 
+	// public async getFileContent(path: string, name: string): Promise<string> {
+	// 	const fullPath = this.getDownloadPath(path, name);
+	// 	const response = await axios.get(fullPath);
+
+	// 	return response.data;
+	// }
+
+	public async getFileContent(path: string, fileId: number): Promise<string> {
+		if(fileId == 0){
+			showError('File ID is missing!');
+		}
+		var url = generateUrl('/apps/files_bpm/page/getFileContent?fileId=' + fileId);
+		const response = await axios.get(url);
 		return response.data;
 	}
 
-	
+
 	public getDownloadPath(path: string, name: string): string {
 		path = encodeURI(path);
 		name = encodeURIComponent(name);
@@ -57,12 +67,12 @@ class Api {
 			});
 		} catch (error) {
 			if (!error.response) {
+				console.log(error);
 				throw error;
 			}
-
+			showError('Problem saving file, please check the console');
 			response = error.response;
 		}
-
 		return {
 			data: response.data,
 			statuscode: response.status,
@@ -91,18 +101,14 @@ class Api {
 		return etag;
 	}
 
-	// public async createFile(path: string, ext:string){
+	public async getFileInfo(fileId: string): Promise<NextcloudFile> {
 
-	// }
-
-	public async getFileInfo(fileId: string): Promise<NextcloudFile>{
-
-		var url = generateUrl('/apps/files_bpm/page/getFileInfo?fileId='+fileId);
+		var url = generateUrl('/apps/files_bpm/page/getFileInfo?fileId=' + fileId);
 		//var url = generateUrl('/apps/files_bpm/page/testDummy');
 		const response = await axios.get(url);
 		return response.data;
 	}
-	
+
 }
 
 const api = new Api();

@@ -88,7 +88,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## 1.3.2 (2024-03-24)
 - Fixed bug that prevented regular users from using the modeler
 
-## 1.4.0 
+## 1.4.0
 - Nextcloud support updated to v29
 - DMN-js updated to v16
 
@@ -97,3 +97,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed icons for pdf, svg downloads, save button
 - Update to pdf download: subprocesses now have titles
 - Links for call activities and data references now update immediately
+
+## 1.5.1 (2024-12-09)
+- Added a button to toggle the properties panel
+- Added copy-paste functionality
+- Updated dialog creation in accordance with Nextcloud 30
+- Fixed bug that made some link overlays show up twice

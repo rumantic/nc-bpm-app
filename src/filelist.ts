@@ -1,7 +1,8 @@
 import { translate as t } from '@nextcloud/l10n';
-import { loadState } from '@nextcloud/initial-state';
 import './imports/bootstrap';
-
+import api from './imports/api';
+import { DialogBuilder, showError } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css';
 
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
@@ -14,6 +15,7 @@ import './imports/Editor.scss';
 import './imports/BPMNEditor';
 import './imports/DMNEditor';
 import './imports/Editor';
+import { emit } from '@nextcloud/event-bus'
 
 import {
 	DefaultType, FileAction, addNewFileMenuEntry, registerFileAction,
@@ -23,15 +25,18 @@ import {
 import './imports/Editor.scss';
 import './filelist.scss';
 
-const bpmnicon = require('./../img/icon-filetypes_bpmn.svg')
-const dmnicon = require('./../img/icon-filetypes_dmn.svg')
+const bpmnicon = require('svg-inline-loader!../img/icon-filetypes_bpmn.svg')
+const dmnicon = require('svg-inline-loader!../img/icon-filetypes_dmn.svg')
 
+const STATUS_CREATED = 201;
+
+
+//
 function bootstrapFileShare() {
 	//called once on page load
 	if (!OCA?.Sharing?.PublicApp) {
 		return;
 	}
-
 }
 
 function fixFileIconForFileShare() {
@@ -40,9 +45,6 @@ function fixFileIconForFileShare() {
 	}
 
 	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-dmn') {
-		console.log('found a dmn icon');
-		console.log($('#dir').val());
-		console.log($('#mimetype').val());
 		$('#mimetypeIcon').val(dmnicon);//OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'));
 	}
 }
@@ -54,8 +56,35 @@ function registerFileIcon() {
 	}
 }
 
+//action when "New BPMN File" or "New DMN File"
+async function createDiagram(folder, ext) {
+	//const content = await this.getContent();
+	let path = folder.path;
+	let filename = 'New-'+ext.toUpperCase()+'-file-' + (new Date()).getTime().toString() + '.' + ext;
+	try {
+		const result = await api.uploadFile(path, filename, '');
+		console.log('the result is: ')
+		// const file = new File({
+		// 	source: folder.source + '/' + filename,
+		// 	id: result.data.id,
+		// 	mtime: new Date(),
+		// 	mime: 'application/x-' + ext,
+		// 	owner: window.OC.getCurrentUser()?.uid || null,
+		// 	permissions: Permission.ALL,
+		// 	root: folder?.root || '/files/' + window.OC.getCurrentUser()?.uid,
+		// });
+		if (result.statuscode >= 200 && result.statuscode <= 299) {
+			return true;
+		}
+	}catch(e){
+		console.error(e);
+		showError('Error creating new file');
+		return false;
+	}
+}
 
 
+//NB: Nextcloud changed the file API in version 28, so the previous filemenu actions are no longer compatible
 if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 	//Thanks to : https://github.com/githubkoma/multiboards/blob/main/js/filesintegration/src/index.js
 	const Mimes = {
@@ -88,18 +117,13 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 			iconSvgInline: () => attr.icon,
 			async exec(file, view) {
 
-				if (!window.OC.getCurrentUser().uid) {
-					alert("Not yet implemented.");
-					return false;
-				} else {
+				var dirName = file.dirname;
 
-					var dirName = file.dirname;
+				var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + dirName + '&fileId=' + file.fileid);
+				window.location.href = url;
 
-					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + dirName + '&fileId='+file.fileid);
-					window.location.href = url;
+				return true;
 
-					return true;
-				}
 
 			},
 			default: DefaultType.HIDDEN
@@ -111,21 +135,26 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 			id: ext,
 			displayName: attr.newStr,
 			enabled() {
-				// only attach to main file list, public view is not supported yet
 				return getNavigation()?.active?.id === 'files'
 			},
 			iconClass: attr.css,
-			iconSvgInline: attr.icon,
+			//iconSvgInline: attr.icon,
 			async handler(folder, contents) {
 				//Generate new BPMN/DMN diagram
 				if (!window.OC.getCurrentUser().uid) {
 					alert("Not yet implemented.");
 				} else {
-					var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + folder.path +'&ext='+ext);
-				
-					window.location.href = url;
-					
-					return true;
+					try{
+						const returnValue = await createDiagram(folder, ext);
+						if(returnValue){
+							location.reload();
+						}
+						return true;
+					}catch(e){
+						console.log(e);
+						return false;
+					}
+
 
 				}
 			}
@@ -134,7 +163,7 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 
 	for (const ext in Mimes) {
 		registerAction(ext, Mimes[ext]);
-		
+
 		addMenuEntry(ext, Mimes[ext]);
 	}
 }
@@ -147,7 +176,7 @@ else {  // Nextcloud versions lower than 28
 			editor.start();
 		});
 	}
-	
+
 	function startDMNEditor(file, fileList) {
 		import(/* webpackChunkName: "dmn-editor" */ './imports/DMNEditor').then(({ default: Editor }) => {
 			const editor = new Editor(file, fileList);
@@ -155,7 +184,7 @@ else {  // Nextcloud versions lower than 28
 			editor.start();
 		});
 	}
-	
+
 	const BpmFileMenuPlugin = {
 		attach: function (menu) {
 			menu.addMenuEntry({
@@ -165,7 +194,7 @@ else {  // Nextcloud versions lower than 28
 				iconClass: 'icon-filetype-bpmn',
 				fileType: 'file',
 				actionHandler(fileName: string) {
-					
+
 					const fileList = menu.fileList;
 					const file = {
 						name: fileName,
@@ -252,4 +281,3 @@ else {  // Nextcloud versions lower than 28
 
 bootstrapFileShare();
 fixFileIconForFileShare();
-
