@@ -1,13 +1,10 @@
 # BPMN/DMN Viewer and Editor for Nextcloud
 
-![Static analysis](https://github.com/Loydl/nc-bpm-app/workflows/Static%20analysis/badge.svg)
-![PHP Tests](https://github.com/Loydl/nc-bpm-app/workflows/PHP%20Tests/badge.svg)
-![Lint](https://github.com/Loydl/nc-bpm-app/workflows/Lint/badge.svg)
-![Downloads](https://img.shields.io/github/downloads/Loydl/nc-bpm-app/total.svg)
-![GitHub release](https://img.shields.io/github/release/Loydl/nc-bpm-app.svg)
 
-View and edit [BPMN 2.0](https://www.omg.org/spec/BPMN/2.0.2/) and [DMN 1.3](http://www.omg.org/spec/DMN/About-DMN/) diagrams in [Nextcloud](https://nextcloud.com).<br>
-This app integrates the [BPMN.io editor](https://bpmn.io) into Nextcloud.
+View and edit [BPMN 2.0](https://www.omg.org/spec/BPMN/2.0.2/) and [DMN 1.3](http://www.omg.org/spec/DMN/About-DMN/) diagrams in [Nextcloud](https://nextcloud.com).
+
+This app integrates the [BPMN.io editor](https://bpmn.io) into Nextcloud Files. 
+
 
 ![Screenshot BPMN editor](./docs/screenshot-BPMN-editor.png)
 ![Screenshot DMN editor](./docs/screenshot-DMN-editor.png)
@@ -18,27 +15,35 @@ This integration provides the following features:
 
 * **Editor** Edit BPMN and DMN diagrams on every folder with write permission
 * **Viewer** View BPMN and DMN diagrams if you have no write permission
-* **New diagrams** Create new diagrams via the Nextcloud files app
+* **New diagrams** Create new diagrams via the Nextcloud files app "New" menu
+
+## :wave: About us
+The BPM Files app is maintained by [processCentric GmbH](https://www.processcentric.ch/en/home/). You can learn more about the services we offer and the extended version of our modeling tool [here](https://www.processcentric.ch/en/training/process-modeling-1/modeling-tool/). 
 
 ## :rocket: Install it
 The easiest way to install this app is by using the [Nextcloud app store](https://apps.nextcloud.com/apps/files_bpm).
-If you like to build from source, please continue reading.
+If you would prefer to build it from source, the instructions are below.
 
-To install it change into your Nextcloud's apps directory:
+To install the app, change into your Nextcloud's apps directory:
 
     cd nextcloud/workspace/server/apps-extra
 
 Then run:
 
-    git clone https://github.com/Loydl/nc-bpm-app.git files_bpm
-  Note: double-check that the folder is now named files_bpm, otherwise the app won't install in your Nextcloud properly.
-Then install the dependencies using:
+    git clone https://github.com/kirstenhh/nc-bpm-app.git files_bpm
+  Note: double-check that the folder is now named files_bpm, otherwise the app won't show up in your Nextcloud apps.
+
+Install the dependencies using:
 
     yarn install && composer install
 
-Last thing you have to do is to build all assets with:
+Finally, build the assets using:
 
     yarn build
+    
+When the build is finished, you should see "BPM Files" in your Nextcloud apps. (You may need to clear the cache and refresh the page, and/or enable BPM Files).
+
+If you are trying to extend the tool for your own usage, you will find resources and information about the bpmn-js modeler tool [here](https://github.com/bpmn-io/bpmn-js)
 
 ## :gear: Configuration
 If you like to have previews of your BPM files, please install the [BPM preview
