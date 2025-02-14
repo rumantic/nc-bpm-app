@@ -14,8 +14,8 @@ import '@fortawesome/fontawesome-free/js/solid.js';
 import './imports/Editor.scss';
 import './imports/BPMNEditor';
 import './imports/DMNEditor';
+import './imports/CMMNEditor';
 import './imports/Editor';
-import { emit } from '@nextcloud/event-bus'
 
 import {
 	DefaultType, FileAction, addNewFileMenuEntry, registerFileAction,
@@ -27,6 +27,7 @@ import './filelist.scss';
 
 const bpmnicon = require('svg-inline-loader!../img/icon-filetypes_bpmn.svg')
 const dmnicon = require('svg-inline-loader!../img/icon-filetypes_dmn.svg')
+const cmmnicon = require('svg-inline-loader!../img/icon-filetypes_cmmn.svg')
 
 const STATUS_CREATED = 201;
 
@@ -47,12 +48,16 @@ function fixFileIconForFileShare() {
 	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-dmn') {
 		$('#mimetypeIcon').val(dmnicon);//OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'));
 	}
+	if (!$('#dir').val() && $('#mimetype').val() === 'application/x-cmmn') {
+		$('#mimetypeIcon').val(cmmnicon);//OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg'));
+	}
 }
 
 function registerFileIcon() {
 	if (OC?.MimeType?._mimeTypeIcons) {
 		OC.MimeType._mimeTypeIcons['application/x-bpmn'] = OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg');
 		OC.MimeType._mimeTypeIcons['application/x-dmn'] = OC.imagePath('files_bpm', 'icon-filetypes_dmn.svg');
+		OC.MimeType._mimeTypeIcons['application/x-cmmn'] = OC.imagePath('files_bpm', 'icon-filetypes_cmmn.svg');
 	}
 }
 
@@ -60,23 +65,14 @@ function registerFileIcon() {
 async function createDiagram(folder, ext) {
 	//const content = await this.getContent();
 	let path = folder.path;
-	let filename = 'New-'+ext.toUpperCase()+'-file-' + (new Date()).getTime().toString() + '.' + ext;
+	let filename = 'New-' + ext.toUpperCase() + '-file-' + (new Date()).getTime().toString() + '.' + ext;
 	try {
 		const result = await api.uploadFile(path, filename, '');
-		console.log('the result is: ')
-		// const file = new File({
-		// 	source: folder.source + '/' + filename,
-		// 	id: result.data.id,
-		// 	mtime: new Date(),
-		// 	mime: 'application/x-' + ext,
-		// 	owner: window.OC.getCurrentUser()?.uid || null,
-		// 	permissions: Permission.ALL,
-		// 	root: folder?.root || '/files/' + window.OC.getCurrentUser()?.uid,
-		// });
+
 		if (result.statuscode >= 200 && result.statuscode <= 299) {
 			return true;
 		}
-	}catch(e){
+	} catch (e) {
 		console.error(e);
 		showError('Error creating new file');
 		return false;
@@ -102,6 +98,13 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 			icon: dmnicon, //OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'),
 			newStr: 'New DMN File',
 		},
+		cmmn: {
+			mime: 'application/x-cmmn',
+			type: 'text',
+			css: 'icon-filetype-cmmn',
+			icon: cmmnicon, //OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'),
+			newStr: 'New new CMMN File',
+		},
 	};
 	registerFileIcon();
 
@@ -121,7 +124,6 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 
 				var url = OC.generateUrl('/apps/' + 'files_bpm/?' + 'dir=' + dirName + '&fileId=' + file.fileid);
 				window.location.href = url;
-
 				return true;
 
 
@@ -144,13 +146,13 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 				if (!window.OC.getCurrentUser().uid) {
 					alert("Not yet implemented.");
 				} else {
-					try{
+					try {
 						const returnValue = await createDiagram(folder, ext);
-						if(returnValue){
+						if (returnValue) {
 							location.reload();
 						}
 						return true;
-					}catch(e){
+					} catch (e) {
 						console.log(e);
 						return false;
 					}
@@ -181,6 +183,13 @@ else {  // Nextcloud versions lower than 28
 		import(/* webpackChunkName: "dmn-editor" */ './imports/DMNEditor').then(({ default: Editor }) => {
 			const editor = new Editor(file, fileList);
 			console.log('Starting DMN editor');
+			editor.start();
+		});
+	}
+	function startCMMNEditor(file, fileList) {
+		import(/* webpackChunkName: "dmn-editor" */ './imports/CMMNEditor').then(({ default: Editor }) => {
+			const editor = new Editor(file, fileList);
+			console.log('Starting CMMN editor');
 			editor.start();
 		});
 	}
@@ -222,6 +231,25 @@ else {  // Nextcloud versions lower than 28
 					};
 
 					startDMNEditor(file, fileList);
+				},
+			});
+
+			menu.addMenuEntry({
+				id: 'cmmn',
+				displayName: t('files_bpm', 'New CMMN diagram'),
+				templateName: 'diagram.cmmn',
+				iconClass: 'icon-filetype-cmmn',
+				fileType: 'file',
+				actionHandler(fileName: string) {
+					const fileList = menu.fileList;
+
+					const file = {
+						name: fileName,
+						path: fileList.getCurrentDirectory(),
+						permissions: OC.PERMISSION_CREATE | OC.PERMISSION_UPDATE,
+					};
+
+					startCMMNEditor(file, fileList);
 				},
 			});
 		},
@@ -270,6 +298,22 @@ else {  // Nextcloud versions lower than 28
 			});
 
 			fileList.fileActions.setDefault('application/x-dmn', 'dmn');
+
+
+			fileList.fileActions.registerAction({
+				name: 'cmmn',
+				displayName: t('files_bpm', 'CMMN diagram'),
+				mime: 'application/x-cmmn',
+				icon: OC.imagePath('files_bpm', 'icon-filetypes_cmmn.svg'),
+				permissions: OC.PERMISSION_READ,
+				actionHandler(fileName: string, context) {
+					const file = context.fileList.elementToFile(context.$file);
+
+					startDMNEditor(file, context.fileList);
+				},
+			});
+
+			fileList.fileActions.setDefault('application/x-cmmn', 'cmmn');
 		},
 	};
 

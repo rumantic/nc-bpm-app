@@ -22,6 +22,7 @@ class AddMimetypeStep implements IRepairStep {
 	private const MAPPING = [
 		'bpmn' => 'application/x-bpmn',
 		'dmn' => 'application/x-dmn',
+		'cmmn' => 'application/x-cmmn',
 	];
 
 	/** @var IMimeTypeDetector */

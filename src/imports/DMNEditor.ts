@@ -57,7 +57,7 @@ export default class DMNEditor extends Editor {
 			const temp = await this.modeler.getActiveView();
 			console.log(active);
 			if (active.type == 'drd') {
-				console.log('print this');
+				console.log('currently in DRD; creating SVG');
 			}
 			else {
 				const drd = this.modeler.getViews().filter(a => a.type == 'drd')[0];

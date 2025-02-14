@@ -3,7 +3,7 @@
 
 View and edit [BPMN 2.0](https://www.omg.org/spec/BPMN/2.0.2/) and [DMN 1.3](http://www.omg.org/spec/DMN/About-DMN/) diagrams in [Nextcloud](https://nextcloud.com).
 
-This app integrates the [BPMN.io editor](https://bpmn.io) into Nextcloud Files. 
+This app integrates the [BPMN.io editor](https://bpmn.io) into Nextcloud Files.
 
 
 ![Screenshot BPMN editor](./docs/screenshot-BPMN-editor.png)
@@ -18,7 +18,7 @@ This integration provides the following features:
 * **New diagrams** Create new diagrams via the Nextcloud files app "New" menu
 
 ## :wave: About us
-The BPM Files app is maintained by [processCentric GmbH](https://www.processcentric.ch/en/home/). You can learn more about the services we offer and the extended version of our modeling tool [here](https://www.processcentric.ch/en/training/process-modeling-1/modeling-tool/). 
+The BPM Files app is maintained by [processCentric GmbH](https://www.processcentric.ch/en/home/). You can learn more about the services we offer and the extended version of our modeling tool [here](https://www.processcentric.ch/en/training/process-modeling-1/modeling-tool/).
 
 ## :rocket: Install it
 The easiest way to install this app is by using the [Nextcloud app store](https://apps.nextcloud.com/apps/files_bpm).
@@ -40,13 +40,16 @@ Install the dependencies using:
 Finally, build the assets using:
 
     yarn build
-    
+
 When the build is finished, you should see "BPM Files" in your Nextcloud apps. (You may need to clear the cache and refresh the page, and/or enable BPM Files).
 
 If you are trying to extend the tool for your own usage, you will find resources and information about the bpmn-js modeler tool [here](https://github.com/bpmn-io/bpmn-js)
 
 ## :gear: Configuration
-If you like to have previews of your BPM files, please install the [BPM preview
+
+To give your files their proper icons, you need to add the icon images to your Nextcloud server. You can find the images in the /img folder here. Copy them to [your Nextcloud]/servercore/img/filetypes/ to get the icons in your Files.
+
+If you would like to have previews of your BPM files, please install the [BPM preview
 service][preview-service] on your server (requires root access) and add the
 corresponding URL to your settings under admin settings > additional settings.
 

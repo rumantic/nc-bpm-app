@@ -227,9 +227,6 @@ button.bio-properties-panel-group-header-button.bio-properties-panel-arrow{
 }
 
 
-.bio-properties-panel-input {
-}
-
 .popup-search>input {
   background-color: #eeeeee !important;
   color: black !important;
@@ -254,7 +251,7 @@ button.bio-properties-panel-group-header-button.bio-properties-panel-arrow{
 
 
 .bio-properties-panel-group-header-button,
-.bio-properties-panel-input {
+.bio-properties-panel-input{
   color: var(--color-grey-225-10-15) !important;
   background-color: var(--input-background-color) !important;
   border: 2px solid var(--color-grey-225-10-85) !important;
@@ -292,4 +289,39 @@ div[contenteditable="true"]{
   background-color: var(--color-grey-225-10-95);
   color: black;
   box-shadow: none !important;
+}
+
+
+.diagram-note {
+  background-color: rgba(66, 180, 21, 0.7);
+  color: White;
+  border-radius: 5px;
+  font-family: Arial;
+  font-size: 12px;
+  padding: 5px;
+  min-height: 16px;
+  width: 65px;
+  text-align: center;
+}
+
+.needs-discussion:not(.djs-connection) .djs-visual > :nth-child(1) {
+  stroke: rgba(66, 180, 21, 0.7) !important; /* color elements as red */
+}
+
+#save-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+}
+
+
+.cpp-properties-header{
+  color: #666;
+}
+
+
+.cpp-field-wrapper > input{
+  background-color: white;
+  color: #808080;
+
 }

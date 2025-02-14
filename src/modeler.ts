@@ -59,18 +59,24 @@ async function runEditor(){
 
 	//TEMP: Get mimetype properly
 	if (fileInfo.mime?.includes('bpmn')) {
-		
+
 		import(/* webpackChunkName: "bpmn-editor" */ './imports/BPMNEditor').then(({ default: Editor }) => {
 			const editor = new Editor(fileInfo);
 			console.log('Starting BPMN editor');
 			editor.start();
 		});
-	
-	
+
+
 	} else if (fileInfo.mime?.includes('dmn')) {
 		import(/* webpackChunkName: "bpmn-editor" */ './imports/DMNEditor').then(({ default: Editor }) => {
 			const editor = new Editor(fileInfo);
 			console.log('Starting DMN editor');
+			editor.start();
+		});
+	}else if (fileInfo.mime?.includes('cmmn')) {
+		import(/* webpackChunkName: "bpmn-editor" */ './imports/CMMNEditor').then(({ default: Editor }) => {
+			const editor = new Editor(fileInfo);
+			console.log('Starting CMMN editor');
 			editor.start();
 		});
 	}else{

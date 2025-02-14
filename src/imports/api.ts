@@ -62,7 +62,7 @@ class Api {
 		let response;
 
 		try {
-			response = await axios.put(fullPath, data, {
+			response = await axios.put (fullPath, data, {
 				headers,
 			});
 		} catch (error) {

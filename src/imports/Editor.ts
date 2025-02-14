@@ -285,8 +285,11 @@ export default abstract class Editor {
 
 	private async onSave() {
 		const content = await this.getContent();
-
+		console.log('The content is: ');
+		console.log(content);
 		const result = await api.uploadFile(this.file.path, this.file.name, content, this.file.etag);
+		console.log('Result: ');
+		console.log(result);
 
 		if (result.statuscode >= 200 && result.statuscode <= 299) {
 			if (result.statuscode === STATUS_CREATED) {

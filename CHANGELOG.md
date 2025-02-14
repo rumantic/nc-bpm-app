@@ -103,3 +103,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added copy-paste functionality
 - Updated dialog creation in accordance with Nextcloud 30
 - Fixed bug that made some link overlays show up twice
+
+
+## 1.6.0 (2025-02-13)
+- Implemented the bpmn.io CMMN modeler
