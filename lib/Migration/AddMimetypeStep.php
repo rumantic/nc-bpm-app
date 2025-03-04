@@ -7,16 +7,16 @@ use OCP\Files\IMimeTypeLoader;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
 
-interface ITrueMimeTypeLoader extends IMimeTypeLoader {
-	/**
-	 * Update filecache mimetype based on file extension
-	 *
-	 * @param string $ext file extension
-	 * @param int $mimeTypeId
-	 * @return int number of changed rows
-	 */
-	public function updateFilecache($ext, $mimeTypeId);
-}
+// interface ITrueMimeTypeLoader extends IMimeTypeLoader {
+// 	/**
+// 	 * Update filecache mimetype based on file extension
+// 	 *
+// 	 * @param string $ext file extension
+// 	 * @param int $mimeTypeId
+// 	 * @return int number of changed rows
+// 	 */
+// 	public function updateFilecache($ext, $mimeTypeId);
+// }
 
 class AddMimetypeStep implements IRepairStep {
 	private const MAPPING = [
@@ -28,7 +28,7 @@ class AddMimetypeStep implements IRepairStep {
 	/** @var IMimeTypeDetector */
 	protected $mimetypeDetector;
 
-	/** @var ITrueMimeTypeLoader */
+	/** @var IMimeTypeLoader */ ///** @var ITrueMimeTypeLoader */
 	protected $mimetypeLoader;
 
 	public function __construct(

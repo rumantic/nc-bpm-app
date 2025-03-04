@@ -16,7 +16,8 @@ use OCP\Files\IRootFolder;
 
 use OCP\AppFramework\Http;
 
-use OCP\ILogger;
+//use OCP\ILogger;
+use Psr\Log\LoggerInterface;
 
 //Thanks to : https://github.com/githubkoma/multiboards/blob/main/js/filesintegration/src/index.js
 
@@ -33,7 +34,7 @@ class PageController extends Controller {
 					IRootFolder
 					$storage,
 					$UserId,
-					ILogger $logger,
+					LoggerInterface $logger,
 					IURLGenerator $urlGenerator,){
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;

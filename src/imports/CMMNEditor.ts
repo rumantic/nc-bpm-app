@@ -18,12 +18,12 @@ import Viewer from 'cmmn-js/lib/Viewer';
 import { jsPDF } from 'jspdf';
 import { is, isAny, getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
-
+let openPropertiesPanel = true;
 
 const PLAIN_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
 <cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0iu0xrq" targetNamespace="http://bpmn.io/schema/cmmn" exporter="cmmn-js (https://demo.bpmn.io/cmmn)" exporterVersion="0.20.0">
   <cmmn:case id="Case_17wsr0k">
-    <cmmn:casePlanModel id="CasePlanModel_0t8rloj" name="An interesting little model">
+    <cmmn:casePlanModel id="CasePlanModel_0t8rloj" name="New model">
       <cmmn:planItem id="PlanItem_0zsvbce" definitionRef="Task_0erv9sh" />
       <cmmn:task id="Task_0erv9sh" />
     </cmmn:casePlanModel>
@@ -167,12 +167,50 @@ export default class CMMNEditor extends Editor {
 			}) : new Viewer({
 				container: canvasElement,
 			});
+			// if (openPropertiesPanel) {
+
+			// 	$('<div>')
+			// 		.addClass('entry close icon-close propertiespanel-close')
+			// 		.attr('role', 'button')
+			// 		.on('click', this.clickCallbackFactory(this.closeProp))
+			// 		.appendTo(propertiesElement);
+			// }
 		}
 		return this.modeler;
 	}
+	protected async closeProp(): Promise<void> {
+		const containerElement = this.getAppContainerElement();
+		const propertiesElement = containerElement.find('.bpmn-properties');
+		propertiesElement.addClass('hidden');
+	}
 
 	protected getAppContainerElement(): JQuery {
+		let newcontainer = false;
+		if (!this.containerElement || this.containerElement.length === 0) {
+			newcontainer = true;
+		}
+
 		const containerElement = super.getAppContainerElement();
+
+		if (newcontainer) {
+			const actionsgroup = document.getElementById('modeler-actions-group') ?? $('#modeler-actions-group');
+			console.log(actionsgroup);
+			$('<div>', { id: 'propertiesToggle' })
+				.attr('role', 'button')
+				.addClass('entry')
+				.on('click', this.toggleProperties)
+				.append('<span>Properties</span>')
+				.appendTo(actionsgroup);
+			console.log('appending')
+		}
+
 		return containerElement;
+	}
+	private toggleProperties = (ev: JQuery.ClickEvent) => {
+
+		openPropertiesPanel = !openPropertiesPanel;
+
+		const propertiesElement = this.getAppContainerElement().find('.bpmn-properties');
+		propertiesElement.toggleClass('hidden');
 	}
 }

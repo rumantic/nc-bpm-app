@@ -103,7 +103,7 @@ if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 			type: 'text',
 			css: 'icon-filetype-cmmn',
 			icon: cmmnicon, //OC.imagePath('files_bpm', 'icon-filetypes_bpmn.svg'),
-			newStr: 'New new CMMN File',
+			newStr: 'New CMMN File',
 		},
 	};
 	registerFileIcon();
