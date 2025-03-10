@@ -30,10 +30,6 @@
   }
 }
 
-#app-navigation-vue{
-  display:none;
-}
-
 .bpmn-canvas {
   flex-grow: 1;
 }
@@ -187,7 +183,7 @@
   }
 
   overflow-y: scroll;
-  border-left: solid 2px var(--color-border-dark);
+  border-left: solid 2px #555;
   max-width: 25%;
   width: 25%;
 }
