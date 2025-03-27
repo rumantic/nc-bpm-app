@@ -5,6 +5,15 @@ import {} from 'bpmn-js/lib/core';
 
 export default function (element):Array<unknown> {
 	const ncProperties = new Array<unknown>();
+
+	ncProperties.push({
+		id: 'bpmnModel',
+		element,
+		label: 'Test',
+		component: TextComponent,
+		isEdited: isTextFieldEntryEdited,
+	});
+
 	if(is(element, 'bpmn:CallActivity')){
 		ncProperties.push({
 			id: 'bpmnModel',
@@ -18,7 +27,7 @@ export default function (element):Array<unknown> {
 		ncProperties.push({
 			id: 'dataSource',
 			element,
-			label: 'Data reference url',
+			label: 'Data reference url (test)',
 			component: TextComponent,
 			isEdited: isTextFieldEntryEdited,
 		});
