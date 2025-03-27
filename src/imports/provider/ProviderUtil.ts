@@ -2,6 +2,7 @@ import { TextFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
+import Quill from 'quill';
 export function TextComponent(props: any):TextFieldEntry {
 	const { element, id } = props;
 
@@ -31,7 +32,7 @@ export function TextComponent(props: any):TextFieldEntry {
 			extensionElements.get('values').push(prop);
 		}
 		prop.value = value;
-		
+
 		return modeling.updateProperties(element, {
 			extensionElements,
 		});
@@ -46,6 +47,61 @@ export function TextComponent(props: any):TextFieldEntry {
 	    setValue=${setValue}
 	    debounce=${debounce}
 	  />`;
+}
+
+export function HtmlEditorComponent(props: any): any {
+	const { element, id } = props;
+
+	const modeling = useService('modeling');
+	const translate = useService('translate');
+	const moddle = useService('moddle');
+
+	const getValue = () => {
+		const ext = element.businessObject.extensionElements;
+		if (!ext) {
+			return '';
+		}
+		const prop = getProperty(element.businessObject, id);
+		if (!prop) {
+			return '';
+		}
+		return prop.value;
+	};
+
+	const setValue = (value: string) => {
+		const extensionElements = element.businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
+		let prop = getProperty(element.businessObject, id);
+		if (!prop) {
+			prop = moddle.create('nc:property', { name: id, value: value });
+			extensionElements.get('values').push(prop);
+		}
+		prop.value = value;
+
+		return modeling.updateProperties(element, {
+			extensionElements,
+		});
+	};
+
+	const label = props.label ?? id;
+
+	return html`
+    <div class="html-editor-component">
+      <label>${translate(label)}</label>
+      <div
+        id="editor-${id}"
+        style="border: 1px solid #ccc; min-height: 100px;"
+        oncreate=${(node) => {
+		const quill = new Quill(node, {
+			theme: 'snow',
+		});
+		quill.on('text-change', () => {
+			setValue(quill.root.innerHTML);
+		});
+		quill.root.innerHTML = getValue();
+	}}
+      ></div>
+    </div>
+  `;
 }
 
 //TODO: import types from bpmn.io?

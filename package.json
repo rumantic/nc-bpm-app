@@ -47,6 +47,7 @@
 		"node-polyfill-webpack-plugin": "^2.0.1",
 		"path-browserify": "^1.0.1",
 		"process": "^0.11.10",
+		"quill": "^2.0.3",
 		"svg-inline-loader": "^0.8.2",
 		"svg2pdf.js": "^2.1.0",
 		"tiny-svg": "4.0.0",
