@@ -3,6 +3,8 @@ import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
 import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
+
 export function TextComponent(props: any):TextFieldEntry {
 	const { element, id } = props;
 
@@ -85,23 +87,25 @@ export function HtmlEditorComponent(props: any): any {
 	const label = props.label ?? id;
 
 	return html`
-    <div class="html-editor-component">
-      <label>${translate(label)}</label>
-      <div
-        id="editor-${id}"
-        style="border: 1px solid #ccc; min-height: 100px;"
-        oncreate=${(node) => {
-		const quill = new Quill(node, {
-			theme: 'snow',
-		});
-		quill.on('text-change', () => {
-			setValue(quill.root.innerHTML);
-		});
-		quill.root.innerHTML = getValue();
-	}}
-      ></div>
-    </div>
-  `;
+		<div class="html-editor-component">
+			<label>${translate(label)}</label>
+			<div
+				id="editor-${id}"
+				style="border: 1px solid #ccc; min-height: 100px;"
+				oncreate=${(node) => {
+					setTimeout(() => {
+						const quill = new Quill(node, {
+							theme: 'snow',
+						});
+						quill.on('text-change', () => {
+							setValue(quill.root.innerHTML);
+						});
+						quill.root.innerHTML = getValue();
+					}, 0);
+				}}
+			></div>
+		</div>
+	`;
 }
 
 //TODO: import types from bpmn.io?
