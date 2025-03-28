@@ -5,6 +5,26 @@ import { html } from 'htm/preact';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
+// Определяем новый класс кастомного элемента
+class WysiwygEditorElement extends HTMLElement {
+	constructor() {
+	  super();  // вызываем конструктор родительского класса
+	}
+  
+	// Метод для инициализации компонента
+	connectedCallback() {
+	  this.innerHTML = `
+		<div style="border: 2px solid #000; padding: 20px; border-radius: 5px; background-color: lightgray;">
+		  <h2>Привет, это кастомный элемент!</h2>
+		  <p>Он был создан с помощью TypeScript.</p>
+		</div>
+	  `;
+	}
+}
+  
+// Регистрируем кастомный элемент
+customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
+
 export function TextComponent(props: any):TextFieldEntry {
 	const { element, id } = props;
 
@@ -87,24 +107,8 @@ export function HtmlEditorComponent(props: any): any {
 	const label = props.label ?? id;
 
 	return html`
-		<div class="html-editor-component">
-			<label>${translate(label)}</label>
-			<div
-				id="editor-${id}"
-				style="border: 1px solid #ccc; min-height: 100px;"
-				oncreate=${(node) => {
-					setTimeout(() => {
-						const quill = new Quill(node, {
-							theme: 'snow',
-						});
-						quill.on('text-change', () => {
-							setValue(quill.root.innerHTML);
-						});
-						quill.root.innerHTML = getValue();
-					}, 0);
-				}}
-			></div>
-		</div>
+		<wysiwyg-editor-element>
+		</wysiwyg-editor-element>
 	`;
 }
 
