@@ -2,26 +2,59 @@ import { TextFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
-import Quill from 'quill';
-import 'quill/dist/quill.snow.css';
+// Импортируем TinyMCE
+import tinymce from 'tinymce';
+// Подключаем необходимые модули TinyMCE (опционально)
+import 'tinymce/themes/silver';
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/autolink';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/image';
 
-// Определяем новый класс кастомного элемента
+// Кастомный элемент
 class WysiwygEditorElement extends HTMLElement {
+	private editor: any;
+
 	constructor() {
-	  super();  // вызываем конструктор родительского класса
+		super();  // вызываем конструктор родительского класса
 	}
-  
+
 	// Метод для инициализации компонента
 	connectedCallback() {
-	  this.innerHTML = `
-		<div style="border: 2px solid #000; padding: 20px; border-radius: 5px; background-color: lightgray;">
-		  <h2>Привет, это кастомный элемент!</h2>
-		  <p>Он был создан с помощью TypeScript.</p>
-		</div>
-	  `;
+		// Создаем контейнер для редактора
+		this.innerHTML = `
+      <div style="border: 2px solid #000; padding: 20px; border-radius: 5px; background-color: lightgray;">
+        <textarea id="editor"></textarea>
+      </div>
+    `;
+
+		// Инициализируем TinyMCE
+		this.initTinyMCE();
+	}
+
+	// Метод для инициализации TinyMCE
+	initTinyMCE() {
+		if (tinymce) {
+			tinymce.init({
+				selector: '#editor', // выбираем textarea по id
+				menubar: false, // отключаем меню
+				plugins: 'advlist autolink lists link image', // подключаем плагины
+				toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image', // настройка панели инструментов
+				setup: (editor: any) => {
+					this.editor = editor;
+				}
+			});
+		}
+	}
+
+	// Очистка и уничтожение редактора при удалении элемента из DOM
+	disconnectedCallback() {
+		if (this.editor) {
+			this.editor.remove();
+		}
 	}
 }
-  
 // Регистрируем кастомный элемент
 customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
 
@@ -77,6 +110,8 @@ export function HtmlEditorComponent(props: any): any {
 	const modeling = useService('modeling');
 	const translate = useService('translate');
 	const moddle = useService('moddle');
+	const debounce = useService('debounceInput');
+
 
 	const getValue = () => {
 		const ext = element.businessObject.extensionElements;
@@ -107,7 +142,14 @@ export function HtmlEditorComponent(props: any): any {
 	const label = props.label ?? id;
 
 	return html`
-		<wysiwyg-editor-element>
+		<wysiwyg-editor-element
+	    id=${id}
+	    element=${element}
+	    label=${translate(label)}
+	    getValue=${getValue}
+	    setValue=${setValue}
+	    debounce=${debounce}
+		>
 		</wysiwyg-editor-element>
 	`;
 }
