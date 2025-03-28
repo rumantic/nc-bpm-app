@@ -5,12 +5,14 @@ import { html } from 'htm/preact';
 // Импортируем TinyMCE
 import tinymce from 'tinymce';
 // Подключаем необходимые модули TinyMCE (опционально)
+/*
 import 'tinymce/themes/silver';
 import 'tinymce/plugins/advlist';
 import 'tinymce/plugins/autolink';
 import 'tinymce/plugins/lists';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/image';
+ */
 
 // Кастомный элемент
 class WysiwygEditorElement extends HTMLElement {
