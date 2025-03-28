@@ -5,14 +5,12 @@ import { html } from 'htm/preact';
 // Импортируем TinyMCE
 import tinymce from 'tinymce';
 // Подключаем необходимые модули TinyMCE (опционально)
-/*
 import 'tinymce/themes/silver';
 import 'tinymce/plugins/advlist';
 import 'tinymce/plugins/autolink';
 import 'tinymce/plugins/lists';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/image';
- */
 
 // Кастомный элемент
 class WysiwygEditorElement extends HTMLElement {
@@ -40,9 +38,9 @@ class WysiwygEditorElement extends HTMLElement {
 		if (tinymce) {
 			tinymce.init({
 				selector: '#editor', // выбираем textarea по id
-				menubar: true, // отключаем меню
-				// plugins: 'advlist autolink lists link image', // подключаем плагины
-				// toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image', // настройка панели инструментов
+				menubar: false, // отключаем меню
+				plugins: 'advlist autolink lists link image', // подключаем плагины
+				toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image', // настройка панели инструментов
 				setup: (editor: any) => {
 					this.editor = editor;
 				}
