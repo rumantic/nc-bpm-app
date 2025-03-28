@@ -40,9 +40,9 @@ class WysiwygEditorElement extends HTMLElement {
 		if (tinymce) {
 			tinymce.init({
 				selector: '#editor', // выбираем textarea по id
-				menubar: false, // отключаем меню
-				plugins: 'advlist autolink lists link image', // подключаем плагины
-				toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image', // настройка панели инструментов
+				menubar: true, // отключаем меню
+				// plugins: 'advlist autolink lists link image', // подключаем плагины
+				// toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image', // настройка панели инструментов
 				setup: (editor: any) => {
 					this.editor = editor;
 				}
