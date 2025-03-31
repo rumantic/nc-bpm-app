@@ -43,6 +43,32 @@ class WysiwygEditorElement extends HTMLElement {
 				toolbar: 'link image | fullscreen | undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
 				setup: (editor: any) => {
 					this.editor = editor;
+					editor.on('FullscreenStateChanged', (e) => {
+						const fullscreenElement = document.querySelector('.tox-editor-container') as HTMLElement; // Cast to HTMLElement
+						if (e.state && fullscreenElement) {
+							// Apply custom styles dynamically
+							fullscreenElement.style.position = 'fixed';
+							fullscreenElement.style.top = '100px';
+							fullscreenElement.style.left = '100px';
+							fullscreenElement.style.right = '100px';
+							fullscreenElement.style.bottom = '100px';
+							fullscreenElement.style.width = 'calc(100% - 200px)'; // Adjust width dynamically
+							fullscreenElement.style.height = 'calc(100% - 200px)'; // Adjust height dynamically
+							fullscreenElement.style.backgroundColor = 'white'; // Optional: Set a background color
+							fullscreenElement.style.zIndex = '10000'; // Ensure it stays on top
+						} else if (fullscreenElement) {
+							// Reset styles when exiting fullscreen
+							fullscreenElement.style.position = '';
+							fullscreenElement.style.top = '';
+							fullscreenElement.style.left = '';
+							fullscreenElement.style.right = '';
+							fullscreenElement.style.bottom = '';
+							fullscreenElement.style.width = '';
+							fullscreenElement.style.height = '';
+							fullscreenElement.style.backgroundColor = '';
+							fullscreenElement.style.zIndex = '';
+						}
+					});
 				},
 				base_url: '/custom_apps/files_bpm/tinymce', // Adjust this path if necessary
 				// Enable image uploads
@@ -79,6 +105,7 @@ class WysiwygEditorElement extends HTMLElement {
 					};
 					input.click();
 				},
+
 			});
 		}
 	}

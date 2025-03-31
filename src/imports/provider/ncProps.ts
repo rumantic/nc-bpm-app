@@ -7,13 +7,15 @@ export default function (element):Array<unknown> {
 	const ncProperties = new Array<unknown>();
 	console.log(element);
 
-	ncProperties.push({
-		id: 'bpmnModel',
-		element,
-		label: 'Test',
-		component: HtmlEditorComponent,
-		isEdited: isTextFieldEntryEdited,
-	});
+	if(is(element, 'bpmn:Task')){
+		ncProperties.push({
+			id: 'bpmnModel',
+			element,
+			label: 'Редактор HTML',
+			component: HtmlEditorComponent,
+			isEdited: isTextFieldEntryEdited,
+		});
+	}
 
 	if(is(element, 'bpmn:CallActivity')){
 		ncProperties.push({
@@ -28,7 +30,7 @@ export default function (element):Array<unknown> {
 		ncProperties.push({
 			id: 'dataSource',
 			element,
-			label: 'Data reference url (test)',
+			label: 'Data reference url',
 			component: TextComponent,
 			isEdited: isTextFieldEntryEdited,
 		});
