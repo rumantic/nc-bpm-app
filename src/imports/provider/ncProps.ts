@@ -5,6 +5,7 @@ import {} from 'bpmn-js/lib/core';
 
 export default function (element):Array<unknown> {
 	const ncProperties = new Array<unknown>();
+	console.log(element);
 
 	ncProperties.push({
 		id: 'bpmnModel',

@@ -24,7 +24,7 @@ class WysiwygEditorElement extends HTMLElement {
 	connectedCallback() {
 		// Создаем контейнер для редактора
 		this.innerHTML = `
-      <div style="">
+      <div class="bio-properties-panel-entry">
         <textarea id="editor"></textarea>
       </div>
     `;
@@ -39,12 +39,46 @@ class WysiwygEditorElement extends HTMLElement {
 			tinymce.init({
 				selector: '#editor', // выбираем textarea по id
 				menubar: false, // отключаем меню
-				plugins: 'advlist autolink lists link image', // подключаем плагины
-				toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image', // настройка панели инструментов
+				plugins: 'lists link image table code fullscreen',
+				toolbar: 'link image | fullscreen | undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
 				setup: (editor: any) => {
 					this.editor = editor;
 				},
-				base_url: '/tinymce', // Adjust this path if necessary
+				base_url: '/custom_apps/files_bpm/tinymce', // Adjust this path if necessary
+				// Enable image uploads
+				images_upload_url: '/index.php/apps/files/api/v1/upload', // Nextcloud upload endpoint
+				automatic_uploads: true,
+				images_upload_credentials: true, // Send cookies with the request for authentication
+				file_picker_types: 'image',
+				file_picker_callback: (callback, value, meta) => {
+					// Custom file picker for Nextcloud
+					const input = document.createElement('input');
+					input.setAttribute('type', 'file');
+					input.setAttribute('accept', 'image/*');
+					input.onchange = (event) => {
+						const file = (event.target as HTMLInputElement).files?.[0];
+						if (file) {
+							const formData = new FormData();
+							formData.append('file', file);
+
+							// Perform the upload to Nextcloud
+							fetch('/index.php/apps/files/api/v1/upload', {
+								method: 'POST',
+								body: formData,
+								credentials: 'include', // Include cookies for authentication
+							})
+								.then((response) => response.json())
+								.then((data) => {
+									// Pass the uploaded image URL to TinyMCE
+									callback(data.url);
+								})
+								.catch((error) => {
+									console.error('Image upload failed:', error);
+								});
+						}
+					};
+					input.click();
+				},
 			});
 		}
 	}
