@@ -24,7 +24,7 @@ class WysiwygEditorElement extends HTMLElement {
 	connectedCallback() {
 		// Создаем контейнер для редактора
 		this.innerHTML = `
-      <div style="border: 2px solid #000; padding: 20px; border-radius: 5px; background-color: lightgray;">
+      <div style="">
         <textarea id="editor"></textarea>
       </div>
     `;
@@ -43,7 +43,8 @@ class WysiwygEditorElement extends HTMLElement {
 				toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image', // настройка панели инструментов
 				setup: (editor: any) => {
 					this.editor = editor;
-				}
+				},
+				base_url: '/tinymce', // Adjust this path if necessary
 			});
 		}
 	}
