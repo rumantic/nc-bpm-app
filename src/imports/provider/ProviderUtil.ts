@@ -38,7 +38,7 @@ class WysiwygEditorElement extends HTMLElement {
 		if (tinymce) {
 			tinymce.init({
 				selector: '#editor', // выбираем textarea по id
-				menubar: false, // отключаем меню
+				menubar: true, // отключаем меню
 				plugins: 'lists link image table code fullscreen',
 				toolbar: 'link image | fullscreen | undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
 				setup: (editor: any) => {
@@ -56,6 +56,8 @@ class WysiwygEditorElement extends HTMLElement {
 							fullscreenElement.style.height = 'calc(100% - 200px)'; // Adjust height dynamically
 							fullscreenElement.style.backgroundColor = 'white'; // Optional: Set a background color
 							fullscreenElement.style.zIndex = '10000'; // Ensure it stays on top
+							fullscreenElement.style.border = '1px solid #ccc'; // Add a gray border
+							fullscreenElement.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; // Add a subtle shadow
 						} else if (fullscreenElement) {
 							// Reset styles when exiting fullscreen
 							fullscreenElement.style.position = '';
@@ -67,6 +69,8 @@ class WysiwygEditorElement extends HTMLElement {
 							fullscreenElement.style.height = '';
 							fullscreenElement.style.backgroundColor = '';
 							fullscreenElement.style.zIndex = '';
+							fullscreenElement.style.border = '';
+							fullscreenElement.style.boxShadow = '';
 						}
 					});
 				},
