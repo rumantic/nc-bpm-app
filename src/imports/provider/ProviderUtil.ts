@@ -19,7 +19,7 @@ class WysiwygEditorElement extends HTMLElement {
 		// Создаем контейнер для редактора
 		this.innerHTML = `
       <div class="bio-properties-panel-entry">
-        <textarea id="editor"></textarea>
+        <textarea id="editor-container"></textarea>
       </div>
     `;
 
