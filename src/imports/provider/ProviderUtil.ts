@@ -3,8 +3,10 @@ import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
 
-import Quill from 'quill';
-import 'quill/dist/quill.snow.css'; // Import Quill's default theme
+import EditorJS from '@editorjs/editorjs';
+import Header from '@editorjs/header';
+import List from '@editorjs/list';
+import ImageTool from '@editorjs/image';
 
 // Кастомный элемент
 class WysiwygEditorElement extends HTMLElement {
@@ -28,30 +30,23 @@ class WysiwygEditorElement extends HTMLElement {
 	}
 
 	initializeEditor() {
-		this.editor = new Quill('#editor-container', {
-			theme: 'snow', // Use the "snow" theme
-			modules: {
-				toolbar: [
-					['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-					['blockquote', 'code-block'],
-
-					[{header: 1}, {header: 2}],               // custom button values
-					[{list: 'ordered'}, {list: 'bullet'}],
-					[{script: 'sub'}, {script: 'super'}],      // superscript/subscript
-					[{indent: '-1'}, {indent: '+1'}],          // outdent/indent
-					[{direction: 'rtl'}],                         // text direction
-
-					[{size: ['small', false, 'large', 'huge']}],  // custom dropdown
-					[{header: [1, 2, 3, 4, 5, 6, false]}],
-
-					[{color: []}, {background: []}],          // dropdown with defaults from theme
-					[{font: []}],
-					[{align: []}],
-					['link', 'image', 'video'],
-
-					['clean'],                                    // remove formatting button
-				],
+		this.editor = new EditorJS({
+			holder: 'editor-container', // The ID of the container
+			tools: {
+				header: Header,
+				list: List,
+				image: {
+					class: ImageTool,
+					config: {
+						endpoints: {
+							byFile: '/uploadFile', // Endpoint for file uploads
+							byUrl: '/fetchUrl', // Endpoint for URL-based uploads
+						},
+					},
+				},
 			},
+			placeholder: 'Start writing your content here...', // Placeholder text
+			autofocus: true, // Automatically focus the editor
 		});
 	}
 
