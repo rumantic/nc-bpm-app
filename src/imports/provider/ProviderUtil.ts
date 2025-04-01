@@ -12,7 +12,7 @@ import 'tinymce/plugins/lists';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/image';
 
-// Кастомный элемент
+// Кастомный элемент test
 class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
 
