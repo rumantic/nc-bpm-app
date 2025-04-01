@@ -34,6 +34,14 @@ class WysiwygEditorElement extends HTMLElement {
     `;
 		const getValue = this.getAttribute('data-get-value');
 		const setValue = this.getAttribute('data-set-value');
+		console.log('setValue', setValue);
+		console.log('getValue', getValue);
+
+		const getValue1 = this.getAttribute('get-value');
+		const setValue1 = this.getAttribute('set-value');
+
+		console.log('setValue1', setValue1);
+		console.log('getValue1', getValue1);
 
 		// Инициализируем TinyMCE
 		this.initializeEditor(getValue, setValue);
@@ -151,6 +159,11 @@ export function HtmlEditorComponent(props: any): any {
 	};
 
 	const label = props.label ?? id;
+
+
+	console.log(getValue);
+	console.log(setValue);
+
 
 	return html`
 		<wysiwyg-editor-element
