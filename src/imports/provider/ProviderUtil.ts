@@ -17,7 +17,7 @@ import {font, video} from 'suneditor/src/plugins';
 import lang from 'suneditor/src/lang';
 // import ru from 'suneditor/src/lang/ru';
 
-// Кастомный элемент
+// Кастомный элемент.
 class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
 
