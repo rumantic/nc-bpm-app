@@ -9,9 +9,8 @@ import 'suneditor/dist/css/suneditor.min.css';
 import suneditor from 'suneditor';
 
 // How to import plugins
-import image from 'suneditor/src/plugins/dialog/link';
 import list from 'suneditor/src/plugins/submenu/list';
-import {font, video} from 'suneditor/src/plugins';
+import {font, video, image} from 'suneditor/src/plugins';
 
 // How to import language files (default: en)
 import lang from 'suneditor/src/lang';
@@ -33,20 +32,31 @@ class WysiwygEditorElement extends HTMLElement {
         <textarea id="editor-container"></textarea>
       </div>
     `;
+		const getValue = this.getAttribute('data-get-value');
+		const setValue = this.getAttribute('data-set-value');
 
 		// Инициализируем TinyMCE
-		this.initializeEditor();
+		this.initializeEditor(getValue, setValue);
 	}
 
-	initializeEditor() {
+	initializeEditor(getValue: any, setValue: any) {
 		console.log('initializeEditor');
 		this.editor = suneditor.create('editor-container', {
+			width: '100%',
 			plugins: [font, video, image, list],
 			buttonList: [
 				['font', 'video', 'image', 'list'],
 			],
 			lang: lang.ru,
 		});
+
+		// Устанавливаем начальное значение
+		this.editor.setContents(getValue);
+
+		// Слушаем изменения и вызываем setValue
+		this.editor.onChange = (content: string) => {
+			setValue(content);
+		};
 	}
 
 	// Очистка и уничтожение редактора при удалении элемента из DOM
@@ -149,6 +159,8 @@ export function HtmlEditorComponent(props: any): any {
 	    label=${translate(label)}
 	    getValue=${getValue}
 	    setValue=${setValue}
+		data-get-value=${getValue()}
+		data-set-value=${(value) => setValue(value)}
 	    debounce=${debounce}
 		>
 		</wysiwyg-editor-element>
