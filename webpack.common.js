@@ -51,6 +51,10 @@ module.exports = {
 				use: ['style-loader', 'vue-style-loader', 'css-loader'],
 			},
 			{
+				test: /\.min\.css$/,
+				use: ['style-loader', 'vue-style-loader', 'css-loader'],
+			},
+			{
 				test: /\.scss$/,
 				use: ['style-loader', 'css-loader', 'sass-loader'],
 			},
@@ -82,7 +86,7 @@ module.exports = {
 		new VueLoaderPlugin(),
 	],
 	resolve: {
-		extensions: ['*', '.tsx', '.ts', '.js', '.scss'],
+		extensions: ['*', '.tsx', '.ts', '.js', '.scss', '.css', '.min.css'],
 		fallback: {
 			path: require.resolve('path-browserify'),
 		},
