@@ -30,6 +30,7 @@ class WysiwygEditorElement extends HTMLElement {
 	}
 
 	initializeEditor() {
+		console.log('initializeEditor');
 		this.editor = new EditorJS({
 			holder: 'editor-container', // The ID of the container
 			tools: {
@@ -45,7 +46,7 @@ class WysiwygEditorElement extends HTMLElement {
 					},
 				},
 			},
-			placeholder: 'Start writing your content here...', // Placeholder text
+			placeholder: '', // Placeholder text
 			autofocus: true, // Automatically focus the editor
 		});
 	}
