@@ -165,10 +165,10 @@ export function HtmlEditorComponent(props: any): any {
 	return html`
 		<wysiwyg-editor-element
 	    id=${id}
-	    element=${element}
-	    label=${translate(label)}
-	    getValue=${getValue}
-	    setValue=${setValue}
+	    .element=${element}
+	    .label=${translate(label)}
+	    .getValue=${getValue}
+	    .setValue=${setValue}
 	    debounce=${debounce}
 		>
 		</wysiwyg-editor-element>
