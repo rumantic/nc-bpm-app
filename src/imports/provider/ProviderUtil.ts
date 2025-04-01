@@ -42,6 +42,10 @@ class WysiwygEditorElement extends HTMLElement {
 
 	initializeEditor() {
 		console.log('initializeEditor');
+		console.log('functions');
+		console.log(this.getValue);
+		console.log(this.setValue);
+		console.log('end list');
 		this.editor = suneditor.create('editor-container', {
 			width: '100%',
 			plugins: [font, video, image, list],
