@@ -20,6 +20,24 @@ class WysiwygEditorElement extends HTMLElement {
 	connectedCallback() {
 		// Создаем контейнер для редактора
 		this.innerHTML = `
+		<style scoped>
+		#editor-container {
+		  background-color: #fff; /* Set a white background */
+		  border: 1px solid #ccc; /* Add a light border */
+		  border-radius: 4px; /* Optional: Rounded corners */
+		  padding: 10px; /* Add padding inside the editor */
+		  min-height: 300px; /* Ensure the editor has a minimum height */
+		  color: #000; /* Set text color to black */
+		}
+
+		.ce-block__content {
+		  margin: 10px 0; /* Add spacing between blocks */
+		}
+
+		.ce-toolbar__content {
+		  z-index: 10; /* Ensure the toolbar is visible */
+		}
+		</style>
       <div class="bio-properties-panel-entry">
         <textarea id="editor-container"></textarea>
       </div>
@@ -34,8 +52,14 @@ class WysiwygEditorElement extends HTMLElement {
 		this.editor = new EditorJS({
 			holder: 'editor-container', // The ID of the container
 			tools: {
-				header: Header,
-				list: List,
+				header: {
+					class: Header,
+					inlineToolbar: true, // Enable inline toolbar for the header
+				},
+				list: {
+					class: List,
+					inlineToolbar: true, // Enable inline toolbar for lists
+				},
 				image: {
 					class: ImageTool,
 					config: {
