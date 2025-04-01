@@ -3,10 +3,19 @@ import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
 
-import EditorJS from '@editorjs/editorjs';
-import Header from '@editorjs/header';
-import List from '@editorjs/list';
-import ImageTool from '@editorjs/image';
+import 'suneditor/dist/css/suneditor.min.css';
+// import 'suneditor/assets/css/suneditor.css';
+// import 'suneditor/assets/css/suneditor-contents.css';
+import suneditor from 'suneditor';
+
+// How to import plugins
+import image from 'suneditor/src/plugins/dialog/link';
+import list from 'suneditor/src/plugins/submenu/list';
+import {font, video} from 'suneditor/src/plugins';
+
+// How to import language files (default: en)
+import lang from 'suneditor/src/lang';
+// import ru from 'suneditor/src/lang/ru';
 
 // Кастомный элемент
 class WysiwygEditorElement extends HTMLElement {
@@ -20,24 +29,6 @@ class WysiwygEditorElement extends HTMLElement {
 	connectedCallback() {
 		// Создаем контейнер для редактора
 		this.innerHTML = `
-		<style scoped>
-		#editor-container {
-		  background-color: #fff; /* Set a white background */
-		  border: 1px solid #ccc; /* Add a light border */
-		  border-radius: 4px; /* Optional: Rounded corners */
-		  padding: 10px; /* Add padding inside the editor */
-		  min-height: 300px; /* Ensure the editor has a minimum height */
-		  color: #000; /* Set text color to black */
-		}
-
-		.ce-block__content {
-		  margin: 10px 0; /* Add spacing between blocks */
-		}
-
-		.ce-toolbar__content {
-		  z-index: 10; /* Ensure the toolbar is visible */
-		}
-		</style>
       <div class="bio-properties-panel-entry">
         <textarea id="editor-container"></textarea>
       </div>
@@ -49,29 +40,12 @@ class WysiwygEditorElement extends HTMLElement {
 
 	initializeEditor() {
 		console.log('initializeEditor');
-		this.editor = new EditorJS({
-			holder: 'editor-container', // The ID of the container
-			tools: {
-				header: {
-					class: Header,
-					inlineToolbar: true, // Enable inline toolbar for the header
-				},
-				list: {
-					class: List,
-					inlineToolbar: true, // Enable inline toolbar for lists
-				},
-				image: {
-					class: ImageTool,
-					config: {
-						endpoints: {
-							byFile: '/uploadFile', // Endpoint for file uploads
-							byUrl: '/fetchUrl', // Endpoint for URL-based uploads
-						},
-					},
-				},
-			},
-			placeholder: '', // Placeholder text
-			autofocus: true, // Automatically focus the editor
+		this.editor = suneditor.create('editor-container', {
+			plugins: [font, video, image, list],
+			buttonList: [
+				['font', 'video', 'image', 'list'],
+			],
+			lang: lang.ru,
 		});
 	}
 
