@@ -19,6 +19,10 @@ import lang from 'suneditor/src/lang';
 // Кастомный элемент!
 class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
+	public element: any; // Свойство для хранения переданного элемента
+	public label: string; // Свойство для хранения переданной метки
+	public getValue: () => string; // Свойство для функции получения значения
+	public setValue: (value: string) => void; // Свойство для функции установки значения
 
 	constructor() {
 		super();  // вызываем конструктор родительского класса
@@ -32,22 +36,11 @@ class WysiwygEditorElement extends HTMLElement {
         <textarea id="editor-container"></textarea>
       </div>
     `;
-		const getValue = this.getAttribute('data-get-value');
-		const setValue = this.getAttribute('data-set-value');
-		console.log('setValue', setValue);
-		console.log('getValue', getValue);
-
-		const getValue1 = this.getAttribute('get-value');
-		const setValue1 = this.getAttribute('set-value');
-
-		console.log('setValue1', setValue1);
-		console.log('getValue1', getValue1);
-
 		// Инициализируем TinyMCE
-		this.initializeEditor(getValue, setValue);
+		this.initializeEditor();
 	}
 
-	initializeEditor(getValue: any, setValue: any) {
+	initializeEditor() {
 		console.log('initializeEditor');
 		this.editor = suneditor.create('editor-container', {
 			width: '100%',
@@ -59,11 +52,11 @@ class WysiwygEditorElement extends HTMLElement {
 		});
 
 		// Устанавливаем начальное значение
-		this.editor.setContents(getValue);
+		this.editor.setContents(this.getValue);
 
 		// Слушаем изменения и вызываем setValue
 		this.editor.onChange = (content: string) => {
-			setValue(content);
+			this.setValue(content);
 		};
 	}
 
@@ -172,8 +165,6 @@ export function HtmlEditorComponent(props: any): any {
 	    label=${translate(label)}
 	    getValue=${getValue}
 	    setValue=${setValue}
-		data-get-value=${getValue()}
-		data-set-value=${(value) => setValue(value)}
 	    debounce=${debounce}
 		>
 		</wysiwyg-editor-element>
