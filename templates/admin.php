@@ -4,6 +4,8 @@
 
 script('files_bpm', 'admin');
 ?>
+<link rel="stylesheet" href="/custom_apps/files_bpm/suneditor/dist/css/suneditor.min.css">
+
 <div id="bpm-settings" class="section">
     <h2>BPM Editor</h2>
 
