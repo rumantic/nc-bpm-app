@@ -4,8 +4,8 @@ import ncProps from './ncProps';
 import { html } from 'htm/preact';
 
 import 'suneditor/dist/css/suneditor.min.css';
-// import 'suneditor/assets/css/suneditor.css';
-// import 'suneditor/assets/css/suneditor-contents.css';
+//import 'suneditor/assets/css/suneditor.css';
+//import 'suneditor/assets/css/suneditor-contents.css';
 import suneditor from 'suneditor';
 
 // How to import plugins
@@ -17,7 +17,7 @@ import {font, video} from 'suneditor/src/plugins';
 import lang from 'suneditor/src/lang';
 // import ru from 'suneditor/src/lang/ru';
 
-// Кастомный элемент.
+// Кастомный элемент!
 class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
 
