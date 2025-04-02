@@ -23,8 +23,8 @@ class WysiwygEditorElement extends HTMLElement {
 	private bpm_id: any;
 	public label: string; // Свойство для хранения переданной метки
 
-	private moddle = useService('moddle');
-	private modeling = useService('modeling');
+	//private moddle = useService('moddle');
+	//private modeling = useService('modeling');
 
 	getValue = () => {
 		const ext = this.shadowElement.businessObject.extensionElements;
