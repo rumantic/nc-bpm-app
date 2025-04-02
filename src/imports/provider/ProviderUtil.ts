@@ -2,7 +2,6 @@ import { TextFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
-import { useRef } from 'preact/hooks';
 
 import 'suneditor/dist/css/suneditor.min.css';
 //import 'suneditor/assets/css/suneditor.css';
@@ -15,6 +14,9 @@ import {font, video, image} from 'suneditor/src/plugins';
 
 // How to import language files (default: en)
 import lang from 'suneditor/src/lang';
+import hooks from '@bpmn-io/properties-panel/preact/hooks';
+import minDash from 'min-dash';
+import jsxRuntime from '@bpmn-io/properties-panel/preact/jsx-runtime';
 // import ru from 'suneditor/src/lang/ru';
 
 // Кастомный элемент!
@@ -140,8 +142,6 @@ customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
 
-	const editorRef = useRef(null); // Создаем ref для доступа к элементу
-
 	console.log('for element...');
 	console.log(element);
 	console.log('...for element');
@@ -188,29 +188,79 @@ export function HtmlEditorComponent(props: any): any {
 	console.log(getValue);
 	console.log(setValue);
 
+	return html`
+		<EditorEntry
+	    id=${id}
+		bpm_id=${element.id}
+	    label=${translate(label)}
+	    getValue=${getValue}
+	    setValue=${setValue}
+	    debounce=${debounce}
+		/>
+	`;
 
-	// Устанавливаем свойство перед возвратом
-	const wysiwygElement = html`
-    <wysiwyg-editor-element
-      id=${id}
-      bpm_id=${element.id}
-      label=${translate(label)}
-      getValue=${getValue}
-      setValue=${setValue}
-      debounce=${debounce}
-      ref=${editorRef}
-    ></wysiwyg-editor-element>
-  `;
-
-	// Устанавливаем свойство вручную
-	if (editorRef.current) {
-		// editorRef.current.element = element;
-		console.log('editorRef.current');
-		console.log(editorRef.current);
-	}
-
-	return wysiwygElement;
 }
+
+export function EditorEntry(props) {
+	console.log('EditorEntry');
+	console.log(props);
+	const {
+		element,
+		id,
+		description,
+		debounce,
+		disabled,
+		label,
+		getValue,
+		setValue,
+		validate,
+		onFocus,
+		onBlur,
+		tooltip,
+	} = props;
+	const globalError = useError(id);
+	const [localError, setLocalError] = hooks.useState(null);
+	let value = getValue(element);
+	hooks.useEffect(() => {
+		if (minDash.isFunction(validate)) {
+			const newValidationError = validate(value) || null;
+			setLocalError(newValidationError);
+		}
+	}, [value, validate]);
+	const onInput = newValue => {
+		let newValidationError = null;
+		if (minDash.isFunction(validate)) {
+			newValidationError = validate(newValue) || null;
+		}
+		setValue(newValue, newValidationError);
+		setLocalError(newValidationError);
+	};
+	const error = globalError || localError;
+	return jsxRuntime.jsxs("div", {
+		class: classnames('bio-properties-panel-entry', error ? 'has-error' : ''),
+		"data-entry-id": id,
+		children: [jsxRuntime.jsx(Textfield, {
+			debounce: debounce,
+			disabled: disabled,
+			id: id,
+			label: label,
+			onInput: onInput,
+			onFocus: onFocus,
+			onBlur: onBlur,
+			value: value,
+			tooltip: tooltip,
+			element: element,
+		}, element), error && jsxRuntime.jsx("div", {
+			class: "bio-properties-panel-error",
+			children: error,
+		}), jsxRuntime.jsx(Description, {
+			forId: id,
+			element: element,
+			value: description,
+		})],
+	});
+}
+
 
 //TODO: import types from bpmn.io?
 export function getProperty(businessObject, type: string):any {
