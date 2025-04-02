@@ -79,11 +79,11 @@ class WysiwygEditorElement extends HTMLElement {
 		this.initializeEditor();
 
 		console.log('label ->');
-		console.log(this.label);
+		console.log(this.getAttribute('label'));
 		console.log('< - label');
 
 		console.log('this.element ->');
-		console.log(this.element);
+		console.log(this.getAttribute('element'));
 		console.log('< - this.element');
 
 		console.log('d element ->');
