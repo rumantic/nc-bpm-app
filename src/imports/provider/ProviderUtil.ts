@@ -168,15 +168,13 @@ export function HtmlEditorComponent(props: any): any {
 	console.log(getValue);
 	console.log(setValue);
 
-	html`
-    <wysiwyg-editor-element
-      id=${id}
-      element=${element}
-      label=${translate(label)}
-      getValue=${getValue}
-      setValue=${setValue}
-    ></wysiwyg-editor-element>
-  `;
+	const editorElement = document.createElement('wysiwyg-editor-element') as WysiwygEditorElement;
+	editorElement.getValue = getValue;
+	editorElement.setValue = setValue;
+
+	element.appendChild(editorElement);
+
+	return element;
 }
 
 //TODO: import types from bpmn.io?
