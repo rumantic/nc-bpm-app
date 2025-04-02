@@ -73,15 +73,11 @@ class WysiwygEditorElement extends HTMLElement {
 		this.bpm_id = this.getAttribute('bpm_id');
 		this.shadowElement = this.shadowRoot?.getElementById(this.bpm_id);
 
-		const functions = window[this.bpm_id];
+		//const functions = window[this.bpm_id];
 
-		this.getValue = functions.getValue;
-		this.setValue = functions.setValue;
+		this.getValue = window['testGetValue'];
+		this.setValue = window['testSetValue'];
 
-		setTimeout(() => {
-			const element = document.getElementById(this.bpm_id);
-			console.log('Found element:', element);
-		}, 0); // Используем setTimeout, чтобы дождаться добавления в DOM
 
 		// this.shadowElement = document.getElementById(this.bpm_id);
 
@@ -195,10 +191,8 @@ export function HtmlEditorComponent(props: any): any {
 	console.log(getValue);
 	console.log(setValue);
 
-	window[element.id] = {
-		getValue,
-		setValue,
-	};
+	window['testGetValue'] = getValue;
+	window['testSetValue'] = setValue;
 
 
 	return html`
