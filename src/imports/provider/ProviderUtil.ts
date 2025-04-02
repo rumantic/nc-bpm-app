@@ -21,12 +21,19 @@ class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
 	public element: any; // Свойство для хранения переданного элемента
 	public label: string; // Свойство для хранения переданной метки
-	public getValue: () => string; // Свойство для функции получения значения
-	public setValue: (value: string) => void; // Свойство для функции установки значения
 
 	constructor() {
 		super();  // вызываем конструктор родительского класса
 	}
+
+	getValue() {
+		console.log('method getValue not defined');
+	}
+
+	setValue(value) {
+		console.log('method setValue not defined', value);
+	}
+
 
 	// Метод для инициализации компонента
 	connectedCallback() {
@@ -67,7 +74,7 @@ class WysiwygEditorElement extends HTMLElement {
 	// Очистка и уничтожение редактора при удалении элемента из DOM
 	disconnectedCallback() {
 		if (this.editor) {
-			this.editor.remove();
+			// this.editor.;
 		}
 	}
 }
@@ -161,18 +168,11 @@ export function HtmlEditorComponent(props: any): any {
 	console.log(getValue);
 	console.log(setValue);
 
+	const editor_element = document.createElement('wysiwyg-editor-element') as WysiwygEditorElement;
+	editor_element.getValue = getValue;
+	editor_element.setValue = setValue;
 
-	return html`
-		<wysiwyg-editor-element
-	    id=${id}
-	    .element=${element}
-	    .label=${translate(label)}
-	    .getValue=${getValue}
-	    .setValue=${setValue}
-	    debounce=${debounce}
-		>
-		</wysiwyg-editor-element>
-	`;
+	return editor_element;
 }
 
 //TODO: import types from bpmn.io?
