@@ -20,7 +20,6 @@ import lang from 'suneditor/src/lang';
 class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
 	private shadowElement: any;
-	public element: any; // Свойство для хранения переданного элемента
 	private bpm_id: any;
 	public label: string; // Свойство для хранения переданной метки
 
@@ -66,22 +65,15 @@ class WysiwygEditorElement extends HTMLElement {
       </div>
     `;
 		this.bpm_id = this.getAttribute('bpm_id');
-		this.shadowElement = this.shadowRoot?.getElementById(this.bpm_id);
+		this.shadowElement = document.getElementById(this.bpm_id);
 
 		// Инициализируем TinyMCE
 		this.initializeEditor();
 		console.log('element ->');
-		this.element = this.getAttribute('element');
-		console.log(this.element);
-		console.log('shadow...');
-		console.log(this.shadowRoot);
-		console.log('...shadow');
+		console.log(this.shadowElement);
 		console.log('bpm id...');
 		console.log(this.bpm_id);
 		console.log('...bpm id');
-		// console.log(this.element.businessObject.extensionElements);
-		console.log(this.getAttribute('element'));
-		console.log('<- element');
 
 		console.log('moddle...');
 		console.log(this.moddle);
