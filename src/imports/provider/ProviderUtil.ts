@@ -53,6 +53,7 @@ class WysiwygEditorElement extends HTMLElement {
 	};
 
 	constructor(props: any) {
+		console.log('props = ');
 		console.log(props);
 		super();  // вызываем конструктор родительского класса
 	}
@@ -71,8 +72,14 @@ class WysiwygEditorElement extends HTMLElement {
 
 		// Инициализируем TinyMCE
 		this.initializeEditor();
+
+		console.log('d element ->');
+		console.log(document.getElementById(this.bpm_id));
+		console.log('< - d element');
+
 		console.log('element ->');
 		console.log(this.shadowElement);
+		console.log('< - element');
 		console.log('bpm id...');
 		console.log(this.bpm_id);
 		console.log('...bpm id');
@@ -114,51 +121,6 @@ class WysiwygEditorElement extends HTMLElement {
 // Регистрируем кастомный элемент
 customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
 
-export function TextComponent(props: any):TextFieldEntry {
-	const { element, id } = props;
-
-	const modeling = useService('modeling');
-	const translate = useService('translate');
-	const debounce = useService('debounceInput');
-	const moddle = useService('moddle');
-
-	const getValue = () => {
-		const ext = element.businessObject.extensionElements;
-		if (!ext) {
-			return [];
-		}
-		const prop = getProperty(element.businessObject, id);
-		if (!prop || prop.length < 1) {
-			return [];
-		}
-		return prop.value;
-		//return element.businessObject.nameDE || '';
-	};
-
-	const setValue = value => {
-		const extensionElements = element.businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-		let prop = getProperty(element.businessObject, id);
-		if (!prop) {
-			prop = moddle.create('nc:property', { name: id, value: value });
-			extensionElements.get('values').push(prop);
-		}
-		prop.value = value;
-
-		return modeling.updateProperties(element, {
-			extensionElements,
-		});
-	};
-
-	const label = props.label ?? id;
-	return html`<${TextFieldEntry}
-	    id=${id}
-	    element=${element}
-	    label=${translate(label)}
-	    getValue=${getValue}
-	    setValue=${setValue}
-	    debounce=${debounce}
-	  />`;
-}
 
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
@@ -251,4 +213,50 @@ export function createGroup(element, translate) {
 	};
 
 	return group;
+}
+
+export function TextComponent(props: any):TextFieldEntry {
+	const { element, id } = props;
+
+	const modeling = useService('modeling');
+	const translate = useService('translate');
+	const debounce = useService('debounceInput');
+	const moddle = useService('moddle');
+
+	const getValue = () => {
+		const ext = element.businessObject.extensionElements;
+		if (!ext) {
+			return [];
+		}
+		const prop = getProperty(element.businessObject, id);
+		if (!prop || prop.length < 1) {
+			return [];
+		}
+		return prop.value;
+		//return element.businessObject.nameDE || '';
+	};
+
+	const setValue = value => {
+		const extensionElements = element.businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
+		let prop = getProperty(element.businessObject, id);
+		if (!prop) {
+			prop = moddle.create('nc:property', { name: id, value: value });
+			extensionElements.get('values').push(prop);
+		}
+		prop.value = value;
+
+		return modeling.updateProperties(element, {
+			extensionElements,
+		});
+	};
+
+	const label = props.label ?? id;
+	return html`<${TextFieldEntry}
+	    id=${id}
+	    element=${element}
+	    label=${translate(label)}
+	    getValue=${getValue}
+	    setValue=${setValue}
+	    debounce=${debounce}
+	  />`;
 }
