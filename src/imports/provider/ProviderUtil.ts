@@ -159,7 +159,9 @@ export function HtmlEditorComponent(props: any): any {
 
 	const getValue = () => {
 		console.log('getValue = ');
+		return 'test';
 
+		/*
 		const ext = element.businessObject.extensionElements;
 		if (!ext) {
 			return '';
@@ -170,6 +172,7 @@ export function HtmlEditorComponent(props: any): any {
 		}
 		console.log(prop.value);
 		return prop.value;
+		 */
 	};
 
 	const setValue = (value: string) => {
