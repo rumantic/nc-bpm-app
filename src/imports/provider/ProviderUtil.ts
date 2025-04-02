@@ -39,17 +39,17 @@ class WysiwygEditorElement extends HTMLElement {
 	};
 
 	setValue = (value: string) => {
-		const extensionElements = this.shadowElement.businessObject.extensionElements || this.moddle.create('bpmn:ExtensionElements');
+		const extensionElements = this.shadowElement.businessObject.extensionElements;
 		let prop = getProperty(this.shadowElement.businessObject, this.bpm_id);
-		if (!prop) {
-			prop = this.moddle.create('nc:property', { name: this.bpm_id, value: value });
-			extensionElements.get('values').push(prop);
-		}
 		prop.value = value;
+		console.log(prop);
+		console.log(extensionElements);
 
+		/*
 		return this.modeling.updateProperties(this.shadowElement, {
 			extensionElements,
 		});
+		 */
 	};
 
 	constructor() {
