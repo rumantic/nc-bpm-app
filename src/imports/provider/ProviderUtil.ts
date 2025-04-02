@@ -195,9 +195,11 @@ export function HtmlEditorComponent(props: any): any {
 	    setValue=${setValue}
 	    debounce=${debounce}
 		oncreate=${(node) => {
+			console.log('oncreate');
+			console.log(node);
         	// Устанавливаем свойство вручную
         	node.element = element;
-      	}}		
+      	}}
 		>
 		</wysiwyg-editor-element>
 	`;
