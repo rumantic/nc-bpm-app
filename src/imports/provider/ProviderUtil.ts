@@ -120,7 +120,6 @@ class WysiwygEditorElement extends HTMLElement {
 			lang: lang.ru,
 		});
 
-		/*
 		// Устанавливаем начальное значение
 		this.editor.setContents(this.getValue);
 
@@ -128,7 +127,6 @@ class WysiwygEditorElement extends HTMLElement {
 		this.editor.onChange = (content: string) => {
 			this.setValue(content);
 		};
-		 */
 	}
 
 	// Очистка и уничтожение редактора при удалении элемента из DOM
