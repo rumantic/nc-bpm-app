@@ -74,15 +74,6 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('bpm id...');
 		console.log(this.bpm_id);
 		console.log('...bpm id');
-
-		console.log('moddle...');
-		console.log(this.moddle);
-		console.log('...moddle');
-
-		console.log('modeling...');
-		console.log(this.modeling);
-		console.log('...modeling');
-
 	}
 
 	initializeEditor() {
