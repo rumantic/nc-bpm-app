@@ -168,6 +168,8 @@ export function HtmlEditorComponent(props: any): any {
 		if (!prop) {
 			return '';
 		}
+		console.log('getValue = ');
+		console.log(prop.value);
 		return prop.value;
 	};
 
@@ -179,6 +181,9 @@ export function HtmlEditorComponent(props: any): any {
 			extensionElements.get('values').push(prop);
 		}
 		prop.value = value;
+
+		console.log('setValue = ');
+		console.log(prop.value);
 
 		return modeling.updateProperties(element, {
 			extensionElements,
