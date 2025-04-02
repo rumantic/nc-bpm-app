@@ -41,7 +41,9 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('element ->');
 		this.element = this.getAttribute('element');
 		console.log(this.element);
+		console.log('shadow...');
 		console.log(this.shadowRoot);
+		console.log('...shadow');
 		// console.log(this.element.businessObject.extensionElements);
 		console.log(this.getAttribute('element'));
 		console.log('<- element');
@@ -129,6 +131,14 @@ export function TextComponent(props: any):TextFieldEntry {
 
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
+
+	console.log('for element...');
+	console.log(element);
+	console.log('...for element');
+
+	console.log('id...');
+	console.log(id);
+	console.log('...id');
 
 	const modeling = useService('modeling');
 	const translate = useService('translate');
