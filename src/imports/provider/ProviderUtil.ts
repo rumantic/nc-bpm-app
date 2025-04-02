@@ -41,7 +41,8 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('element ->');
 		this.element = this.getAttribute('element');
 		console.log(this.element);
-		console.log(this.element.businessObject.extensionElements);
+		console.log(this.shadowRoot);
+		// console.log(this.element.businessObject.extensionElements);
 		console.log(this.getAttribute('element'));
 		console.log('<- element');
 	}
