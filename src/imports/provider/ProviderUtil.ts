@@ -68,6 +68,12 @@ class WysiwygEditorElement extends HTMLElement {
     `;
 		this.bpm_id = this.getAttribute('bpm_id');
 		this.shadowElement = this.shadowRoot?.getElementById(this.bpm_id);
+
+		setTimeout(() => {
+			const element = document.getElementById(this.bpm_id);
+			console.log('Found element:', element);
+		}, 0); // Используем setTimeout, чтобы дождаться добавления в DOM
+
 		// this.shadowElement = document.getElementById(this.bpm_id);
 
 		// Инициализируем TinyMCE
