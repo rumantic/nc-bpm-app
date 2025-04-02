@@ -160,6 +160,8 @@ export function HtmlEditorComponent(props: any): any {
 
 
 	const getValue = () => {
+		console.log('getValue = ');
+
 		const ext = element.businessObject.extensionElements;
 		if (!ext) {
 			return '';
@@ -168,12 +170,13 @@ export function HtmlEditorComponent(props: any): any {
 		if (!prop) {
 			return '';
 		}
-		console.log('getValue = ');
 		console.log(prop.value);
 		return prop.value;
 	};
 
 	const setValue = (value: string) => {
+		console.log('setValue = ');
+
 		const extensionElements = element.businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
 		let prop = getProperty(element.businessObject, id);
 		if (!prop) {
@@ -182,7 +185,6 @@ export function HtmlEditorComponent(props: any): any {
 		}
 		prop.value = value;
 
-		console.log('setValue = ');
 		console.log(prop.value);
 
 		return modeling.updateProperties(element, {
