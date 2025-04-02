@@ -19,11 +19,39 @@ import lang from 'suneditor/src/lang';
 // Кастомный элемент!
 class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
+	private shadowElement: any;
 	public element: any; // Свойство для хранения переданного элемента
 	private bpm_id: any;
 	public label: string; // Свойство для хранения переданной метки
-	public getValue: () => string; // Свойство для функции получения значения
-	public setValue: (value: string) => void; // Свойство для функции установки значения
+
+	private moddle = useService('moddle');
+	private modeling = useService('modeling');
+
+	getValue = () => {
+		const ext = this.shadowElement.businessObject.extensionElements;
+		if (!ext) {
+			return '';
+		}
+		const prop = getProperty(this.shadowElement.businessObject, this.bpm_id);
+		if (!prop) {
+			return '';
+		}
+		return prop.value;
+	};
+
+	setValue = (value: string) => {
+		const extensionElements = this.shadowElement.businessObject.extensionElements || this.moddle.create('bpmn:ExtensionElements');
+		let prop = getProperty(this.shadowElement.businessObject, this.bpm_id);
+		if (!prop) {
+			prop = this.moddle.create('nc:property', { name: this.bpm_id, value: value });
+			extensionElements.get('values').push(prop);
+		}
+		prop.value = value;
+
+		return this.modeling.updateProperties(this.shadowElement, {
+			extensionElements,
+		});
+	};
 
 	constructor() {
 		super();  // вызываем конструктор родительского класса
@@ -37,11 +65,13 @@ class WysiwygEditorElement extends HTMLElement {
         <textarea id="editor-container"></textarea>
       </div>
     `;
+		this.bpm_id = this.getAttribute('bpm_id');
+		this.shadowElement = this.shadowRoot.getElementById(this.bpm_id);
+
 		// Инициализируем TinyMCE
 		this.initializeEditor();
 		console.log('element ->');
 		this.element = this.getAttribute('element');
-		this.bpm_id = this.getAttribute('bpm_id');
 		console.log(this.element);
 		console.log('shadow...');
 		console.log(this.shadowRoot);
