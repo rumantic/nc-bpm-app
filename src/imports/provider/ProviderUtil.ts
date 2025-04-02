@@ -139,6 +139,8 @@ customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
 
+	const editorRef = useRef(null); // Создаем ref для доступа к элементу
+
 	console.log('for element...');
 	console.log(element);
 	console.log('...for element');
@@ -186,23 +188,27 @@ export function HtmlEditorComponent(props: any): any {
 	console.log(setValue);
 
 
-	return html`
-		<wysiwyg-editor-element
-	    id=${id}
-		bpm_id=${element.id}
-	    label=${translate(label)}
-	    getValue=${getValue}
-	    setValue=${setValue}
-	    debounce=${debounce}
-		oncreate=${(node) => {
-			console.log('oncreate');
-			console.log(node);
-        	// Устанавливаем свойство вручную
-        	node.element = element;
-      	}}
-		>
-		</wysiwyg-editor-element>
-	`;
+	// Устанавливаем свойство перед возвратом
+	const wysiwygElement = html`
+    <wysiwyg-editor-element
+      id=${id}
+      bpm_id=${element.id}
+      label=${translate(label)}
+      getValue=${getValue}
+      setValue=${setValue}
+      debounce=${debounce}
+      ref=${editorRef}
+    ></wysiwyg-editor-element>
+  `;
+
+	// Устанавливаем свойство вручную
+	if (editorRef.current) {
+		editorRef.current.element = element;
+		console.log('editorRef.current');
+		console.log(editorRef.current);
+	}
+
+	return wysiwygElement;
 }
 
 //TODO: import types from bpmn.io?
