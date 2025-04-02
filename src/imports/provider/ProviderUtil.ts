@@ -20,6 +20,7 @@ import lang from 'suneditor/src/lang';
 class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
 	public element: any; // Свойство для хранения переданного элемента
+	private bpm_id: any;
 	public label: string; // Свойство для хранения переданной метки
 	public getValue: () => string; // Свойство для функции получения значения
 	public setValue: (value: string) => void; // Свойство для функции установки значения
@@ -40,10 +41,14 @@ class WysiwygEditorElement extends HTMLElement {
 		this.initializeEditor();
 		console.log('element ->');
 		this.element = this.getAttribute('element');
+		this.bpm_id = this.getAttribute('bpm_id');
 		console.log(this.element);
 		console.log('shadow...');
 		console.log(this.shadowRoot);
 		console.log('...shadow');
+		console.log('bpm id...');
+		console.log(this.bpm_id);
+		console.log('...bpm id');
 		// console.log(this.element.businessObject.extensionElements);
 		console.log(this.getAttribute('element'));
 		console.log('<- element');
@@ -183,6 +188,7 @@ export function HtmlEditorComponent(props: any): any {
 		<wysiwyg-editor-element
 	    id=${id}
 	    element=${element}
+		bpm_id=${element.id}
 	    label=${translate(label)}
 	    getValue=${getValue}
 	    setValue=${setValue}
