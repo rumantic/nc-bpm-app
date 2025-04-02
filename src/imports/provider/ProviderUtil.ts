@@ -120,7 +120,7 @@ class WysiwygEditorElement extends HTMLElement {
 	// Очистка и уничтожение редактора при удалении элемента из DOM
 	disconnectedCallback() {
 		if (this.editor) {
-			this.editor.remove();
+			//this.editor.remove();
 		}
 	}
 }
