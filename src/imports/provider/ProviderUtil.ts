@@ -2,6 +2,7 @@ import { TextFieldEntry } from '@bpmn-io/properties-panel';
 import { useService } from 'bpmn-js-properties-panel';
 import ncProps from './ncProps';
 import { html } from 'htm/preact';
+import { useRef } from 'preact/hooks';
 
 import 'suneditor/dist/css/suneditor.min.css';
 //import 'suneditor/assets/css/suneditor.css';
