@@ -22,6 +22,7 @@ class WysiwygEditorElement extends HTMLElement {
 	private shadowElement: any;
 	private bpm_id: any;
 	public label: string; // Свойство для хранения переданной метки
+	public element: any;
 
 	//private moddle = useService('moddle');
 	//private modeling = useService('modeling');
@@ -52,9 +53,7 @@ class WysiwygEditorElement extends HTMLElement {
 		 */
 	};
 
-	constructor(props: any) {
-		console.log('props = ');
-		console.log(props);
+	constructor() {
 		super();  // вызываем конструктор родительского класса
 	}
 
@@ -78,6 +77,14 @@ class WysiwygEditorElement extends HTMLElement {
 
 		// Инициализируем TinyMCE
 		this.initializeEditor();
+
+		console.log('label ->');
+		console.log(this.label);
+		console.log('< - label');
+
+		console.log('this.element ->');
+		console.log(this.element);
+		console.log('< - this.element');
 
 		console.log('d element ->');
 		console.log(document.getElementById(this.bpm_id));
