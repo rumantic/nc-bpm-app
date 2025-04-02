@@ -188,7 +188,7 @@ export function HtmlEditorComponent(props: any): any {
 	console.log(getValue);
 	console.log(setValue);
 
-	return html`
+	const test = html`
 		<EditorEntry
 	    id=${id}
 		bpm_id=${element.id}
@@ -199,7 +199,19 @@ export function HtmlEditorComponent(props: any): any {
 		/>
 	`;
 
+	return html`
+		<wysiwyg-editor-element
+	    id=${id}
+		bpm_id=${element.id}
+	    label=${translate(label)}
+	    getValue=${getValue}
+	    setValue=${setValue}
+	    debounce=${debounce}
+		/>
+	`;
+
 }
+
 
 export function EditorEntry(props) {
 	console.log('EditorEntry');
@@ -218,47 +230,7 @@ export function EditorEntry(props) {
 		onBlur,
 		tooltip,
 	} = props;
-	const globalError = useError(id);
-	const [localError, setLocalError] = hooks.useState(null);
-	let value = getValue(element);
-	hooks.useEffect(() => {
-		if (minDash.isFunction(validate)) {
-			const newValidationError = validate(value) || null;
-			setLocalError(newValidationError);
-		}
-	}, [value, validate]);
-	const onInput = newValue => {
-		let newValidationError = null;
-		if (minDash.isFunction(validate)) {
-			newValidationError = validate(newValue) || null;
-		}
-		setValue(newValue, newValidationError);
-		setLocalError(newValidationError);
-	};
-	const error = globalError || localError;
-	return jsxRuntime.jsxs("div", {
-		class: classnames('bio-properties-panel-entry', error ? 'has-error' : ''),
-		"data-entry-id": id,
-		children: [jsxRuntime.jsx(Textfield, {
-			debounce: debounce,
-			disabled: disabled,
-			id: id,
-			label: label,
-			onInput: onInput,
-			onFocus: onFocus,
-			onBlur: onBlur,
-			value: value,
-			tooltip: tooltip,
-			element: element,
-		}, element), error && jsxRuntime.jsx("div", {
-			class: "bio-properties-panel-error",
-			children: error,
-		}), jsxRuntime.jsx(Description, {
-			forId: id,
-			element: element,
-			value: description,
-		})],
-	});
+
 }
 
 
