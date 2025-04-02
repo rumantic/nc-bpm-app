@@ -52,7 +52,8 @@ class WysiwygEditorElement extends HTMLElement {
 		 */
 	};
 
-	constructor() {
+	constructor(props: any) {
+		console.log(props);
 		super();  // вызываем конструктор родительского класса
 	}
 
