@@ -204,7 +204,7 @@ export function HtmlEditorComponent(props: any): any {
 
 	// Устанавливаем свойство вручную
 	if (editorRef.current) {
-		editorRef.current.element = element;
+		// editorRef.current.element = element;
 		console.log('editorRef.current');
 		console.log(editorRef.current);
 	}
