@@ -26,10 +26,13 @@ class WysiwygEditorElement extends HTMLElement {
 	private bpm_id: any;
 	public label: string; // Свойство для хранения переданной метки
 	public element: any;
+	public getValue = () => {};
+	public setValue = (value: string) => {};
 
 	//private moddle = useService('moddle');
 	//private modeling = useService('modeling');
 
+	/*
 	getValue = () => {
 		const ext = this.shadowElement.businessObject.extensionElements;
 		if (!ext) {
@@ -49,12 +52,11 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log(prop);
 		console.log(extensionElements);
 
-		/*
-		return this.modeling.updateProperties(this.shadowElement, {
-			extensionElements,
-		});
-		 */
+		//return this.modeling.updateProperties(this.shadowElement, {
+		//	extensionElements,
+		//});
 	};
+	 */
 
 	constructor() {
 		super();  // вызываем конструктор родительского класса
@@ -188,48 +190,17 @@ export function HtmlEditorComponent(props: any): any {
 	console.log(getValue);
 	console.log(setValue);
 
-	const test = html`
-		<EditorEntry
-	    id=${id}
-		bpm_id=${element.id}
-	    label=${translate(label)}
-	    getValue=${getValue}
-	    setValue=${setValue}
-	    debounce=${debounce}
-		/>
-	`;
 
 	return html`
 		<wysiwyg-editor-element
 	    id=${id}
 		bpm_id=${element.id}
 	    label=${translate(label)}
-	    getValue=${getValue}
-	    setValue=${setValue}
+	    .getValue=${getValue}
+	    .setValue=${setValue}
 	    debounce=${debounce}
 		/>
 	`;
-
-}
-
-
-export function EditorEntry(props) {
-	console.log('EditorEntry');
-	console.log(props);
-	const {
-		element,
-		id,
-		description,
-		debounce,
-		disabled,
-		label,
-		getValue,
-		setValue,
-		validate,
-		onFocus,
-		onBlur,
-		tooltip,
-	} = props;
 
 }
 
