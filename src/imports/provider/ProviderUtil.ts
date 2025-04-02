@@ -83,6 +83,7 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('< - label');
 
 		console.log('this.element ->');
+		console.log(this.element);
 		console.log(this.getAttribute('element'));
 		console.log('< - this.element');
 
@@ -188,12 +189,15 @@ export function HtmlEditorComponent(props: any): any {
 	return html`
 		<wysiwyg-editor-element
 	    id=${id}
-	    element=${element}
 		bpm_id=${element.id}
 	    label=${translate(label)}
 	    getValue=${getValue}
 	    setValue=${setValue}
 	    debounce=${debounce}
+		oncreate=${(node) => {
+        	// Устанавливаем свойство вручную
+        	node.element = element;
+      	}}		
 		>
 		</wysiwyg-editor-element>
 	`;
