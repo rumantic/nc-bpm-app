@@ -172,10 +172,9 @@ export function HtmlEditorComponent(props: any): any {
 	editorElement.getValue = getValue;
 	editorElement.setValue = setValue;
 
-	const container = document.createElement('div');
-	container.appendChild(editorElement);
+	element.appendChild(editorElement);
 
-	return container;
+	return element;
 }
 
 //TODO: import types from bpmn.io?
