@@ -26,8 +26,8 @@ class WysiwygEditorElement extends HTMLElement {
 	private bpm_id: any;
 	public label: string; // Свойство для хранения переданной метки
 	public element: any;
-	public getValue = () => {};
-	public setValue = (value: string) => {};
+	public getValue: any;
+	public setValue: any;
 
 	//private moddle = useService('moddle');
 	//private modeling = useService('modeling');
