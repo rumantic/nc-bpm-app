@@ -38,6 +38,9 @@ class WysiwygEditorElement extends HTMLElement {
     `;
 		// Инициализируем TinyMCE
 		this.initializeEditor();
+		console.log('element ->');
+		console.log(this.element);
+		console.log('<- element');
 	}
 
 	initializeEditor() {
