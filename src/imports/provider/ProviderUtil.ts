@@ -226,8 +226,14 @@ export function TextComponent(props: any):TextFieldEntry {
 			extensionElements.get('values').push(prop);
 		}
 		console.log('Это setValue внутри TextComponent');
-		console.log(value);
-		prop.value = value;
+
+		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
+			prop.value = window['w-editor'].getContents();
+		} else {
+			prop.value = value;
+		}
+		console.log(prop.value);
+
 
 		return modeling.updateProperties(element, {
 			extensionElements,
