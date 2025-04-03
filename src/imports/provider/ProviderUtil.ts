@@ -30,34 +30,6 @@ class WysiwygEditorElement extends HTMLElement {
 	public getValue: any;
 	public setValue: any;
 
-	//private moddle = useService('moddle');
-	//private modeling = useService('modeling');
-
-	/*
-	getValue = () => {
-		const ext = this.shadowElement.businessObject.extensionElements;
-		if (!ext) {
-			return '';
-		}
-		const prop = getProperty(this.shadowElement.businessObject, this.bpm_id);
-		if (!prop) {
-			return '';
-		}
-		return prop.value;
-	};
-
-	setValue = (value: string) => {
-		const extensionElements = this.shadowElement.businessObject.extensionElements;
-		let prop = getProperty(this.shadowElement.businessObject, this.bpm_id);
-		prop.value = value;
-		console.log(prop);
-		console.log(extensionElements);
-
-		//return this.modeling.updateProperties(this.shadowElement, {
-		//	extensionElements,
-		//});
-	};
-	 */
 
 	constructor() {
 		super();  // вызываем конструктор родительского класса
@@ -72,50 +44,20 @@ class WysiwygEditorElement extends HTMLElement {
       </div>
     `;
 		this.bpm_id = this.getAttribute('bpm_id');
-		this.shadowElement = this.shadowRoot?.getElementById(this.bpm_id);
-
-		//const functions = window[this.bpm_id];
-
-		this.getValue = window['testGetValue'];
-		this.setValue = window['testSetValue'];
-
-		this.bio_properties_panel_documentation = document.getElementById('bio-properties-panel-documentation');
-		console.log('bio_properties_panel_documentation');
-		console.log(this.bio_properties_panel_documentation);
-
-
-		// this.shadowElement = document.getElementById(this.bpm_id);
 
 		// Инициализируем TinyMCE
 		this.initializeEditor();
 
-		console.log('label ->');
-		console.log(this.getAttribute('label'));
-		console.log('< - label');
-
-		console.log('this.element ->');
-		console.log(this.element);
-		console.log(this.getAttribute('element'));
-		console.log('< - this.element');
-
-		console.log('d element ->');
-		console.log(document.getElementById(this.bpm_id));
-		console.log('< - d element');
-
-		console.log('element ->');
-		console.log(this.shadowElement);
-		console.log('< - element');
 		console.log('bpm id...');
 		console.log(this.bpm_id);
 		console.log('...bpm id');
 	}
 
 	initializeEditor() {
-		console.log('initializeEditor');
-		console.log('functions');
-		console.log(this.getValue);
-		console.log(this.setValue);
-		console.log('end list');
+		this.bio_properties_panel_documentation = document.getElementById('bio-properties-panel-documentation');
+		console.log('bio_properties_panel_documentation');
+		console.log(this.bio_properties_panel_documentation);
+
 		this.editor = suneditor.create('editor-container', {
 			width: '100%',
 			height: '400',
@@ -172,52 +114,7 @@ export function HtmlEditorComponent(props: any): any {
 	const moddle = useService('moddle');
 	const debounce = useService('debounceInput');
 
-
-	const getValue = () => {
-		console.log('getValue = ');
-		return 'test';
-
-		/*
-		const ext = element.businessObject.extensionElements;
-		if (!ext) {
-			return '';
-		}
-		const prop = getProperty(element.businessObject, id);
-		if (!prop) {
-			return '';
-		}
-		console.log(prop.value);
-		return prop.value;
-		 */
-	};
-
-	const setValue = (value: string) => {
-		console.log('setValue = ');
-
-		const extensionElements = element.businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-		let prop = getProperty(element.businessObject, id);
-		if (!prop) {
-			prop = moddle.create('nc:property', { name: id, value: value });
-			extensionElements.get('values').push(prop);
-		}
-		prop.value = value;
-
-		console.log(prop.value);
-
-		return modeling.updateProperties(element, {
-			extensionElements,
-		});
-	};
-
 	const label = props.label ?? id;
-
-
-	console.log(getValue);
-	console.log(setValue);
-
-	window['testGetValue'] = getValue;
-	window['testSetValue'] = setValue;
-
 
 	return html`
 		<wysiwyg-editor-element
