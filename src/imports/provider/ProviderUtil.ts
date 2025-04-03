@@ -42,7 +42,7 @@ class WysiwygEditorElement extends HTMLElement {
 		// Создаем контейнер для редактора
 		this.innerHTML = `
       <div class="bio-properties-panel-entry">
-        <textarea id="editor-container"></textarea>
+        <textarea id="w-editor-container"></textarea>
       </div>
     `;
 		this.bpm_id = this.getAttribute('bpm_id');
@@ -60,7 +60,7 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
-		this.editor = suneditor.create('editor-container', {
+		window['w-editor'] = suneditor.create('w-editor-container', {
 			width: '100%',
 			height: '400',
 			minHeight: '400',
@@ -86,10 +86,10 @@ class WysiwygEditorElement extends HTMLElement {
 		});
 
 		// Устанавливаем начальное значение
-		this.editor.setContents(this.bio_properties_panel_documentation.value);
+		window['w-editor'].setContents(this.bio_properties_panel_documentation.value);
 
 		// Слушаем изменения и вызываем setValue
-		this.editor.onChange = (content: string) => {
+		window['w-editor'].onChange = (content: string) => {
 			this.bio_properties_panel_documentation.value = content;
 			const event = new Event('input', {
 				bubbles: true,
@@ -106,8 +106,8 @@ class WysiwygEditorElement extends HTMLElement {
 	// Очистка и уничтожение редактора при удалении элемента из DOM
 	disconnectedCallback() {
 		console.log('disconnectedCallback');
-		if (this.editor) {
-			this.editor.destroy();
+		if (window['w-editor']) {
+			window['w-editor'].destroy();
 			console.log('destroy');
 		}
 	}
@@ -119,11 +119,11 @@ customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
 
-	const myId = 'wysiwyg-editor-id';
+	const myId = 'w-editor-container';
+	const bio_properties_panel_documentation = document.getElementById('bio-properties-panel-documentation');
 
-	const oldEditor = document.getElementById(myId);
-	if (oldEditor) {
-		oldEditor.remove();
+	if (window['w-editor']) {
+		window['w-editor'].setContents(bio_properties_panel_documentation.value);
 	}
 
 	console.log('for element...');
