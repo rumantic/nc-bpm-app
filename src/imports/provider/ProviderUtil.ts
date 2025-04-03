@@ -120,8 +120,8 @@ export function HtmlEditorComponent(props: any): any {
 
 		const wysiwygElement = document.getElementById(myId);
 		if (wysiwygElement) {
-			wysiwygElement.remove(); // Удаляет элемент из DOM и вызывает disconnectedCallback
-			console.log('wysiwyg-editor-element удален из DOM');
+			// wysiwygElement.remove(); // Удаляет элемент из DOM и вызывает disconnectedCallback
+			console.log('wysiwyg-editor-element есть в DOM');
 		} else {
 			console.error('wysiwyg-editor-element не найден');
 		}
