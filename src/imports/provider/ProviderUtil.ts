@@ -124,8 +124,15 @@ export function HtmlEditorComponent(props: any): any {
 		const bio_properties_panel_documentation =
 			document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
 
-		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
+		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function' && bio_properties_panel_documentation.value !== '') {
+			console.log('documentation text = ');
 			console.log(bio_properties_panel_documentation.value);
+			console.log('editor text = ');
+			console.log(window['w-editor'].getContents());
+			if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
+				window['w-editor'].setContents(bio_properties_panel_documentation.value);
+			}
+
 			// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 		}
 	}, 1000); // Пауза в 1 секунду (1000 миллисекунд)
