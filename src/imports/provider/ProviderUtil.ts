@@ -126,11 +126,12 @@ class WysiwygEditorElement extends HTMLElement {
 		});
 
 		// Устанавливаем начальное значение
-		this.editor.setContents(this.getValue);
+		this.editor.setContents(this.bio_properties_panel_documentation.value);
 
 		// Слушаем изменения и вызываем setValue
 		this.editor.onChange = (content: string) => {
-			this.setValue(content);
+			this.bio_properties_panel_documentation.value = content;
+			//this.setValue(content);
 		};
 	}
 
