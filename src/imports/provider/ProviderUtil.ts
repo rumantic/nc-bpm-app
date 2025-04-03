@@ -123,7 +123,7 @@ export function HtmlEditorComponent(props: any): any {
 	const bio_properties_panel_documentation =
 		document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
 
-	if (window['w-editor']) {
+	if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
 		window['w-editor'].setContents(bio_properties_panel_documentation.value);
 	}
 
