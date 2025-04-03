@@ -117,7 +117,7 @@ export function HtmlEditorComponent(props: any): any {
 
 	if (window['w-editor'] && typeof window['w-editor'].setContents === 'function' && bio_properties_panel_documentation.value !== '') {
 		console.log('documentation text = ');
-		//console.log(bio_properties_panel_documentation.value);
+		console.log(bio_properties_panel_documentation.value);
 		console.log('editor text = ');
 		//console.log(window['w-editor'].getContents());
 
