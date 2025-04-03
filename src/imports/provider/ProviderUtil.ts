@@ -140,6 +140,7 @@ export function HtmlEditorComponent(props: any): any {
 	}
 
 
+/*
 
 	if ( bio_properties_panel_documentation !== undefined ) {
 		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
@@ -170,6 +171,7 @@ export function HtmlEditorComponent(props: any): any {
 		}
 	}
 
+*/
 
 	const modeling = useService('modeling');
 	const translate = useService('translate');
