@@ -241,7 +241,10 @@ export function TextComponent(props: any):TextFieldEntry {
 		if ( needRestartEditor ) {
 			console.log('нужно пересоздать редактор с новым значением = ', prop.value);
 			window['prev_element_id'] = element.id;
-			create_editor(prop.value);
+			setTimeout(() => {
+				console.log('после паузы');
+				create_editor(prop.value);
+			}, 1000);
 		} else {
 			console.log('защита от пересоздания');
 		}
