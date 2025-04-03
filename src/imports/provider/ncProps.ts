@@ -6,6 +6,7 @@ import {} from 'bpmn-js/lib/core';
 export default function (element):Array<unknown> {
 	const ncProperties = new Array<unknown>();
 	console.log(element);
+	window['prev_element_id'] = element.id;
 
 	if(is(element, 'bpmn:Task')){
 		/*
