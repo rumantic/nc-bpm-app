@@ -1,5 +1,5 @@
 import { isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
-import {HtmlEditorComponent, TextComponent} from './ProviderUtil';
+import {TextComponent} from './ProviderUtil';
 import {is, isAny} from 'bpmn-js/lib/util/ModelUtil';
 import {} from 'bpmn-js/lib/core';
 
