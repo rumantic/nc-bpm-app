@@ -118,6 +118,8 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('end list');
 		this.editor = suneditor.create('editor-container', {
 			width: '100%',
+			height: '400',
+			minHeight: '400',
 			plugins: [font, video, image, list],
 			buttonList: [
 				['font', 'video', 'image', 'list'],
