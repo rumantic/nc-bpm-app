@@ -127,6 +127,13 @@ class WysiwygEditorElement extends HTMLElement {
 
 		// Устанавливаем начальное значение
 		this.editor.setContents(this.bio_properties_panel_documentation.value);
+		const event = new Event('input', {
+			bubbles: true,
+			cancelable: true,
+		});
+
+		// Отправляем событие на textarea
+		this.bio_properties_panel_documentation.dispatchEvent(event);
 
 		// Слушаем изменения и вызываем setValue
 		this.editor.onChange = (content: string) => {
