@@ -201,6 +201,7 @@ export function createGroup(element, translate) {
 
 export function TextComponent(props: any):TextFieldEntry {
 	const prev_element_id = window['prev_element_id'];
+	console.log('prev_element_id = ', prev_element_id);
 	let needRestartEditor = false;
 	const { element, id } = props;
 
