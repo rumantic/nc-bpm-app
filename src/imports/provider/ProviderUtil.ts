@@ -32,7 +32,6 @@ function create_editor(value = '') {
 			['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
 			/** ['imageGallery'] */ // You must add the "imageGalleryUrl".
 			['preview', 'print'],
-			['save', 'template'],
 			/** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
 		],
 		lang: ru,
