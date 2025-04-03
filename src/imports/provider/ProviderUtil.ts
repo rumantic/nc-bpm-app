@@ -139,6 +139,38 @@ export function HtmlEditorComponent(props: any): any {
 		// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 	}
 
+
+
+	if ( bio_properties_panel_documentation !== undefined ) {
+		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
+
+		} else {
+			window['w-editor'] = suneditor.create('bio-properties-panel-htmlContent', {
+				width: '100%',
+				height: '400',
+				minHeight: '400',
+				fullScreenOffset: '50px',
+				plugins: plugins,
+				buttonList: [
+					['undo', 'redo'],
+					['fullScreen', 'showBlocks', 'codeView'],
+					['font', 'fontSize', 'formatBlock'],
+					['paragraphStyle', 'blockquote'],
+					['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+					['fontColor', 'hiliteColor', 'textStyle'],
+					['removeFormat'],
+					'/', // Line break
+					['outdent', 'indent'],
+					['align', 'horizontalRule', 'list', 'lineHeight'],
+					['table', 'link', 'image', 'video', 'audio'], // You must add the 'katex' library at options to use the 'math' plugin.
+					['preview', 'print'],
+				],
+				lang: ru,
+			});
+		}
+	}
+
+
 	const modeling = useService('modeling');
 	const translate = useService('translate');
 	const moddle = useService('moddle');
@@ -198,39 +230,6 @@ export function TextComponent(props: any):TextFieldEntry {
 		console.log('Это getValue внутри TextComponent');
 
 		console.log(window['w-editor']);
-		const bio_properties_panel_documentation =
-			document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
-
-		/*
-		if ( bio_properties_panel_documentation !== undefined ) {
-			if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
-
-			} else {
-				window['w-editor'] = suneditor.create('bio-properties-panel-htmlContent', {
-					width: '100%',
-					height: '400',
-					minHeight: '400',
-					fullScreenOffset: '50px',
-					plugins: plugins,
-					buttonList: [
-						['undo', 'redo'],
-						['fullScreen', 'showBlocks', 'codeView'],
-						['font', 'fontSize', 'formatBlock'],
-						['paragraphStyle', 'blockquote'],
-						['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-						['fontColor', 'hiliteColor', 'textStyle'],
-						['removeFormat'],
-						'/', // Line break
-						['outdent', 'indent'],
-						['align', 'horizontalRule', 'list', 'lineHeight'],
-						['table', 'link', 'image', 'video', 'audio'], // You must add the 'katex' library at options to use the 'math' plugin.
-						['preview', 'print'],
-					],
-					lang: ru,
-				});
-			}
-		}
-		*/
 
 
 
