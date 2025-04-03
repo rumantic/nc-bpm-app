@@ -215,18 +215,6 @@ export function TextComponent(props: any):TextFieldEntry {
 		console.log('Это getValue внутри TextComponent');
 
 
-
-
-		const ext = element.businessObject.extensionElements;
-		if (!ext) {
-			return [];
-		}
-		const prop = getProperty(element.businessObject, id);
-		if (!prop || prop.length < 1) {
-			return [];
-		}
-		console.log(prop.value);
-
 		console.log(window['w-editor']);
 		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
 			console.log('редактор уже существует');
@@ -237,6 +225,34 @@ export function TextComponent(props: any):TextFieldEntry {
 		} else {
 			needRestartEditor = true;
 		}
+
+
+		const ext = element.businessObject.extensionElements;
+		if (!ext) {
+			if ( needRestartEditor ) {
+				window['prev_element_id'] = element.id;
+				setTimeout(() => {
+					console.log('после паузы');
+					create_editor('');
+				}, 1000);
+			}
+
+			return [];
+		}
+		const prop = getProperty(element.businessObject, id);
+		if (!prop || prop.length < 1) {
+			if ( needRestartEditor ) {
+				window['prev_element_id'] = element.id;
+				setTimeout(() => {
+					console.log('после паузы');
+					create_editor('');
+				}, 1000);
+			}
+
+			return [];
+		}
+		console.log(prop.value);
+
 
 		if ( needRestartEditor ) {
 			console.log('нужно пересоздать редактор с новым значением = ', prop.value);
