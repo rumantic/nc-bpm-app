@@ -117,31 +117,38 @@ export function HtmlEditorComponent(props: any): any {
 		console.log(bio_properties_panel_documentation.value);
 		console.log('editor text = ');
 		console.log(window['w-editor'].getContents());
+
+		const wysiwygElement = document.getElementById(myId);
+		if (wysiwygElement) {
+			wysiwygElement.remove(); // Удаляет элемент из DOM и вызывает disconnectedCallback
+			console.log('wysiwyg-editor-element удален из DOM');
+		} else {
+			console.error('wysiwyg-editor-element не найден');
+		}
+
 		if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
-			window['w-editor'].destroy();
+			// window['w-editor'].destroy();
 			// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 		}
 
 		// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 	}
+	console.log('for element...');
+	console.log(element);
+	console.log('...for element');
 
-	setTimeout(() => {
-		console.log('for element...');
-		console.log(element);
-		console.log('...for element');
+	console.log('id...');
+	console.log(myId);
+	console.log('...id');
 
-		console.log('id...');
-		console.log(myId);
-		console.log('...id');
+	const modeling = useService('modeling');
+	const translate = useService('translate');
+	const moddle = useService('moddle');
+	const debounce = useService('debounceInput');
 
-		const modeling = useService('modeling');
-		const translate = useService('translate');
-		const moddle = useService('moddle');
-		const debounce = useService('debounceInput');
+	const label = props.label ?? myId;
 
-		const label = props.label ?? myId;
-
-		return html`
+	return html`
 		<wysiwyg-editor-element
 	    id=${myId}
 		bpm_id=${element.id}
@@ -149,9 +156,6 @@ export function HtmlEditorComponent(props: any): any {
 	    debounce=${debounce}
 		/>
 		`;
-	}, 500); // Пауза
-
-
 }
 
 
