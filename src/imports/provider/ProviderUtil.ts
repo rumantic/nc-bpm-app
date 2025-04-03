@@ -109,47 +109,48 @@ export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
 
 	const myId = 'w-editor-container';
-	setTimeout(() => {
-		const bio_properties_panel_documentation =
-			document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
+	const bio_properties_panel_documentation =
+		document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
 
-		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function' && bio_properties_panel_documentation.value !== '') {
-			console.log('documentation text = ');
-			console.log(bio_properties_panel_documentation.value);
-			console.log('editor text = ');
-			console.log(window['w-editor'].getContents());
-			if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
-				window['w-editor'].destroy();
-				// window['w-editor'].setContents(bio_properties_panel_documentation.value);
-			}
-
+	if (window['w-editor'] && typeof window['w-editor'].setContents === 'function' && bio_properties_panel_documentation.value !== '') {
+		console.log('documentation text = ');
+		console.log(bio_properties_panel_documentation.value);
+		console.log('editor text = ');
+		console.log(window['w-editor'].getContents());
+		if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
+			window['w-editor'].destroy();
 			// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 		}
-	}, 1000); // Пауза в 1 секунду (1000 миллисекунд)
 
-	console.log('for element...');
-	console.log(element);
-	console.log('...for element');
+		// window['w-editor'].setContents(bio_properties_panel_documentation.value);
+	}
 
-	console.log('id...');
-	console.log(myId);
-	console.log('...id');
+	setTimeout(() => {
+		console.log('for element...');
+		console.log(element);
+		console.log('...for element');
 
-	const modeling = useService('modeling');
-	const translate = useService('translate');
-	const moddle = useService('moddle');
-	const debounce = useService('debounceInput');
+		console.log('id...');
+		console.log(myId);
+		console.log('...id');
 
-	const label = props.label ?? myId;
+		const modeling = useService('modeling');
+		const translate = useService('translate');
+		const moddle = useService('moddle');
+		const debounce = useService('debounceInput');
 
-	return html`
+		const label = props.label ?? myId;
+
+		return html`
 		<wysiwyg-editor-element
 	    id=${myId}
 		bpm_id=${element.id}
 	    label=${translate(label)}
 	    debounce=${debounce}
 		/>
-	`;
+		`;
+	}, 500); // Пауза
+
 
 }
 
