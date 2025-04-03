@@ -47,7 +47,7 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
-		create_editor();
+		//create_editor();
 
 		console.log('Устанавливаем начальное значение');
 		console.log(this.bio_properties_panel_documentation.value);
@@ -237,7 +237,10 @@ export function TextComponent(props: any):TextFieldEntry {
 				console.log('нужно пересоздать редактор с новым значением = ', prop.value);
 				window['prev_element_id'] = element.id;
 				window['w-editor'].destroy();
-				create_editor(prop.value);
+				setTimeout(() => {
+					console.log('после паузы');
+					create_editor(prop.value);
+				}, 1000);
 			} else {
 				console.log('защита от пересоздания');
 			}
