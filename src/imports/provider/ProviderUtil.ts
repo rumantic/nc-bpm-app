@@ -205,10 +205,6 @@ export function TextComponent(props: any):TextFieldEntry {
 		if (!prop || prop.length < 1) {
 			return [];
 		}
-		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
-			window['w-editor'].setContents(prop.value);
-		}
-
 		return prop.value;
 		//return element.businessObject.nameDE || '';
 	};
@@ -221,6 +217,10 @@ export function TextComponent(props: any):TextFieldEntry {
 			extensionElements.get('values').push(prop);
 		}
 		prop.value = value;
+
+		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
+			window['w-editor'].setContents(prop.value);
+		}
 
 		return modeling.updateProperties(element, {
 			extensionElements,
