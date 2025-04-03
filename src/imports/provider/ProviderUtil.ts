@@ -120,7 +120,8 @@ export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
 
 	const myId = 'w-editor-container';
-	const bio_properties_panel_documentation = document.getElementById('bio-properties-panel-documentation');
+	const bio_properties_panel_documentation =
+		document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
 
 	if (window['w-editor']) {
 		window['w-editor'].setContents(bio_properties_panel_documentation.value);
