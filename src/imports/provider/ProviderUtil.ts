@@ -24,6 +24,7 @@ class WysiwygEditorElement extends HTMLElement {
 	private editor: any;
 	private shadowElement: any;
 	private bpm_id: any;
+	private bio_properties_panel_documentation: any;
 	public label: string; // Свойство для хранения переданной метки
 	public element: any;
 	public getValue: any;
@@ -77,6 +78,10 @@ class WysiwygEditorElement extends HTMLElement {
 
 		this.getValue = window['testGetValue'];
 		this.setValue = window['testSetValue'];
+
+		this.bio_properties_panel_documentation = document.getElementById('bio-properties-panel-documentation');
+		console.log('bio_properties_panel_documentation');
+		console.log(this.bio_properties_panel_documentation);
 
 
 		// this.shadowElement = document.getElementById(this.bpm_id);
