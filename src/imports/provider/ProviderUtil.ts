@@ -44,11 +44,11 @@ class WysiwygEditorElement extends HTMLElement {
 	}
 
 	initializeEditor() {
-		this.bio_properties_panel_documentation = document.getElementById('bio-properties-panel-documentation');
+		this.bio_properties_panel_documentation = document.getElementById('bio-properties-panel-htmlContent');
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
-		window['w-editor'] = suneditor.create('bio-properties-panel-documentation', {
+		window['w-editor'] = suneditor.create('bio-properties-panel-htmlContent', {
 			width: '100%',
 			height: '400',
 			minHeight: '400',
