@@ -200,12 +200,17 @@ export function createGroup(element, translate) {
 }
 
 export function TextComponent(props: any):TextFieldEntry {
+	const prev_element_id = window['prev_element_id'];
+	let needRestartEditor = false;
 	const { element, id } = props;
 
 	const modeling = useService('modeling');
 	const translate = useService('translate');
 	const debounce = useService('debounceInput');
 	const moddle = useService('moddle');
+	if ( prev_element_id != element.id) {
+		needRestartEditor = true;
+	}
 
 	const getValue = () => {
 		console.log('Это getValue внутри TextComponent');
@@ -226,8 +231,11 @@ export function TextComponent(props: any):TextFieldEntry {
 		console.log(window['w-editor']);
 		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
 			console.log('редактор уже существует');
-			window['w-editor'].destroy();
-			create_editor(prop.value);
+			if ( needRestartEditor ) {
+				window['prev_element_id'] = element.id;
+				window['w-editor'].destroy();
+				create_editor(prop.value);
+			}
 		}
 
 		return prop.value;
