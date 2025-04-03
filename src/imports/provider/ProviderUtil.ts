@@ -138,13 +138,6 @@ export function HtmlEditorComponent(props: any): any {
 
 		// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 	}
-	console.log('for element...');
-	console.log(element);
-	console.log('...for element');
-
-	console.log('id...');
-	console.log(myId);
-	console.log('...id');
 
 	const modeling = useService('modeling');
 	const translate = useService('translate');
@@ -210,6 +203,9 @@ export function TextComponent(props: any):TextFieldEntry {
 		if (!prop || prop.length < 1) {
 			return [];
 		}
+		console.log('Это getValue внутри TextComponent');
+		console.log(prop.value);
+
 		return prop.value;
 		//return element.businessObject.nameDE || '';
 	};
@@ -221,6 +217,8 @@ export function TextComponent(props: any):TextFieldEntry {
 			prop = moddle.create('nc:property', { name: id, value: value });
 			extensionElements.get('values').push(prop);
 		}
+		console.log('Это setValue внутри TextComponent');
+		console.log(value);
 		prop.value = value;
 
 		return modeling.updateProperties(element, {
