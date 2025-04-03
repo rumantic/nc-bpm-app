@@ -201,6 +201,9 @@ export function TextComponent(props: any):TextFieldEntry {
 		console.log('Это getValue внутри TextComponent');
 
 		console.log(window['w-editor']);
+		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
+			window['w-editor'].show();
+		}
 
 
 
