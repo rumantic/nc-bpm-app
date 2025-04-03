@@ -265,6 +265,15 @@ export function TextComponent(props: any):TextFieldEntry {
 		});
 	};
 
+	const w = html`
+		<wysiwyg-editor-element
+	    id=test
+		bpm_id=${element.id}
+	    label=l
+	    debounce=${debounce}
+		/>
+		`;
+
 	const label = props.label ?? id;
 	return html`<${TextFieldEntry}
 	    id=${id}
