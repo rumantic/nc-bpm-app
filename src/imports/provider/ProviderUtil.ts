@@ -82,6 +82,8 @@ class WysiwygEditorElement extends HTMLElement {
 
 		// Слушаем изменения и вызываем setValue
 		window['w-editor'].onChange = (content: string) => {
+			console.log('событие изменения контента в редакторе');
+			console.log(content);
 			this.bio_properties_panel_documentation.value = content;
 			const event = new Event('input', {
 				bubbles: true,
