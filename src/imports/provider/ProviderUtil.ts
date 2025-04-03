@@ -119,7 +119,7 @@ export function HtmlEditorComponent(props: any): any {
 		console.log('documentation text = ');
 		console.log(bio_properties_panel_documentation.value);
 		console.log('editor text = ');
-		//console.log(window['w-editor'].getContents());
+		console.log(window['w-editor'].getContents());
 
 		const wysiwygElement = document.getElementById(myId);
 		if (wysiwygElement) {
@@ -131,7 +131,7 @@ export function HtmlEditorComponent(props: any): any {
 
 		if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
 			// window['w-editor'].destroy();
-			// window['w-editor'].setContents(bio_properties_panel_documentation.value);
+			window['w-editor'].setContents(bio_properties_panel_documentation.value);
 		}
 
 		// window['w-editor'].setContents(bio_properties_panel_documentation.value);
