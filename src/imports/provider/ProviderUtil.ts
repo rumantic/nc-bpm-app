@@ -201,6 +201,7 @@ export function TextComponent(props: any):TextFieldEntry {
 		const bio_properties_panel_documentation =
 			document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
 
+		/*
 		if ( bio_properties_panel_documentation !== undefined ) {
 			if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
 
@@ -222,16 +223,14 @@ export function TextComponent(props: any):TextFieldEntry {
 						'/', // Line break
 						['outdent', 'indent'],
 						['align', 'horizontalRule', 'list', 'lineHeight'],
-						['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
-						/** ['imageGallery'] */ // You must add the "imageGalleryUrl".
+						['table', 'link', 'image', 'video', 'audio'], // You must add the 'katex' library at options to use the 'math' plugin.
 						['preview', 'print'],
-						['save', 'template'],
-						/** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
 					],
 					lang: ru,
 				});
 			}
 		}
+		*/
 
 
 
