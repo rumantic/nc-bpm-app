@@ -44,7 +44,6 @@ class WysiwygEditorElement extends HTMLElement {
 	}
 
 	initializeEditor() {
-		this.bio_properties_panel_documentation = document.getElementById('bio-properties-panel-htmlContent');
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
@@ -53,24 +52,6 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('Устанавливаем начальное значение');
 		console.log(this.bio_properties_panel_documentation.value);
 
-		// Устанавливаем начальное значение
-		window['w-editor'].setContents(this.bio_properties_panel_documentation.value);
-
-		// Слушаем изменения и вызываем setValue
-		window['w-editor'].onChange = (content: string) => {
-			console.log('событие изменения контента в редакторе');
-			console.log(content);
-			//this.bio_properties_panel_documentation.value = content;
-			const event = new Event('input', {
-				bubbles: true,
-				cancelable: true,
-			});
-
-			// Отправляем событие на textarea
-			this.bio_properties_panel_documentation.dispatchEvent(event);
-
-			//this.setValue(content);
-		};
 	}
 
 	// Очистка и уничтожение редактора при удалении элемента из DOM
@@ -86,7 +67,9 @@ class WysiwygEditorElement extends HTMLElement {
 // Регистрируем кастомный элемент
 customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
 
-function create_editor() {
+function create_editor(value = '') {
+	const bio_properties_panel_documentation = document.getElementById('bio-properties-panel-htmlContent');
+
 	window['w-editor'] = suneditor.create('bio-properties-panel-htmlContent', {
 		width: '100%',
 		height: '400',
@@ -112,6 +95,28 @@ function create_editor() {
 		],
 		lang: ru,
 	});
+
+	// Устанавливаем начальное значение
+	window['w-editor'].setContents(value);
+
+	// Слушаем изменения и вызываем setValue
+	window['w-editor'].onChange = (content: string) => {
+		console.log('событие изменения контента в редакторе');
+		console.log(content);
+		//this.bio_properties_panel_documentation.value = content;
+		const event = new Event('input', {
+			bubbles: true,
+			cancelable: true,
+		});
+
+		// Отправляем событие на textarea
+		if ( bio_properties_panel_documentation ) {
+			bio_properties_panel_documentation.dispatchEvent(event);
+		}
+
+		//this.setValue(content);
+	};
+
 }
 
 
@@ -205,12 +210,6 @@ export function TextComponent(props: any):TextFieldEntry {
 	const getValue = () => {
 		console.log('Это getValue внутри TextComponent');
 
-		console.log(window['w-editor']);
-		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
-			console.log('редактор уже существует');
-			window['w-editor'].destroy();
-			create_editor();
-		}
 
 
 
@@ -223,6 +222,13 @@ export function TextComponent(props: any):TextFieldEntry {
 			return [];
 		}
 		console.log(prop.value);
+
+		console.log(window['w-editor']);
+		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
+			console.log('редактор уже существует');
+			window['w-editor'].destroy();
+			create_editor(prop.value);
+		}
 
 		return prop.value;
 		//return element.businessObject.nameDE || '';
