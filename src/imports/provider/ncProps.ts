@@ -15,6 +15,15 @@ export default function (element):Array<unknown> {
 			component: HtmlEditorComponent,
 			isEdited: isTextFieldEntryEdited,
 		});
+
+		ncProperties.push({
+			id: 'htmlContent',
+			element,
+			label: 'HTML-content',
+			component: TextComponent,
+			isEdited: isTextFieldEntryEdited,
+		});
+
 	}
 
 	if(is(element, 'bpmn:CallActivity')){
