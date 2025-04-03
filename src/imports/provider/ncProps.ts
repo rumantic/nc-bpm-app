@@ -5,19 +5,8 @@ import {} from 'bpmn-js/lib/core';
 
 export default function (element):Array<unknown> {
 	const ncProperties = new Array<unknown>();
-	console.log(element);
 
 	if(is(element, 'bpmn:Task')){
-		/*
-		ncProperties.push({
-			id: 'bpmnModel',
-			element,
-			label: 'Редактор HTML',
-			component: HtmlEditorComponent,
-			isEdited: isTextFieldEntryEdited,
-		});
-		 */
-
 		ncProperties.push({
 			id: 'htmlContent',
 			element,

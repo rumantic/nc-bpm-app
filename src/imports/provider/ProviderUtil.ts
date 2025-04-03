@@ -9,64 +9,6 @@ import plugins from 'suneditor/src/plugins';
 
 import ru from 'suneditor/src/lang/ru';
 
-// Кастомный элемент!
-class WysiwygEditorElement extends HTMLElement {
-	private editor: any;
-	private shadowElement: any;
-	private bpm_id: any;
-	private bio_properties_panel_documentation: any;
-	public label: string; // Свойство для хранения переданной метки
-	public element: any;
-	public getValue: any;
-	public setValue: any;
-
-
-	constructor() {
-		super();  // вызываем конструктор родительского класса
-	}
-
-	// Метод для инициализации компонента
-	connectedCallback() {
-		// Создаем контейнер для редактора
-		this.innerHTML = `
-      <div class="bio-properties-panel-entry">
-        <textarea id="w-editor-container"></textarea>
-      </div>
-    `;
-		this.bpm_id = this.getAttribute('bpm_id');
-
-		// Инициализируем TinyMCE
-		this.initializeEditor();
-
-		console.log('bpm id...');
-		console.log(this.bpm_id);
-		console.log('...bpm id');
-	}
-
-	initializeEditor() {
-		console.log('bio_properties_panel_documentation');
-		console.log(this.bio_properties_panel_documentation);
-
-		//create_editor();
-
-		console.log('Устанавливаем начальное значение');
-		console.log(this.bio_properties_panel_documentation.value);
-
-	}
-
-	// Очистка и уничтожение редактора при удалении элемента из DOM
-	disconnectedCallback() {
-		console.log('disconnectedCallback');
-		if (window['w-editor']) {
-			window['w-editor'].destroy();
-			console.log('destroy');
-		}
-	}
-}
-
-// Регистрируем кастомный элемент
-customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
-
 function create_editor(value = '') {
 	const bio_properties_panel_documentation = document.getElementById('bio-properties-panel-htmlContent');
 
@@ -101,9 +43,6 @@ function create_editor(value = '') {
 
 	// Слушаем изменения и вызываем setValue
 	window['w-editor'].onChange = (content: string) => {
-		console.log('событие изменения контента в редакторе');
-		console.log(content);
-		//this.bio_properties_panel_documentation.value = content;
 		const event = new Event('input', {
 			bubbles: true,
 			cancelable: true,
@@ -113,62 +52,9 @@ function create_editor(value = '') {
 		if ( bio_properties_panel_documentation ) {
 			bio_properties_panel_documentation.dispatchEvent(event);
 		}
-
-		//this.setValue(content);
 	};
 
 }
-
-
-export function HtmlEditorComponent(props: any): any {
-	const { element, id } = props;
-
-	const myId = 'w-editor-container';
-	const bio_properties_panel_documentation =
-		document.getElementById('bio-properties-panel-htmlContent')  as HTMLTextAreaElement;
-
-	/*
-	if (window['w-editor'] && typeof window['w-editor'].setContents === 'function' && bio_properties_panel_documentation.value !== '') {
-		console.log('documentation text = ');
-		console.log(bio_properties_panel_documentation.value);
-		console.log('editor text = ');
-		console.log(window['w-editor'].getContents());
-
-		const wysiwygElement = document.getElementById(myId);
-		if (wysiwygElement) {
-			// wysiwygElement.remove(); // Удаляет элемент из DOM и вызывает disconnectedCallback
-			console.log('wysiwyg-editor-element есть в DOM');
-		} else {
-			console.error('wysiwyg-editor-element не найден');
-		}
-
-		if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
-			// window['w-editor'].destroy();
-			window['w-editor'].setContents(bio_properties_panel_documentation.value);
-		}
-
-		// window['w-editor'].setContents(bio_properties_panel_documentation.value);
-	}
-	 */
-
-
-	const modeling = useService('modeling');
-	const translate = useService('translate');
-	const moddle = useService('moddle');
-	const debounce = useService('debounceInput');
-
-	const label = props.label ?? myId;
-
-	return html`
-		<wysiwyg-editor-element
-	    id=${myId}
-		bpm_id=${element.id}
-	    label=${translate(label)}
-	    debounce=${debounce}
-		/>
-		`;
-}
-
 
 //TODO: import types from bpmn.io?
 export function getProperty(businessObject, type: string):any {
@@ -203,21 +89,13 @@ export function TextComponent(props: any):TextFieldEntry {
 	const prev_element_id = window['prev_element_id'];
 	let needRestartEditor = false;
 	const { element, id } = props;
-	console.log('prev_element_id = ', prev_element_id);
-	console.log('current_element_id = ', element.id);
-
 	const modeling = useService('modeling');
 	const translate = useService('translate');
 	const debounce = useService('debounceInput');
 	const moddle = useService('moddle');
 
 	const getValue = () => {
-		console.log('Это getValue внутри TextComponent');
-
-
-		console.log(window['w-editor']);
 		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
-			console.log('редактор уже существует');
 			if ( prev_element_id !== element.id) {
 				window['w-editor'].destroy();
 				needRestartEditor = true;
@@ -225,7 +103,6 @@ export function TextComponent(props: any):TextFieldEntry {
 		} else {
 			needRestartEditor = true;
 		}
-
 
 		const ext = element.businessObject.extensionElements;
 		if (!ext) {
@@ -236,7 +113,6 @@ export function TextComponent(props: any):TextFieldEntry {
 					create_editor('');
 				}, 1000);
 			}
-
 			return [];
 		}
 		const prop = getProperty(element.businessObject, id);
@@ -251,22 +127,15 @@ export function TextComponent(props: any):TextFieldEntry {
 
 			return [];
 		}
-		console.log(prop.value);
-
 
 		if ( needRestartEditor ) {
-			console.log('нужно пересоздать редактор с новым значением = ', prop.value);
 			window['prev_element_id'] = element.id;
 			setTimeout(() => {
-				console.log('после паузы');
 				create_editor(prop.value);
 			}, 1000);
 		} else {
-			console.log('защита от пересоздания');
 		}
-
 		return prop.value;
-		//return element.businessObject.nameDE || '';
 	};
 
 	const setValue = value => {
@@ -276,15 +145,12 @@ export function TextComponent(props: any):TextFieldEntry {
 			prop = moddle.create('nc:property', { name: id, value: value });
 			extensionElements.get('values').push(prop);
 		}
-		console.log('Это setValue внутри TextComponent');
 
 		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
 			prop.value = window['w-editor'].getContents();
 		} else {
 			prop.value = value;
 		}
-		console.log(prop.value);
-
 
 		return modeling.updateProperties(element, {
 			extensionElements,
