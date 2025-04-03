@@ -117,6 +117,7 @@ export function HtmlEditorComponent(props: any): any {
 	const bio_properties_panel_documentation =
 		document.getElementById('bio-properties-panel-htmlContent')  as HTMLTextAreaElement;
 
+	/*
 	if (window['w-editor'] && typeof window['w-editor'].setContents === 'function' && bio_properties_panel_documentation.value !== '') {
 		console.log('documentation text = ');
 		console.log(bio_properties_panel_documentation.value);
@@ -138,6 +139,7 @@ export function HtmlEditorComponent(props: any): any {
 
 		// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 	}
+	 */
 
 
 	const modeling = useService('modeling');
