@@ -4,22 +4,10 @@ import ncProps from './ncProps';
 import { html } from 'htm/preact';
 
 import 'suneditor/dist/css/suneditor.min.css';
-//import 'suneditor/assets/css/suneditor.css';
-//import 'suneditor/assets/css/suneditor-contents.css';
 import suneditor from 'suneditor';
 import plugins from 'suneditor/src/plugins';
 
-
-// How to import plugins
-import list from 'suneditor/src/plugins/submenu/list';
-import {font, video, image} from 'suneditor/src/plugins';
-
-// How to import language files (default: en)
-import lang from 'suneditor/src/lang';
-import hooks from '@bpmn-io/properties-panel/preact/hooks';
-import minDash from 'min-dash';
-import jsxRuntime from '@bpmn-io/properties-panel/preact/jsx-runtime';
-// import ru from 'suneditor/src/lang/ru';
+import ru from 'suneditor/src/lang/ru';
 
 // Кастомный элемент!
 class WysiwygEditorElement extends HTMLElement {
@@ -64,6 +52,7 @@ class WysiwygEditorElement extends HTMLElement {
 			width: '100%',
 			height: '400',
 			minHeight: '400',
+			fullScreenOffset: '100px',
 			plugins: plugins,
 			buttonList: [
 				['undo', 'redo'],
@@ -82,7 +71,7 @@ class WysiwygEditorElement extends HTMLElement {
 				['save', 'template'],
 				/** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
 			],
-			lang: lang.ru,
+			lang: ru,
 		});
 
 		// Устанавливаем начальное значение
@@ -130,7 +119,7 @@ export function HtmlEditorComponent(props: any): any {
 			console.log('editor text = ');
 			console.log(window['w-editor'].getContents());
 			if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
-				window['w-editor'].setContents(bio_properties_panel_documentation.value);
+				// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 			}
 
 			// window['w-editor'].setContents(bio_properties_panel_documentation.value);
