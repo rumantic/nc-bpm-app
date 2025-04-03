@@ -74,8 +74,11 @@ class WysiwygEditorElement extends HTMLElement {
 			lang: ru,
 		});
 
+		console.log('Устанавливаем начальное значение');
+		console.log(this.bio_properties_panel_documentation.value);
+
 		// Устанавливаем начальное значение
-		// window['w-editor'].setContents(this.bio_properties_panel_documentation.value);
+		window['w-editor'].setContents(this.bio_properties_panel_documentation.value);
 
 		// Слушаем изменения и вызываем setValue
 		window['w-editor'].onChange = (content: string) => {
@@ -217,10 +220,6 @@ export function TextComponent(props: any):TextFieldEntry {
 			extensionElements.get('values').push(prop);
 		}
 		prop.value = value;
-
-		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
-			window['w-editor'].setContents(prop.value);
-		}
 
 		return modeling.updateProperties(element, {
 			extensionElements,
