@@ -120,12 +120,14 @@ export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
 
 	const myId = 'w-editor-container';
-	const bio_properties_panel_documentation =
-		document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
+	setTimeout(() => {
+		const bio_properties_panel_documentation =
+			document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
 
-	if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
-		window['w-editor'].setContents(bio_properties_panel_documentation.value);
-	}
+		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
+			window['w-editor'].setContents(bio_properties_panel_documentation.value);
+		}
+	}, 1000); // Пауза в 1 секунду (1000 миллисекунд)
 
 	console.log('for element...');
 	console.log(element);
