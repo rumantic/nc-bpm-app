@@ -75,7 +75,7 @@ class WysiwygEditorElement extends HTMLElement {
 		});
 
 		// Устанавливаем начальное значение
-		window['w-editor'].setContents(this.bio_properties_panel_documentation.value);
+		// window['w-editor'].setContents(this.bio_properties_panel_documentation.value);
 
 		// Слушаем изменения и вызываем setValue
 		window['w-editor'].onChange = (content: string) => {
@@ -101,9 +101,9 @@ class WysiwygEditorElement extends HTMLElement {
 		}
 	}
 }
+
 // Регистрируем кастомный элемент
 customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
-
 
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
@@ -114,9 +114,9 @@ export function HtmlEditorComponent(props: any): any {
 
 	if (window['w-editor'] && typeof window['w-editor'].setContents === 'function' && bio_properties_panel_documentation.value !== '') {
 		console.log('documentation text = ');
-		console.log(bio_properties_panel_documentation.value);
+		//console.log(bio_properties_panel_documentation.value);
 		console.log('editor text = ');
-		console.log(window['w-editor'].getContents());
+		//console.log(window['w-editor'].getContents());
 
 		const wysiwygElement = document.getElementById(myId);
 		if (wysiwygElement) {
@@ -205,6 +205,10 @@ export function TextComponent(props: any):TextFieldEntry {
 		if (!prop || prop.length < 1) {
 			return [];
 		}
+		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
+			window['w-editor'].setContents(prop.value);
+		}
+
 		return prop.value;
 		//return element.businessObject.nameDE || '';
 	};
