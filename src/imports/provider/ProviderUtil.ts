@@ -201,15 +201,16 @@ export function createGroup(element, translate) {
 
 export function TextComponent(props: any):TextFieldEntry {
 	const prev_element_id = window['prev_element_id'];
-	console.log('prev_element_id = ', prev_element_id);
 	let needRestartEditor = false;
 	const { element, id } = props;
+	console.log('prev_element_id = ', prev_element_id);
+	console.log('current_element_id = ', element.id);
 
 	const modeling = useService('modeling');
 	const translate = useService('translate');
 	const debounce = useService('debounceInput');
 	const moddle = useService('moddle');
-	if ( prev_element_id != element.id) {
+	if ( prev_element_id !== element.id) {
 		needRestartEditor = true;
 	}
 
@@ -236,6 +237,8 @@ export function TextComponent(props: any):TextFieldEntry {
 				window['prev_element_id'] = element.id;
 				window['w-editor'].destroy();
 				create_editor(prop.value);
+			} else {
+				console.log('защита от пересоздания');
 			}
 		}
 
