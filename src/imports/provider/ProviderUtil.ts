@@ -210,9 +210,6 @@ export function TextComponent(props: any):TextFieldEntry {
 	const translate = useService('translate');
 	const debounce = useService('debounceInput');
 	const moddle = useService('moddle');
-	if ( prev_element_id !== element.id) {
-		needRestartEditor = true;
-	}
 
 	const getValue = () => {
 		console.log('Это getValue внутри TextComponent');
@@ -233,17 +230,23 @@ export function TextComponent(props: any):TextFieldEntry {
 		console.log(window['w-editor']);
 		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
 			console.log('редактор уже существует');
-			if ( needRestartEditor ) {
-				console.log('нужно пересоздать редактор с новым значением = ', prop.value);
-				window['prev_element_id'] = element.id;
+			if ( prev_element_id !== element.id) {
 				window['w-editor'].destroy();
-				setTimeout(() => {
-					console.log('после паузы');
-					create_editor(prop.value);
-				}, 1000);
-			} else {
-				console.log('защита от пересоздания');
+				needRestartEditor = true;
 			}
+		} else {
+			needRestartEditor = true;
+		}
+
+		if ( needRestartEditor ) {
+			console.log('нужно пересоздать редактор с новым значением = ', prop.value);
+			window['prev_element_id'] = element.id;
+			setTimeout(() => {
+				console.log('после паузы');
+				create_editor(prop.value);
+			}, 1000);
+		} else {
+			console.log('защита от пересоздания');
 		}
 
 		return prop.value;
