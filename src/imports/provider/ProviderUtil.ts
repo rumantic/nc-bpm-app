@@ -234,6 +234,7 @@ export function TextComponent(props: any):TextFieldEntry {
 		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
 			console.log('редактор уже существует');
 			if ( needRestartEditor ) {
+				console.log('нужно пересоздать редактор с новым значением = ', prop.value);
 				window['prev_element_id'] = element.id;
 				window['w-editor'].destroy();
 				create_editor(prop.value);
