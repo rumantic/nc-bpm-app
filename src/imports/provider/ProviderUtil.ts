@@ -52,7 +52,7 @@ class WysiwygEditorElement extends HTMLElement {
 			width: '100%',
 			height: '400',
 			minHeight: '400',
-			fullScreenOffset: '100px',
+			fullScreenOffset: '50px',
 			plugins: plugins,
 			buttonList: [
 				['undo', 'redo'],
@@ -119,6 +119,7 @@ export function HtmlEditorComponent(props: any): any {
 			console.log('editor text = ');
 			console.log(window['w-editor'].getContents());
 			if ( window['w-editor'].getContents() !== bio_properties_panel_documentation.value) {
+				window['w-editor'].destroy();
 				// window['w-editor'].setContents(bio_properties_panel_documentation.value);
 			}
 
