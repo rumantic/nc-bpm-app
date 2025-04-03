@@ -195,6 +195,42 @@ export function TextComponent(props: any):TextFieldEntry {
 	const moddle = useService('moddle');
 
 	const getValue = () => {
+		console.log('Это getValue внутри TextComponent');
+
+		console.log(window['w-editor']);
+
+		if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
+
+		} else {
+			window['w-editor'] = suneditor.create('bio-properties-panel-htmlContent', {
+				width: '100%',
+				height: '400',
+				minHeight: '400',
+				fullScreenOffset: '50px',
+				plugins: plugins,
+				buttonList: [
+					['undo', 'redo'],
+					['fullScreen', 'showBlocks', 'codeView'],
+					['font', 'fontSize', 'formatBlock'],
+					['paragraphStyle', 'blockquote'],
+					['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+					['fontColor', 'hiliteColor', 'textStyle'],
+					['removeFormat'],
+					'/', // Line break
+					['outdent', 'indent'],
+					['align', 'horizontalRule', 'list', 'lineHeight'],
+					['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
+					/** ['imageGallery'] */ // You must add the "imageGalleryUrl".
+					['preview', 'print'],
+					['save', 'template'],
+					/** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
+				],
+				lang: ru,
+			});
+		}
+
+
+
 		const ext = element.businessObject.extensionElements;
 		if (!ext) {
 			return [];
@@ -203,7 +239,6 @@ export function TextComponent(props: any):TextFieldEntry {
 		if (!prop || prop.length < 1) {
 			return [];
 		}
-		console.log('Это getValue внутри TextComponent');
 		console.log(prop.value);
 
 		return prop.value;
