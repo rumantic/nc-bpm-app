@@ -48,31 +48,7 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
-		window['w-editor'] = suneditor.create('bio-properties-panel-htmlContent', {
-			width: '100%',
-			height: '400',
-			minHeight: '400',
-			fullScreenOffset: '50px',
-			plugins: plugins,
-			buttonList: [
-				['undo', 'redo'],
-				['fullScreen', 'showBlocks', 'codeView'],
-				['font', 'fontSize', 'formatBlock'],
-				['paragraphStyle', 'blockquote'],
-				['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-				['fontColor', 'hiliteColor', 'textStyle'],
-				['removeFormat'],
-				'/', // Line break
-				['outdent', 'indent'],
-				['align', 'horizontalRule', 'list', 'lineHeight'],
-				['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
-				/** ['imageGallery'] */ // You must add the "imageGalleryUrl".
-				['preview', 'print'],
-				['save', 'template'],
-				/** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
-			],
-			lang: ru,
-		});
+		create_editor();
 
 		console.log('Устанавливаем начальное значение');
 		console.log(this.bio_properties_panel_documentation.value);
@@ -109,6 +85,35 @@ class WysiwygEditorElement extends HTMLElement {
 
 // Регистрируем кастомный элемент
 customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
+
+function create_editor() {
+	window['w-editor'] = suneditor.create('bio-properties-panel-htmlContent', {
+		width: '100%',
+		height: '400',
+		minHeight: '400',
+		fullScreenOffset: '50px',
+		plugins: plugins,
+		buttonList: [
+			['undo', 'redo'],
+			['fullScreen', 'showBlocks', 'codeView'],
+			['font', 'fontSize', 'formatBlock'],
+			['paragraphStyle', 'blockquote'],
+			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+			['fontColor', 'hiliteColor', 'textStyle'],
+			['removeFormat'],
+			'/', // Line break
+			['outdent', 'indent'],
+			['align', 'horizontalRule', 'list', 'lineHeight'],
+			['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
+			/** ['imageGallery'] */ // You must add the "imageGalleryUrl".
+			['preview', 'print'],
+			['save', 'template'],
+			/** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
+		],
+		lang: ru,
+	});
+}
+
 
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
@@ -202,7 +207,9 @@ export function TextComponent(props: any):TextFieldEntry {
 
 		console.log(window['w-editor']);
 		if (window['w-editor'] && typeof window['w-editor'].getContents === 'function' ) {
-			window['w-editor'].show();
+			console.log('редактор уже существует');
+			window['w-editor'].destroy();
+			create_editor();
 		}
 
 
