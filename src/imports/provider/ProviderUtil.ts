@@ -201,7 +201,7 @@ export function TextComponent(props: any):TextFieldEntry {
 		const bio_properties_panel_documentation =
 			document.getElementById('bio-properties-panel-documentation')  as HTMLTextAreaElement;
 
-		if ( bio_properties_panel_documentation ) {
+		if ( bio_properties_panel_documentation !== undefined ) {
 			if (window['w-editor'] && typeof window['w-editor'].setContents === 'function') {
 
 			} else {
