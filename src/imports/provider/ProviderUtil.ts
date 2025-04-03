@@ -48,7 +48,7 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
-		window['w-editor'] = suneditor.create('w-editor-container', {
+		window['w-editor'] = suneditor.create('bio-properties-panel-documentation', {
 			width: '100%',
 			height: '400',
 			minHeight: '400',
@@ -84,7 +84,7 @@ class WysiwygEditorElement extends HTMLElement {
 		window['w-editor'].onChange = (content: string) => {
 			console.log('событие изменения контента в редакторе');
 			console.log(content);
-			this.bio_properties_panel_documentation.value = content;
+			//this.bio_properties_panel_documentation.value = content;
 			const event = new Event('input', {
 				bubbles: true,
 				cancelable: true,
