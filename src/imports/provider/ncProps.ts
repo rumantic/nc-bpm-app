@@ -8,7 +8,6 @@ export default function (element):Array<unknown> {
 	console.log(element);
 
 	if(is(element, 'bpmn:Task')){
-		/*
 		ncProperties.push({
 			id: 'bpmnModel',
 			element,
@@ -16,7 +15,6 @@ export default function (element):Array<unknown> {
 			component: HtmlEditorComponent,
 			isEdited: isTextFieldEntryEdited,
 		});
-		 */
 
 		ncProperties.push({
 			id: 'htmlContent',
