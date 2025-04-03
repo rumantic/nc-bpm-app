@@ -23,7 +23,7 @@ import jsxRuntime from '@bpmn-io/properties-panel/preact/jsx-runtime';
 
 // Кастомный элемент!
 class WysiwygEditorElement extends HTMLElement {
-	// private editor: any;
+	private editor: any;
 	private shadowElement: any;
 	private bpm_id: any;
 	private bio_properties_panel_documentation: any;
@@ -60,7 +60,7 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
-		window['wysiwyg_editor'] = suneditor.create('editor-container', {
+		this.editor = suneditor.create('editor-container', {
 			width: '100%',
 			height: '400',
 			minHeight: '400',
@@ -86,10 +86,10 @@ class WysiwygEditorElement extends HTMLElement {
 		});
 
 		// Устанавливаем начальное значение
-		window['wysiwyg_editor'].setContents(this.bio_properties_panel_documentation.value);
+		this.editor.setContents(this.bio_properties_panel_documentation.value);
 
 		// Слушаем изменения и вызываем setValue
-		window['wysiwyg_editor'].onChange = (content: string) => {
+		this.editor.onChange = (content: string) => {
 			this.bio_properties_panel_documentation.value = content;
 			const event = new Event('input', {
 				bubbles: true,
@@ -106,8 +106,8 @@ class WysiwygEditorElement extends HTMLElement {
 	// Очистка и уничтожение редактора при удалении элемента из DOM
 	disconnectedCallback() {
 		console.log('disconnectedCallback');
-		if (window['wysiwyg_editor']) {
-			window['wysiwyg_editor'].destroy();
+		if (this.editor) {
+			this.editor.destroy();
 			console.log('destroy');
 		}
 	}
@@ -126,12 +126,6 @@ export function HtmlEditorComponent(props: any): any {
 	console.log('id...');
 	console.log(id);
 	console.log('...id');
-
-	if (window['wysiwyg_editor']) {
-		window['wysiwyg_editor'].destroy();
-		console.log('destroy');
-	}
-
 
 	const modeling = useService('modeling');
 	const translate = useService('translate');
