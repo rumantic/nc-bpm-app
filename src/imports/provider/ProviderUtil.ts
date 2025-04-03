@@ -7,6 +7,8 @@ import 'suneditor/dist/css/suneditor.min.css';
 //import 'suneditor/assets/css/suneditor.css';
 //import 'suneditor/assets/css/suneditor-contents.css';
 import suneditor from 'suneditor';
+import plugins from 'suneditor/src/plugins';
+
 
 // How to import plugins
 import list from 'suneditor/src/plugins/submenu/list';
@@ -21,7 +23,7 @@ import jsxRuntime from '@bpmn-io/properties-panel/preact/jsx-runtime';
 
 // Кастомный элемент!
 class WysiwygEditorElement extends HTMLElement {
-	private editor: any;
+	// private editor: any;
 	private shadowElement: any;
 	private bpm_id: any;
 	private bio_properties_panel_documentation: any;
@@ -58,22 +60,36 @@ class WysiwygEditorElement extends HTMLElement {
 		console.log('bio_properties_panel_documentation');
 		console.log(this.bio_properties_panel_documentation);
 
-		this.editor = suneditor.create('editor-container', {
+		window['wysiwyg_editor'] = suneditor.create('editor-container', {
 			width: '100%',
 			height: '400',
 			minHeight: '400',
-			plugins: [font, video, image, list],
+			plugins: plugins,
 			buttonList: [
-				['font', 'video', 'image', 'list'],
+				['undo', 'redo'],
+				['fullScreen', 'showBlocks', 'codeView'],
+				['font', 'fontSize', 'formatBlock'],
+				['paragraphStyle', 'blockquote'],
+				['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+				['fontColor', 'hiliteColor', 'textStyle'],
+				['removeFormat'],
+				'/', // Line break
+				['outdent', 'indent'],
+				['align', 'horizontalRule', 'list', 'lineHeight'],
+				['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
+				/** ['imageGallery'] */ // You must add the "imageGalleryUrl".
+				['preview', 'print'],
+				['save', 'template'],
+				/** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
 			],
 			lang: lang.ru,
 		});
 
 		// Устанавливаем начальное значение
-		this.editor.setContents(this.bio_properties_panel_documentation.value);
+		window['wysiwyg_editor'].setContents(this.bio_properties_panel_documentation.value);
 
 		// Слушаем изменения и вызываем setValue
-		this.editor.onChange = (content: string) => {
+		window['wysiwyg_editor'].onChange = (content: string) => {
 			this.bio_properties_panel_documentation.value = content;
 			const event = new Event('input', {
 				bubbles: true,
@@ -90,8 +106,8 @@ class WysiwygEditorElement extends HTMLElement {
 	// Очистка и уничтожение редактора при удалении элемента из DOM
 	disconnectedCallback() {
 		console.log('disconnectedCallback');
-		if (this.editor) {
-			this.editor.destroy();
+		if (window['wysiwyg_editor']) {
+			window['wysiwyg_editor'].destroy();
 			console.log('destroy');
 		}
 	}
@@ -110,6 +126,12 @@ export function HtmlEditorComponent(props: any): any {
 	console.log('id...');
 	console.log(id);
 	console.log('...id');
+
+	if (window['wysiwyg_editor']) {
+		window['wysiwyg_editor'].destroy();
+		console.log('destroy');
+	}
+
 
 	const modeling = useService('modeling');
 	const translate = useService('translate');
