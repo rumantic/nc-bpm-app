@@ -91,7 +91,7 @@ class WysiwygEditorElement extends HTMLElement {
 	disconnectedCallback() {
 		console.log('disconnectedCallback');
 		if (this.editor) {
-			//this.editor.remove();
+			this.editor.destroy();
 		}
 	}
 }
