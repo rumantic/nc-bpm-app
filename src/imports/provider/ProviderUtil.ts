@@ -119,12 +119,19 @@ customElements.define('wysiwyg-editor-element', WysiwygEditorElement);
 export function HtmlEditorComponent(props: any): any {
 	const { element, id } = props;
 
+	const myId = 'wysiwyg-editor-id';
+
+	const oldEditor = document.getElementById(myId);
+	if (oldEditor) {
+		oldEditor.remove();
+	}
+
 	console.log('for element...');
 	console.log(element);
 	console.log('...for element');
 
 	console.log('id...');
-	console.log(id);
+	console.log(myId);
 	console.log('...id');
 
 	const modeling = useService('modeling');
@@ -132,11 +139,11 @@ export function HtmlEditorComponent(props: any): any {
 	const moddle = useService('moddle');
 	const debounce = useService('debounceInput');
 
-	const label = props.label ?? id;
+	const label = props.label ?? myId;
 
 	return html`
 		<wysiwyg-editor-element
-	    id=${id}
+	    id=${myId}
 		bpm_id=${element.id}
 	    label=${translate(label)}
 	    debounce=${debounce}
