@@ -77,7 +77,7 @@ export function createGroup(element, translate) {
 	// create a group for properties
 	const group = {
 		id: 'nc',
-		label: translate('Nextcloud properties'),
+		label: translate('Properties'),
 		entries: ncProps(element),
 	};
 
