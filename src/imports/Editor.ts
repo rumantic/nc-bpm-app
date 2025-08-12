@@ -39,6 +39,7 @@ export default abstract class Editor {
 	protected containerElement: JQuery;
 
 	protected hasUnsavedChanges = false;
+	private _poweredByResizeHandler?: () => void;
 
 	private resizeHandler: (() => void)[] = [];
 
@@ -74,20 +75,30 @@ export default abstract class Editor {
 		const poweredBy = document.querySelector('.bjs-powered-by') as HTMLElement;
 		if (poweredBy) {
 			// Проверяем, не добавлен ли уже overlay
-			if (poweredBy.parentElement?.querySelector('.bjs-powered-by-overlay')) return;
+			let overlay = poweredBy.parentElement?.querySelector('.bjs-powered-by-overlay') as HTMLElement;
+			if (!overlay) {
+				overlay = document.createElement('div');
+				overlay.className = 'bjs-powered-by-overlay';
+				overlay.style.position = 'fixed';
+				overlay.style.background = '#fff';
+				overlay.style.pointerEvents = 'none';
+				overlay.style.zIndex = '9999';
+				document.body.appendChild(overlay);
+			}
 
-			const rect = poweredBy.getBoundingClientRect();
-			const overlay = document.createElement('div');
-			overlay.className = 'bjs-powered-by-overlay';
-			overlay.style.position = 'fixed';
-			overlay.style.left = rect.left + 'px';
-			overlay.style.top = rect.top + 'px';
-			overlay.style.width = rect.width + 'px';
-			overlay.style.height = rect.height + 'px';
-			overlay.style.background = '#fff';
-			overlay.style.pointerEvents = 'none';
-			overlay.style.zIndex = '9999';
-			document.body.appendChild(overlay);
+			const updateOverlay = () => {
+				const rect = poweredBy.getBoundingClientRect();
+				overlay.style.left = rect.left + 'px';
+				overlay.style.top = rect.top + 'px';
+				overlay.style.width = rect.width + 'px';
+				overlay.style.height = rect.height + 'px';
+			};
+
+			updateOverlay();
+
+			// Сохраняем ссылку, чтобы можно было удалить обработчик при destroy
+			this._poweredByResizeHandler = updateOverlay;
+			window.addEventListener('resize', updateOverlay);
 		}
 	}
 
@@ -301,6 +312,11 @@ export default abstract class Editor {
 		window.removeEventListener('beforeunload', this.onBeforeUnload);
 		if (parseInt(OC.config.version.substring(0, 2)) >= 28) {
 			window.location.href = OC.generateUrl('/apps/files/?dir=' + this.file.path); //files/dir=path without files_bpm
+		}
+
+		if (this._poweredByResizeHandler) {
+			window.removeEventListener('resize', this._poweredByResizeHandler);
+			this._poweredByResizeHandler = undefined;
 		}
 	}
 
