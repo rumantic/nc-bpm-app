@@ -10,7 +10,7 @@ export default function (element):Array<unknown> {
 		ncProperties.push({
 			id: 'htmlContent',
 			element,
-			label: 'HTML-content',
+			label: 'Описание',
 			component: TextComponent,
 			isEdited: isTextFieldEntryEdited,
 		});
