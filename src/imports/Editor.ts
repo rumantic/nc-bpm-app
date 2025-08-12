@@ -66,7 +66,29 @@ export default abstract class Editor {
 		document.title = this.file.name +' - Nextcloud';
 		await this.runEditor();
 		this.setAppContainerReady();
+		this.overlayPoweredBy();
 		//this.addPropertiesResizeListener();
+	}
+
+	private overlayPoweredBy() {
+		const poweredBy = document.querySelector('.bjs-powered-by') as HTMLElement;
+		if (poweredBy) {
+			// Проверяем, не добавлен ли уже overlay
+			if (poweredBy.parentElement?.querySelector('.bjs-powered-by-overlay')) return;
+
+			const rect = poweredBy.getBoundingClientRect();
+			const overlay = document.createElement('div');
+			overlay.className = 'bjs-powered-by-overlay';
+			overlay.style.position = 'fixed';
+			overlay.style.left = rect.left + 'px';
+			overlay.style.top = rect.top + 'px';
+			overlay.style.width = rect.width + 'px';
+			overlay.style.height = rect.height + 'px';
+			overlay.style.background = '#fff';
+			overlay.style.pointerEvents = 'none';
+			overlay.style.zIndex = '9999';
+			document.body.appendChild(overlay);
+		}
 	}
 
 	private addEditStateToHistory(): void {
